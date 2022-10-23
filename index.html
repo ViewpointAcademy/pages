@@ -1,5 +1,96 @@
 <html>
 
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {font-family: Arial;}
 
+/* Style the tab */
+.tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+  font-size: 17px;
+  width:33.33%;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+  -webkit-animation: fadeEffect 1s;
+  animation: fadeEffect 1s;
+}
+
+/* Fade in tabs */
+@-webkit-keyframes fadeEffect {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+
+@keyframes fadeEffect {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+</style>
+</head>
+<body>
+
+<h3>Fade in Tabs</h3>
+
+<div class="tab">
+  <button class="tablinks" onclick="openCity(event, 'London')">Basic</button>
+  <button class="tablinks" onclick="openCity(event, 'Tokyo')">Advance</button>
+</div>
+
+<div id="London" class="tabcontent">
+  <h3>Basic</h3>
 <div id="zf-widget-root-id"></div> <script type="text/javascript" src='https://js.zohostatic.com/books/zfwidgets/assets/js/zf-widget.js'></script> <script> var pricingTableComponentOptions = { id: 'zf-widget-root-id', product_id: '2-097d3a0dc8e5080752fed5a844388348a3d2dbb01bacca4b66fdcd0e3edacff04eae012ceaea678358bcad6fd428a6fdf4bb5d54eab8dc85cdc51d8ddc5526b9', template: 'elegant', most_popular_plan: '', is_group_by_frequency: false, isFrequencyDropdown: false, isCurrencyDropdown: false, can_show_plan_freq: true, pricebooks: [ { pricebook_id: '2896001000000011001', currency_code: 'USD', currency_symbol: '$', plans: [ { plan_code: 'VID', url: 'https://subscriptions.zoho.com/subscribe/f4bb5d54eab8dc854cbe9f72ce93a778a5e12fff46ccfe5bad482bf477cf719e/VID', recurring_price: '35', recurring_price_formatted: '$35.00', hp_settings_id: '2896001000003247013' }, { plan_code: 'vid-ext-adv', url: 'https://subscriptions.zoho.com/subscribe/f4bb5d54eab8dc854cbe9f72ce93a778a5e12fff46ccfe5bad482bf477cf719e/vid-ext-adv', recurring_price: '65', recurring_price_formatted: '$65.00', hp_settings_id: '2896001000003247013' }, ] }, ], group_options: [ ], plans: [ { plan_code: 'VID', selectedAddons: [ ] }, { plan_code: 'vid-ext-adv', selectedAddons: [ ] }, ], theme: { color: '#5088ED', theme_color_light: ''}, button_text: 'Subscribe', product_url: 'https://subscriptions.zoho.com', price_caption: '', language_code: 'en', open_inSameTab: false }; ZFWidget.init('zf-pricing-table', pricingTableComponentOptions); </script>
-</html>
+</div>
+
+<div id="Tokyo" class="tabcontent">
+  <h3>Advance</h3>
+<div id="zf-widget-root-id"></div> <script type="text/javascript" src='https://js.zohostatic.com/books/zfwidgets/assets/js/zf-widget.js'></script> <script> var pricingTableComponentOptions = { id: 'zf-widget-root-id', product_id: '2-097d3a0dc8e5080752fed5a844388348a3d2dbb01bacca4b66fdcd0e3edacff04eae012ceaea678358bcad6fd428a6fdf4bb5d54eab8dc85cdc51d8ddc5526b9', template: 'elegant', most_popular_plan: '', is_group_by_frequency: false, isFrequencyDropdown: false, isCurrencyDropdown: false, can_show_plan_freq: true, pricebooks: [ { pricebook_id: '2896001000000011001', currency_code: 'USD', currency_symbol: '$', plans: [ { plan_code: 'VID', url: 'https://subscriptions.zoho.com/subscribe/f4bb5d54eab8dc854cbe9f72ce93a778a5e12fff46ccfe5bad482bf477cf719e/VID', recurring_price: '35', recurring_price_formatted: '$35.00', hp_settings_id: '2896001000003247013' }, { plan_code: 'vid-ext-adv', url: 'https://subscriptions.zoho.com/subscribe/f4bb5d54eab8dc854cbe9f72ce93a778a5e12fff46ccfe5bad482bf477cf719e/vid-ext-adv', recurring_price: '65', recurring_price_formatted: '$65.00', hp_settings_id: '2896001000003247013' }, ] }, ], group_options: [ ], plans: [ { plan_code: 'VID', selectedAddons: [ ] }, { plan_code: 'vid-ext-adv', selectedAddons: [ ] }, ], theme: { color: '#5088ED', theme_color_light: ''}, button_text: 'Subscribe', product_url: 'https://subscriptions.zoho.com', price_caption: '', language_code: 'en', open_inSameTab: false }; ZFWidget.init('zf-pricing-table', pricingTableComponentOptions); </script>
+</div>
+
+<script>
+function openCity(evt, cityName) {
+  var i, tabcontent, tablinks;
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+  tablinks = document.getElementsByClassName("tablinks");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+  document.getElementById(cityName).style.display = "block";
+  evt.currentTarget.className += " active";
+}
+</script>
+   
+</body>
+
