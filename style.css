@@ -19,12 +19,14 @@
 	 border-bottom-color: #9b59b6;
 }
  .main-content {
-	 width: 30%;
+	 width: 60%;
+	 min-width: 480px;
 	 margin: auto;
 }
  .layout {
 	 display: grid;
 	 width: 30%;
+	 min-width: 360px;
 	 overflow: hidden;
 	 grid-template-rows: 50px 1fr;
 	 grid-template-columns: 1fr 1fr;
