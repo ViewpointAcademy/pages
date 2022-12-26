@@ -25,7 +25,7 @@
 }
  .layout {
 	 display: grid;
-	 width: 30%;
+	 width: 50%;
 	 min-width: 260px;
 	 overflow: hidden;
 	 grid-template-rows: 50px 1fr;
@@ -52,7 +52,12 @@
  input[type="radio"]:checked + .page + label.nav {
 	 background: #9b59b6;
 	 color: #fff;
-	 padding-left: 20px;
+/* 	 padding-left: 20px; */ /*   for icon effect  */
+   height: 60px;
+    margin-top: -18px;
+   border-radius:5px 5px 0px 0px;
+   box-shadow: rgb(100 100 111 / 70%) 0px 2px 5px -2px;
+
 }
  input[type="radio"]:checked + .page + label.nav span {
 	 padding-left: 20px;
@@ -113,4 +118,5 @@
 	 width: 500px;
 	 margin: 0 auto;
 }
+.bold{font-style:bold}
  
