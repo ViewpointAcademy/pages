@@ -8,73 +8,69 @@ var pricingTableComponentOptionsBasic = { id: 'zf-widget-root-id-basic', product
 var pricingTableComponentOptions = { id: 'zf-widget-root-id', product_id: '2-097d3a0dc8e50807a3d6de534c7d7add992908e4b362f42a297f15e318f099729aede92cabe4edf858bcad6fd428a6fdf4bb5d54eab8dc85cdc51d8ddc5526b9', template: 'elegant', most_popular_plan: '', is_group_by_frequency: false, isFrequencyDropdown: false, isCurrencyDropdown: false, can_show_plan_freq: true, pricebooks: [ { pricebook_id: '2896001000000011001', currency_code: 'USD', currency_symbol: '$', plans: [ { plan_code: 'vid-ext-adv', url: 'https://subscriptions.zoho.com/subscribe/f4bb5d54eab8dc854cbe9f72ce93a778a5e12fff46ccfe5bad482bf477cf719e/vid-ext-adv', recurring_price: '65', recurring_price_formatted: '$65.00', hp_settings_id: '2896001000003247013' }, ] }, ], group_options: [ ], plans: [ { plan_code: 'vid-ext-adv', selectedAddons: [ ] }, ], theme: { color: '#7952b3', theme_color_light: ''}, button_text: 'Subscribe', product_url: 'https://subscriptions.zoho.com', price_caption: '', language_code: 'en', open_inSameTab: false };
 
 
+var pricingTableComponentOptionsView2 = { id: 'zf-widget-root-id-view2', product_id: '2-097d3a0dc8e5080744b6429a91999f93fe51d9f3be20977bbaf22b8faf5bb60795e66c360918bbd558bcad6fd428a6fdf4bb5d54eab8dc85cdc51d8ddc5526b9', template: 'elegant', most_popular_plan: '', is_group_by_frequency: false, isFrequencyDropdown: false, isCurrencyDropdown: false, can_show_plan_freq: true, pricebooks: [ { pricebook_id: '2896001000000011001', currency_code: 'USD', currency_symbol: '$', plans: [ { plan_code: 'revision', url: 'https://subscriptions.zoho.com/subscribe/f4bb5d54eab8dc854cbe9f72ce93a778a5e12fff46ccfe5bad482bf477cf719e/revision', recurring_price: '95', recurring_price_formatted: '$95.00', hp_settings_id: '2896001000003247013' }, ] }, ], group_options: [ ], plans: [ { plan_code: 'revision', selectedAddons: [ ] }, ], theme: { color: '#7952b3', theme_color_light: ''}, button_text: 'Subscribe', product_url: 'https://subscriptions.zoho.com', price_caption: 'Joining a course again after incomplete graduation', language_code: 'en', open_inSameTab: false };
+
 </script> 
 
 <script type="text/javascript" src='https://js.zohostatic.com/books/zfwidgets/assets/js/zf-widget.js'></script> 
 
-<div class="main-content">
-  <h2>
-  Video acess renewal plans
-</h2>
-  
-<p>Based upon the plan you seleceted while signing up for the course, your acess to the videos ay be expiring at some point.</p>
-<p>
-  Use the appropiate subscription plan to extend your video access.
-  Please that your acess has expired or is about to expire so you avoid subscribing for an unncesosary service, if you are unsure about this feel free to contact customer service.
-</p>
-<p>Depending on the specific course you'le need to select a type of course, in general courses are split in tow categories 1. Basic (Which includes Office profesional, Basic computers, and English) and 2. Advance courses such as Software development, IT, Architechture.</p>
-<p>
-  
-  <p>If you already activated a subscription check it out in the <a href="https://pay.viewpointlearn.com/portal/viewpointservices/index#/subscriptions">Subscriptions tab</a><p>
 
-</div>
+<div class="main-content">
+  <h2 >Video access renewal plans</h2>
+  <p >Use the appropriate subscription plan to extend your video access. Please ensure that your access has expired or is about to expire so you avoid subscribing for an unnecessary service, if you are unsure about this feel free to contact customer service.</span></p>
+<p>Depending on the specific course you will need to select a type of course.</p>
+<p>In general courses are split in two categories: <span class="bold">Essential</span>(which includes Office professional, Basic computers, and English) and <span class="bold">Growth </span>(such as Software development, IT, Architecture etc.)</span></p>
+<p >You can manage active subscriptions in the <a href="https://pay.viewpointlearn.com/portal/viewpointservices/index#/subscriptions" target="_blank">Subscriptions tab</a></p>
+<h2><span class="c1">Essential</span></h2><p class="c14"><span class="c4">To extend video access for Essential courses such as Office professional, Basic computers, and English.</span></p>
+<h2>Growth</h2>
+<p>To extend video access for Growth courses such as Software development, IT, Architecture etc.</p>
+<h2>View2</h2>
+<p>To join the View2 program for non-graduating students, learn more about View2 progra</p></div>
 
 
 <link href="https://fonts.googleapis.com/css?family=Work+Sans:400,600,700&display=swap" rel="stylesheet">
+
 <div class="layout">
-  <input name="nav" type="radio" class="nav home-radio" id="home" " onclick="ZFWidget.init('zf-pricing-table', pricingTableComponentOptionsBasic);"/>
+  <input name="nav" type="radio" class="nav home-radio" id="home" onclick="ZFWidget.init('zf-pricing-table', pricingTableComponentOptionsBasic);"/>
   <div class="page home-page">
     <div class="page-contents">
       <h1>Basic</h1>
-      
-<div id="zf-widget-root-id-basic"></div>
-    </div>
-  </div>
-  <label class="nav" for="home">
-    <span>
-      <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-      Basic
-    </span>
-  </label>
+        <div id="zf-widget-root-id-basic"></div>
+         </div>
+     </div>
+      <label class="nav" for="home">
+        <span>
+<!--           <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> -->
+          Basic
+        </span>
+      </label>
 
   <input name="nav" type="radio" class="about-radio" id="about" onclick="ZFWidget.init('zf-pricing-table', pricingTableComponentOptions);"/>
   <div class="page about-page">
     <div class="page-contents">
       <h1>Advance courses</h1>
       <div id="zf-widget-root-id"></div>
-
     </div>
-    
   </div>
   <label class="nav" for="about">
     <span>
     <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12" y2="17"></line></svg>
-      
     Advance courses
       </span>
     </label>
 
-<!--   <input name="nav" type="radio" class="contact-radio" id="contact" />
-  <div class="page contact-page">
+  
+  <input name="nav" type="radio" class="nav view2-radio" id="view2" onclick="ZFWidget.init('zf-pricing-table', pricingTableComponentOptionsView2);"/>
+  <div class="page home-page">
     <div class="page-contents">
-      <h1>Contact</h1>
-    </div>
-  </div>
-  <label class="nav" for="contact">
-    <span>
-    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-    Contact
-      </span>
-    
-  </label> -->
+      <h1>View2</h1>
+        <div id="zf-widget-root-id-view2"></div>
+         </div>
+     </div>
+      <label class="nav" for="view2">
+        <span>
+<!--           <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> -->
+          View2
+        </span>
+      </label>
 </div>
