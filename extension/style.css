@@ -29,7 +29,7 @@
 	 min-width: 260px;
 	 overflow: hidden;
 	 grid-template-rows: 50px 1fr;
-	 grid-template-columns: 1fr 1fr;
+	 grid-template-columns: 1fr 1fr 1fr;
 	 align-items: start;
 	 margin: auto;
 	 padding-top: 30px;
