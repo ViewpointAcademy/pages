@@ -59,9 +59,10 @@
    box-shadow: rgb(100 100 111 / 70%) 0px 2px 5px -2px;
 
 }
- input[type="radio"]:checked + .page + label.nav span {
+/* for svg icon */
+/*  input[type="radio"]:checked + .page + label.nav span {
 	 padding-left: 20px;
-}
+} */
  input[type="radio"]:checked + .page + label.nav svg {
 	 opacity: 1;
 }
