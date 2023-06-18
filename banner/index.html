@@ -29,19 +29,20 @@
 <body>
   <div id="banner">
     <p>Special Ticket Sale! Get your tickets now at discounted prices. Promotion ends on 6/20.</p>
-    <button onclick="resizeIframe();">Resize and Redirect</button>
+    <button onclick="resizeParentWindow();">Resize and Redirect</button>
   </div>
 
   <script>
-    function resizeIframe() {
-      var iframeWidth = window.innerWidth;
-      var iframeHeight = window.innerHeight;
+    function resizeParentWindow() {
+      var parentWindow = window.parent;
 
-      // Adjust the width of the iframe
-      window.parent.document.getElementById('myIframe').style.width = iframeWidth + "px";
+      if (parentWindow !== window.self) {
+        // Adjust the parent window width
+        parentWindow.document.documentElement.style.width = "100%";
 
-      // Redirect the entire window
-      window.parent.location.href = "https://www.techpointsummit.com#/buyTickets?promoCode=Earlybird";
+        // Redirect the parent window
+        parentWindow.location.href = "https://www.techpointsummit.com#/buyTickets?promoCode=Earlybird";
+      }
     }
   </script>
 </body>
