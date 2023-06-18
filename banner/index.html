@@ -3,10 +3,6 @@
 <head>
   <title>Ticket Sale Banner</title>
   <style>
-    body {
-      margin: 0;
-    }
-
     #banner {
       background-color: #3498db;
       padding: 10px;
@@ -29,16 +25,24 @@
       font-size: 16px;
     }
   </style>
-  <script>
-    function redirectToURL() {
-      window.top.location.href = "https://example.com/redirect-page";
-    }
-  </script>
 </head>
 <body>
   <div id="banner">
     <p>Special Ticket Sale! Get your tickets now at discounted prices. Promotion ends on 6/20.</p>
-    <button onclick="redirectToURL()">Redirect Parent</button>
+    <button onclick="resizeIframe();">Resize and Redirect</button>
   </div>
+
+  <script>
+    function resizeIframe() {
+      var iframeWidth = window.innerWidth;
+      var iframeHeight = window.innerHeight;
+
+      // Adjust the width of the iframe
+      window.parent.document.getElementById('myIframe').style.width = iframeWidth + "px";
+
+      // Redirect the entire window
+      window.parent.location.href = "https://example.com/redirect-page";
+    }
+  </script>
 </body>
 </html>
