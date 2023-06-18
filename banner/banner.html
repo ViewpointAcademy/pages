@@ -1,1 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>JavaScript Banner Example</title>
+  <style>
+    #banner {
+      background-color: #f1f1f1;
+      padding: 20px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="banner">
+    <h1>Welcome to our website!</h1>
+    <p>Check out our latest products and offers.</p>
+  </div>
 
+  <script>
+    // JavaScript code to animate the banner
+    var banner = document.getElementById("banner");
+    var interval;
+
+    function startAnimation() {
+      interval = setInterval(function() {
+        banner.style.backgroundColor = getRandomColor();
+      }, 1000);
+    }
+
+    function stopAnimation() {
+      clearInterval(interval);
+      banner.style.backgroundColor = "#f1f1f1";
+    }
+
+    function getRandomColor() {
+      var letters = "0123456789ABCDEF";
+      var color = "#";
+      for (var i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+      }
+      return color;
+    }
+
+    startAnimation();
+  </script>
+</body>
+</html>
