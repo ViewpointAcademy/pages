@@ -73,16 +73,15 @@
             const generatedReview = await generateReview(trade);
             document.getElementById('generatedReview').value = generatedReview;
         });
-
+        
         async function generateReview(trade) {
-            const apiKey = '1003.540138af3e978bceb54509ccfe21f16c.b6fe317bad70037181cfad9cf70d71c7'; // Replace with your actual Zoho API key
-            const response = await fetch(`https://www.zohoapis.com/crm/v2/functions/onlinereviewtext/actions/execute?auth_type=apikey&zapikey=${apiKey}&trade=${trade}`, {
+            const response = await fetch(`https://your-proxy-url.com/api/generate-review?trade=${trade}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
                 }
             });
-
+        
             const data = await response.json();
             return data.details.output; // Assuming Zoho returns the generated review in the 'output'
         }
