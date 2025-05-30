@@ -194,6 +194,30 @@
         }
     });
 </script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Try to get email from URL param first
+    const urlParams = new URLSearchParams(window.location.search);
+    const emailParam = urlParams.get('email');
+
+    // Try to get email from ZB_META if available
+    const portalEmail = window.ZB_META?.contact_details?.contact_person?.email;
+
+    // Choose priority: URL param first, fallback to portal email
+    const emailToUse = emailParam || portalEmail;
+
+    // Pre-fill the form field if available
+    if (emailToUse) {
+        const emailInput = document.getElementById('email');
+        if (emailInput) {
+            emailInput.value = emailToUse;
+            console.log("Pre-filled email:", emailToUse);
+        }
+    } else {
+        console.log("No email found from URL or portal.");
+    }
+});
+</script>
 
 </body>
 </html>
