@@ -2,42 +2,87 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Pay Invoice</title>
     <script src="https://js.stripe.com/v3/"></script>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 16px;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 16px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
         #payment-request-button {
             margin-bottom: 20px;
         }
+
         #card-element {
             padding: 12px;
             border: 1px solid #ccc;
             border-radius: 6px;
             margin-bottom: 20px;
         }
+
         #pay-button {
-            padding: 10px 20px;
+            width: 100%;
+            padding: 14px;
             background: #0070f3;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
+            font-size: 16px;
             cursor: pointer;
+        }
+
+        #pay-button:hover {
+            background: #0059c9;
         }
     </style>
 </head>
 <body>
+
     <h2>Pay Invoice</h2>
+
+    <label for="amount">Amount (USD)</label>
+    <input type="number" id="amount" value="16.70" min="0.01" step="0.01" />
+
     <div id="payment-request-button"></div>
+
     <div id="card-element"></div>
+
     <button id="pay-button">Pay</button>
 
     <script>
         // Replace with your Stripe publishable key
         const stripe = Stripe('pk_live_xxxxxxxxxxxxx');
-
-        const invoiceId = 2896001000023741030; // Set dynamically if needed
-        const amount = 1670; // Amount in cents ($16.70 for example)
-
         const elements = stripe.elements();
+
+        const invoiceId = 2896001000023741030; // Example — you can pass dynamically
+
+        // Helper to get amount in cents
+        function getAmountInCents() {
+            const amountValue = parseFloat(document.getElementById('amount').value);
+            return Math.round(amountValue * 100);
+        }
 
         // --- Setup Payment Request Button ---
         const paymentRequest = stripe.paymentRequest({
@@ -45,7 +90,7 @@
             currency: 'usd',
             total: {
                 label: 'Invoice Payment',
-                amount: amount,
+                amount: getAmountInCents(),
             },
             requestPayerName: true,
             requestPayerEmail: true,
@@ -64,18 +109,27 @@
             }
         });
 
+        // Listen for manual amount change → update PaymentRequest total
+        document.getElementById('amount').addEventListener('input', () => {
+            paymentRequest.update({
+                total: {
+                    label: 'Invoice Payment',
+                    amount: getAmountInCents(),
+                },
+            });
+        });
+
         // Handle PaymentRequestButton payment
         paymentRequest.on('paymentmethod', async function (ev) {
             try {
-                // Call your Zoho Function server endpoint
                 const response = await fetch('https://YOUR_CRM_FUNCTION_URL', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        token: ev.paymentMethod.id, // for PaymentIntent flow, you'd use this differently
-                        amount: amount,
+                        token: ev.paymentMethod.id,
+                        amount: getAmountInCents(),
                         invoiceId: invoiceId,
                     }),
                 });
@@ -87,7 +141,7 @@
                     alert('Payment successful!');
                 } else {
                     ev.complete('fail');
-                    alert('Payment failed: ' + serverResponse.error);
+                    alert('Payment failed: ' + (serverResponse.error || 'Unknown error'));
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -112,7 +166,6 @@
                 return;
             }
 
-            // Call your Zoho Function server endpoint
             try {
                 const response = await fetch('https://YOUR_CRM_FUNCTION_URL', {
                     method: 'POST',
@@ -121,7 +174,7 @@
                     },
                     body: JSON.stringify({
                         token: paymentMethod.id,
-                        amount: amount,
+                        amount: getAmountInCents(),
                         invoiceId: invoiceId,
                     }),
                 });
@@ -131,7 +184,7 @@
                 if (serverResponse.success) {
                     alert('Payment successful!');
                 } else {
-                    alert('Payment failed: ' + serverResponse.error);
+                    alert('Payment failed: ' + (serverResponse.error || 'Unknown error'));
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -139,5 +192,6 @@
             }
         });
     </script>
+
 </body>
 </html>
