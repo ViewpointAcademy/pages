@@ -12,17 +12,8 @@
             max-width: 480px;
             margin: 0 auto;
         }
-
-        h2 {
-            text-align: center;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: bold;
-        }
-
+        h2 { text-align: center; }
+        label { display: block; margin-bottom: 6px; font-weight: bold; }
         input[type="number"] {
             width: 100%;
             padding: 10px;
@@ -30,18 +21,13 @@
             font-size: 16px;
             box-sizing: border-box;
         }
-
-        #payment-request-button {
-            margin-bottom: 20px;
-        }
-
+        #payment-request-button { margin-bottom: 20px; }
         #card-element {
             padding: 12px;
             border: 1px solid #ccc;
             border-radius: 6px;
             margin-bottom: 20px;
         }
-
         #pay-button {
             width: 100%;
             padding: 14px;
@@ -52,110 +38,110 @@
             font-size: 16px;
             cursor: pointer;
         }
-
-        #pay-button:hover {
-            background: #0059c9;
-        }
+        #pay-button:hover { background: #0059c9; }
     </style>
 </head>
 <body>
 
-    <h2>Pay Invoice</h2>
+<h2>Pay Invoice</h2>
 
-    <label for="amount">Amount (USD)</label>
-    <input type="number" id="amount" value="16.70" min="0.01" step="0.01" />
+<label for="amount">Amount (USD)</label>
+<input type="number" id="amount" value="16.70" min="0.01" step="0.01" />
 
-    <div id="payment-request-button"></div>
+<div id="payment-request-button"></div>
 
-    <div id="card-element"></div>
+<div id="card-element"></div>
 
-    <button id="pay-button">Pay</button>
+<button id="pay-button">Pay</button>
 
-    <script>
-        // Replace with your Stripe publishable key
-        const stripe = Stripe('pk_live_xxxxxxxxxxxxx');
-        const elements = stripe.elements();
+<script>
+    const stripe = Stripe('pk_live_xxxxxxxxxxx');
+    const elements = stripe.elements();
 
-        const invoiceId = 2896001000023741030; // Example — you can pass dynamically
+    const invoiceId = 2896001000023741030;
+    const stripeCustomerId = 'cus_xxxxxxxxx'; // You pass this from CRM
 
-        // Helper to get amount in cents
-        function getAmountInCents() {
-            const amountValue = parseFloat(document.getElementById('amount').value);
-            return Math.round(amountValue * 100);
+    function getAmountInCents() {
+        const amountValue = parseFloat(document.getElementById('amount').value);
+        return Math.round(amountValue * 100);
+    }
+
+    // --- Setup Payment Request Button ---
+    const paymentRequest = stripe.paymentRequest({
+        country: 'US',
+        currency: 'usd',
+        total: {
+            label: 'Invoice Payment',
+            amount: getAmountInCents(),
+        },
+        requestPayerName: true,
+        requestPayerEmail: true,
+    });
+
+    const prButton = elements.create('paymentRequestButton', {
+        paymentRequest: paymentRequest,
+    });
+
+    paymentRequest.canMakePayment().then(function (result) {
+        if (result) {
+            prButton.mount('#payment-request-button');
+        } else {
+            document.getElementById('payment-request-button').style.display = 'none';
         }
+    });
 
-        // --- Setup Payment Request Button ---
-        const paymentRequest = stripe.paymentRequest({
-            country: 'US',
-            currency: 'usd',
+    // Update PaymentRequest total if amount is edited
+    document.getElementById('amount').addEventListener('input', () => {
+        paymentRequest.update({
             total: {
                 label: 'Invoice Payment',
                 amount: getAmountInCents(),
             },
-            requestPayerName: true,
-            requestPayerEmail: true,
         });
+    });
 
-        const prButton = elements.create('paymentRequestButton', {
-            paymentRequest: paymentRequest,
-        });
-
-        // Check availability of the Payment Request API first
-        paymentRequest.canMakePayment().then(function (result) {
-            if (result) {
-                prButton.mount('#payment-request-button');
-            } else {
-                document.getElementById('payment-request-button').style.display = 'none';
-            }
-        });
-
-        // Listen for manual amount change → update PaymentRequest total
-        document.getElementById('amount').addEventListener('input', () => {
-            paymentRequest.update({
-                total: {
-                    label: 'Invoice Payment',
+    // PaymentRequestButton payment
+    paymentRequest.on('paymentmethod', async function (ev) {
+        try {
+            // 1️⃣ Create PaymentIntent on your server
+            const intentResponse = await fetch('https://YOUR_CRM_FUNCTION_URL', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
                     amount: getAmountInCents(),
-                },
+                    invoiceId: invoiceId,
+                    stripeCustomerId: stripeCustomerId,
+                }),
             });
-        });
 
-        // Handle PaymentRequestButton payment
-        paymentRequest.on('paymentmethod', async function (ev) {
-            try {
-                const response = await fetch('https://YOUR_CRM_FUNCTION_URL', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        token: ev.paymentMethod.id,
-                        amount: getAmountInCents(),
-                        invoiceId: invoiceId,
-                    }),
-                });
+            const intent = await intentResponse.json();
+            console.log('PaymentIntent:', intent);
 
-                const serverResponse = await response.json();
+            // 2️⃣ Confirm the PaymentIntent client-side
+            const result = await stripe.confirmCardPayment(intent.client_secret, {
+                payment_method: ev.paymentMethod.id
+            });
 
-                if (serverResponse.success) {
-                    ev.complete('success');
-                    alert('Payment successful!');
-                } else {
-                    ev.complete('fail');
-                    alert('Payment failed: ' + (serverResponse.error || 'Unknown error'));
-                }
-            } catch (error) {
-                console.error('Error:', error);
+            if (result.error) {
                 ev.complete('fail');
-                alert('Payment failed: ' + error.message);
+                alert('Payment failed: ' + result.error.message);
+            } else {
+                ev.complete('success');
+                alert('Payment successful!');
             }
-        });
+        } catch (error) {
+            console.error(error);
+            ev.complete('fail');
+            alert('Error: ' + error.message);
+        }
+    });
 
-        // --- Setup Card Element (fallback) ---
-        const card = elements.create('card');
-        card.mount('#card-element');
+    // --- Fallback Card Element ---
+    const card = elements.create('card');
+    card.mount('#card-element');
 
-        // Handle Card Form Submit
-        document.getElementById('pay-button').addEventListener('click', async function () {
+    document.getElementById('pay-button').addEventListener('click', async function () {
+        try {
             const { paymentMethod, error } = await stripe.createPaymentMethod({
                 type: 'card',
                 card: card,
@@ -166,32 +152,36 @@
                 return;
             }
 
-            try {
-                const response = await fetch('https://YOUR_CRM_FUNCTION_URL', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        token: paymentMethod.id,
-                        amount: getAmountInCents(),
-                        invoiceId: invoiceId,
-                    }),
-                });
+            // 1️⃣ Create PaymentIntent
+            const intentResponse = await fetch('https://YOUR_CRM_FUNCTION_URL', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    amount: getAmountInCents(),
+                    invoiceId: invoiceId,
+                    stripeCustomerId: stripeCustomerId,
+                }),
+            });
 
-                const serverResponse = await response.json();
+            const intent = await intentResponse.json();
+            console.log('PaymentIntent:', intent);
 
-                if (serverResponse.success) {
-                    alert('Payment successful!');
-                } else {
-                    alert('Payment failed: ' + (serverResponse.error || 'Unknown error'));
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Payment failed: ' + error.message);
+            // 2️⃣ Confirm PaymentIntent with card
+            const result = await stripe.confirmCardPayment(intent.client_secret, {
+                payment_method: paymentMethod.id
+            });
+
+            if (result.error) {
+                alert('Payment failed: ' + result.error.message);
+            } else {
+                alert('Payment successful!');
             }
-        });
-    </script>
+        } catch (error) {
+            console.error(error);
+            alert('Error: ' + error.message);
+        }
+    });
+</script>
 
 </body>
 </html>
