@@ -193,36 +193,36 @@
             alert('Error: ' + error.message);
         }
     });
-</script>
-<script>
-        console.log(window.ZB_META);
-        console.log("OK");
 
-    console.log(window.ZB_META?.contact_details?.contact_person?.email);
-
-document.addEventListener("DOMContentLoaded", function() {
-    // Try to get email from URL param first
+    // --- Prefill from URL params ---
+function getQueryParam(param) {
     const urlParams = new URLSearchParams(window.location.search);
-    const emailParam = urlParams.get('email');
+    return urlParams.get(param);
+}
 
-    // Try to get email from ZB_META if available
-    const portalEmail = window.ZB_META?.contact_details?.contact_person?.email;
+window.addEventListener('DOMContentLoaded', () => {
+    const amountParam = getQueryParam('amount');
+    const emailParam = getQueryParam('email');
 
-    // Choose priority: URL param first, fallback to portal email
-    const emailToUse = emailParam || portalEmail;
-
-    // Pre-fill the form field if available
-    if (emailToUse) {
-        const emailInput = document.getElementById('email');
-        if (emailInput) {
-            emailInput.value = emailToUse;
-            console.log("Pre-filled email:", emailToUse);
-        }
-    } else {
-        console.log("No email found from URL or portal.");
+    if (amountParam) {
+        document.getElementById('amount').value = parseFloat(amountParam).toFixed(2);
     }
+
+    if (emailParam) {
+        document.getElementById('email').value = emailParam;
+    }
+
+    // Optional: trigger update of PaymentRequest total
+    paymentRequest.update({
+        total: {
+            label: 'Invoice Payment',
+            amount: getAmountInCents(),
+        },
+    });
 });
+
 </script>
+
 
 </body>
 </html>
