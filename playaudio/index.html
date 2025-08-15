@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Play Recording</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 40px;
+        }
+        audio {
+            width: 100%;
+            max-width: 600px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Call Recording</h2>
+    <audio id="player" controls>
+        Your browser does not support the audio element.
+    </audio>
+
+    <script>
+        // Get URL parameter
+        const params = new URLSearchParams(window.location.search);
+        const audioUrl = params.get('url');
+
+        if (audioUrl) {
+            document.getElementById('player').src = audioUrl;
+        } else {
+            document.body.innerHTML = "<p style='color:red;'>No audio URL provided.</p>";
+        }
+    </script>
+</body>
+</html>
