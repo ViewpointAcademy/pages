@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Subscriptions — Child Widget</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font:16px/1.4 system-ui, Segoe UI, Roboto, Arial; margin:0; padding:24px; }
+    #root { max-width: 760px; margin: 0 auto; }
+    .test-wrap { position: relative; }
+    .test-back { position:absolute; top:10px; left:10px; z-index:2; padding:6px 10px; border:0; border-radius:6px; background:#111; color:#fff; cursor:pointer; }
+    .test-frame { width:100%; height:720px; border:0; border-radius:8px; }
+  </style>
+</head>
+<body>
+  <div id="root">
+    <h2>Inner frame: Zoho pricing widget</h2>
+    <p>Click Subscribe. This child page will swap only the widget area below into an embedded page.</p>
+    <div id="zf-widget-root-id-basic"></div>
+  </div>
+
+  <!-- Zoho widget script -->
+  <script src="https://js.zohostatic.com/books/zfwidgets/assets/js/zf-widget.js"></script>
+
+  <script>
+    // Your exact single-widget config
+    var pricingTableComponentOptionsBasic = {
+      id: 'zf-widget-root-id-basic',
+      product_id: '2-097d3a0dc8e5080752fed5a844388348a3d2dbb01bacca4b7d360e7ff89611e2ecae7e723a8c58a158bcad6fd428a6fdf4bb5d54eab8dc85cdc51d8ddc5526b9',
+      template: 'elegant',
+      is_group_by_frequency: false,
+      isFrequencyDropdown: false,
+      isCurrencyDropdown: false,
+      can_show_plan_freq: true,
+      pricebooks: [{
+        pricebook_id: '2896001000000011001',
+        currency_code: 'USD',
+        currency_symbol: '$',
+        plans: [{
+          plan_code: 'VID',
+          url: 'https://subscriptions.zoho.com/subscribe/f4bb5d54eab8dc854cbe9f72ce93a778a5e12fff46ccfe5bad482bf477cf719e/VID',
+          recurring_price: '35',
+          recurring_price_formatted: '$35.00',
+          hp_settings_id: '2896001000003247013'
+        }]
+      }],
+      group_options: [],
+      plans: [{ plan_code: 'VID', selectedAddons: [] }],
+      theme: { color: '#7952b3', theme_color_light: '' },
+      button_text: 'Subscribe',
+      product_url: 'https://subscriptions.zoho.com',
+      price_caption: '',
+      language_code: 'en',
+      open_inSameTab: true
+    };
+
+    // Dummy embeddable page for testing (no frame-busting, no redirects)
+    var TEST_CHECKOUT_URL = 'data:text/html;charset=utf-8,' + encodeURIComponent(`
+      <!doctype html><html><head><meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <title>Inline Swap OK</title>
+      <style>
+        body{font:16px/1.4 system-ui;margin:0;padding:24px;background:#fafafa;color:#111}
+        .card{max-width:720px;margin:40px auto;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.07);padding:24px}
+        .btn{padding:12px 16px;border:0;border-radius:8px;background:#3057A4;color:#fff;cursor:pointer}
+      </style></head><body>
+        <div class="card">
+          <h1>Inline swap worked ✅</h1>
+          <p>This replaced only the widget section. Your parent page never navigated.</p>
+          <button class="btn" onclick="alert('Fake payment. This is just a test.')">Fake Pay</button>
+        </div>
+      </body></html>
+    `);
+
+    var HPP_PREFIX = 'https://subscriptions.zoho.com/subscribe/';
+
+    function initWidget(){
+      if (window.ZFWidget && typeof ZFWidget.init === 'function') {
+        ZFWidget.init('zf-pricing-table', pricingTableComponentOptionsBasic);
+      } else {
+        console.error('ZFWidget not available.');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function(){
+      initWidget();
+
+      var root = document.getElementById('zf-widget-root-id-basic');
+      var originalHTML = '';
+      // grab original after Zoho hydrates
+      setTimeout(function(){ originalHTML = root.innerHTML; }, 300);
+
+      // capture-phase: beat any default navigation
+      root.addEventListener('click', function(e){
+        var a = e.target && e.target.closest && e.target.closest('a[href]');
+        if (!a) return;
+        var href = a.href || '';
+        if (href.indexOf(HPP_PREFIX) !== 0) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Replace ONLY this widget area with the dummy iframe
+        root.innerHTML =
+          '<div class="test-wrap">' +
+            '<button type="button" class="test-back">← Back to plans</button>' +
+            '<iframe class="test-frame" title="Test Checkout" ' +
+              'sandbox="allow-forms allow-scripts allow-same-origin allow-popups" ' +
+              'referrerpolicy="no-referrer" src="'+ TEST_CHECKOUT_URL +'"></iframe>' +
+          '</div>';
+
+        // Back restores widget and re-binds interception
+        root.querySelector('.test-back').addEventListener('click', function(){
+          root.innerHTML = originalHTML;
+          initWidget();
+          setTimeout(function(){
+            // listener is on root in capture, nothing extra
+          }, 120);
+        }, { once: true });
+      }, true);
+    });
+  </script>
+</body>
+</html>
