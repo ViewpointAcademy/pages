@@ -5,25 +5,25 @@
   <title>Subscriptions — Child Widget</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body { font:16px/1.4 system-ui, Segoe UI, Roboto, Arial; margin:0; padding:24px; }
+    html, body { margin:0; padding:0; }
+    body { font:16px/1.4 system-ui, Segoe UI, Roboto, Arial; padding:24px; background:#fff; }
     #root { max-width: 760px; margin: 0 auto; }
     .test-wrap { position: relative; }
-    .test-back { position:absolute; top:10px; left:10px; z-index:2; padding:6px 10px; border:0; border-radius:6px; background:#111; color:#fff; cursor:pointer; }
+    .test-back { position:absolute; top:10px; left:10px; z-index:2;
+                 padding:6px 10px; border:0; border-radius:6px; background:#111; color:#fff; cursor:pointer; }
     .test-frame { width:100%; height:720px; border:0; border-radius:8px; }
   </style>
 </head>
 <body>
   <div id="root">
     <h2>Inner frame: Zoho pricing widget</h2>
-    <p>Click Subscribe. This child page will swap only the widget area below into an embedded page.</p>
+    <p>Click Subscribe. This page will swap only the widget area below into an embedded page.</p>
     <div id="zf-widget-root-id-basic"></div>
   </div>
 
-  <!-- Zoho widget script -->
   <script src="https://js.zohostatic.com/books/zfwidgets/assets/js/zf-widget.js"></script>
-
   <script>
-    // Your exact single-widget config
+    // --- Config (your actual plan) ---
     var pricingTableComponentOptionsBasic = {
       id: 'zf-widget-root-id-basic',
       product_id: '2-097d3a0dc8e5080752fed5a844388348a3d2dbb01bacca4b7d360e7ff89611e2ecae7e723a8c58a158bcad6fd428a6fdf4bb5d54eab8dc85cdc51d8ddc5526b9',
@@ -54,53 +54,66 @@
       open_inSameTab: true
     };
 
-    // Dummy embeddable page for testing (no frame-busting, no redirects)
+    // Dummy page to prove the swap (always embeddable)
     var TEST_CHECKOUT_URL = 'data:text/html;charset=utf-8,' + encodeURIComponent(`
-      <!doctype html><html><head><meta charset="utf-8">
-      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
       <title>Inline Swap OK</title>
-      <style>
-        body{font:16px/1.4 system-ui;margin:0;padding:24px;background:#fafafa;color:#111}
-        .card{max-width:720px;margin:40px auto;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.07);padding:24px}
-        .btn{padding:12px 16px;border:0;border-radius:8px;background:#3057A4;color:#fff;cursor:pointer}
-      </style></head><body>
-        <div class="card">
-          <h1>Inline swap worked ✅</h1>
-          <p>This replaced only the widget section. Your parent page never navigated.</p>
-          <button class="btn" onclick="alert('Fake payment. This is just a test.')">Fake Pay</button>
-        </div>
-      </body></html>
+      <style>body{font:16px/1.4 system-ui;margin:0;padding:24px;background:#fafafa;color:#111}
+      .card{max-width:720px;margin:40px auto;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.07);padding:24px}
+      .btn{padding:12px 16px;border:0;border-radius:8px;background:#3057A4;color:#fff;cursor:pointer}</style>
+      <div class="card"><h1>Inline swap worked ✅</h1><p>This replaced only the widget section.</p>
+      <button class="btn" onclick="alert('Fake payment. Test iframe.')">Fake Pay</button></div>
     `);
 
-    var HPP_PREFIX = 'https://subscriptions.zoho.com/subscribe/';
-
-    function initWidget(){
-      if (window.ZFWidget && typeof ZFWidget.init === 'function') {
-        ZFWidget.init('zf-pricing-table', pricingTableComponentOptionsBasic);
-      } else {
-        console.error('ZFWidget not available.');
-      }
+    // Report height to parent so it resizes the iframe (kills inner scrollbar)
+    function sendHeight(){
+      var h = Math.max(
+        document.documentElement.scrollHeight,
+        document.body.scrollHeight
+      );
+      parent.postMessage({ kind: 'childHeight', h: h }, '*');
     }
+    new ResizeObserver(sendHeight).observe(document.documentElement);
+    window.addEventListener('load', sendHeight);
+    setInterval(sendHeight, 800); // belt-and-suspenders for async widget layout
 
-    document.addEventListener('DOMContentLoaded', function(){
-      initWidget();
+    // Init widget
+    function initWidget(){ ZFWidget.init('zf-pricing-table', pricingTableComponentOptionsBasic); }
+    document.addEventListener('DOMContentLoaded', initWidget);
 
+    // Robust interception:
+    //  - Wait for widget DOM with MutationObserver
+    //  - Intercept pointerdown/click/keydown (Enter/Space)
+    //  - Match anchors, buttons, or role=button
+    (function wire(){
       var root = document.getElementById('zf-widget-root-id-basic');
-      var originalHTML = '';
-      // grab original after Zoho hydrates
-      setTimeout(function(){ originalHTML = root.innerHTML; }, 300);
+      var originalHTML;
 
-      // capture-phase: beat any default navigation
-      root.addEventListener('click', function(e){
-        var a = e.target && e.target.closest && e.target.closest('a[href]');
-        if (!a) return;
-        var href = a.href || '';
-        if (href.indexOf(HPP_PREFIX) !== 0) return;
+      function arm() {
+        if (!originalHTML) originalHTML = root.innerHTML;
+        ['pointerdown','click','keydown'].forEach(function(type){
+          root.addEventListener(type, handler, true); // capture, we go first
+        });
+      }
+
+      function handler(e){
+        // Space/Enter on focused button
+        if (e.type === 'keydown' && !(e.key === 'Enter' || e.key === ' ')) return;
+
+        var btn = e.target.closest && e.target.closest('a[href], button, [role="button"]');
+        if (!btn) return;
+
+        // Be permissive: if it *looks* like the plan button, swap for test
+        var isPlanAction =
+          (btn.tagName === 'A' && btn.href && btn.href.indexOf('https://subscriptions.zoho.com/subscribe/') === 0) ||
+          /subscribe|enroll/i.test(btn.textContent || '');
+
+        if (!isPlanAction) return;
 
         e.preventDefault();
         e.stopPropagation();
+        if (e.stopImmediatePropagation) e.stopImmediatePropagation();
 
-        // Replace ONLY this widget area with the dummy iframe
         root.innerHTML =
           '<div class="test-wrap">' +
             '<button type="button" class="test-back">← Back to plans</button>' +
@@ -109,16 +122,24 @@
               'referrerpolicy="no-referrer" src="'+ TEST_CHECKOUT_URL +'"></iframe>' +
           '</div>';
 
-        // Back restores widget and re-binds interception
+        // Back restores and re-arms
         root.querySelector('.test-back').addEventListener('click', function(){
           root.innerHTML = originalHTML;
           initWidget();
-          setTimeout(function(){
-            // listener is on root in capture, nothing extra
-          }, 120);
+          setTimeout(function(){ wire(); sendHeight(); }, 150);
         }, { once: true });
-      }, true);
-    });
+
+        sendHeight();
+      }
+
+      // MutationObserver to arm after Zoho hydrates dynamic DOM
+      new MutationObserver(function(){
+        try { arm(); sendHeight(); } catch(_) {}
+      }).observe(root, { childList: true, subtree: true });
+
+      // also arm once in case content is already there
+      setTimeout(function(){ arm(); sendHeight(); }, 250);
+    })();
   </script>
 </body>
 </html>
