@@ -55,91 +55,115 @@
     };
 
     // Dummy page to prove the swap (always embeddable)
-    var TEST_CHECKOUT_URL = 'data:text/html;charset=utf-8,' + encodeURIComponent(`
-      <!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-      <title>Inline Swap OK</title>
-      <style>body{font:16px/1.4 system-ui;margin:0;padding:24px;background:#fafafa;color:#111}
-      .card{max-width:720px;margin:40px auto;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.07);padding:24px}
-      .btn{padding:12px 16px;border:0;border-radius:8px;background:#3057A4;color:#fff;cursor:pointer}</style>
-      <div class="card"><h1>Inline swap worked ✅</h1><p>This replaced only the widget section.</p>
-      <button class="btn" onclick="alert('Fake payment. Test iframe.')">Fake Pay</button></div>
-    `);
+     var TEST_CHECKOUT_URL = 'data:text/html;charset=utf-8,' + encodeURIComponent(`
+    <!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Inline Swap OK</title>
+    <style>body{font:16px/1.4 system-ui;margin:0;padding:24px;background:#fafafa;color:#111}
+    .card{max-width:720px;margin:40px auto;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.07);padding:24px}
+    .btn{padding:12px 16px;border:0;border-radius:8px;background:#3057A4;color:#fff;cursor:pointer}</style>
+    <div class="card"><h1>Inline swap worked ✅</h1><p>This replaced only the widget section.</p>
+    <button class="btn" onclick="alert('Fake payment. Test iframe.')">Fake Pay</button></div>
+  `);
 
-    // Report height to parent so it resizes the iframe (kills inner scrollbar)
-    function sendHeight(){
-      var h = Math.max(
-        document.documentElement.scrollHeight,
-        document.body.scrollHeight
-      );
-      parent.postMessage({ kind: 'childHeight', h: h }, '*');
+  // Resize reporter to parent (kills inner scrollbar)
+  function sendHeight(){
+    var h = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+    parent.postMessage({kind:'childHeight', h}, '*');
+  }
+  new ResizeObserver(sendHeight).observe(document.documentElement);
+  window.addEventListener('load', sendHeight);
+  setInterval(sendHeight, 800);
+
+  // Init widget
+  function initWidget(){
+    ZFWidget.init('zf-pricing-table', pricingTableComponentOptionsBasic);
+  }
+  document.addEventListener('DOMContentLoaded', initWidget);
+
+  // BRUTAL, RELIABLE WIRING
+  (function wireAfterHydration(){
+    var root = document.getElementById('zf-widget-root-id-basic');
+    var originalHTML;
+
+    // Wait until the pricing card exists
+    function waitForCard(cb){
+      var tries = 0;
+      var iv = setInterval(function(){
+        // card-ish content shows up under the root when hydrated
+        if (root && root.querySelector('*')) {
+          clearInterval(iv);
+          cb();
+        }
+        if (++tries > 40) clearInterval(iv); // 40 * 125ms ~ 5s timeout
+      }, 125);
     }
-    new ResizeObserver(sendHeight).observe(document.documentElement);
-    window.addEventListener('load', sendHeight);
-    setInterval(sendHeight, 800); // belt-and-suspenders for async widget layout
 
-    // Init widget
-    function initWidget(){ ZFWidget.init('zf-pricing-table', pricingTableComponentOptionsBasic); }
-    document.addEventListener('DOMContentLoaded', initWidget);
+    function findActionCandidates(){
+      // 1) Anything with a Zoho subscribe href
+      var list = Array.from(root.querySelectorAll('a[href*="https://subscriptions.zoho.com/subscribe/"]'));
+      // 2) Buttons or role=button with subscribe/enroll text
+      list = list.concat(Array.from(root.querySelectorAll('button,[role="button"]'))
+        .filter(el => /subscribe|enroll/i.test(el.textContent || '')));
 
-    // Robust interception:
-    //  - Wait for widget DOM with MutationObserver
-    //  - Intercept pointerdown/click/keydown (Enter/Space)
-    //  - Match anchors, buttons, or role=button
-    (function wire(){
-      var root = document.getElementById('zf-widget-root-id-basic');
-      var originalHTML;
+      // dedupe
+      return Array.from(new Set(list));
+    }
 
-      function arm() {
-        if (!originalHTML) originalHTML = root.innerHTML;
-        ['pointerdown','click','keydown'].forEach(function(type){
-          root.addEventListener(type, handler, true); // capture, we go first
-        });
-      }
+    function swapSection(){
+      // Save original once
+      if (!originalHTML) originalHTML = root.innerHTML;
 
-      function handler(e){
-        // Space/Enter on focused button
-        if (e.type === 'keydown' && !(e.key === 'Enter' || e.key === ' ')) return;
+      root.innerHTML =
+        '<div class="test-wrap">' +
+          '<button type="button" class="test-back">← Back to plans</button>' +
+          '<iframe class="test-frame" title="Test Checkout" ' +
+            'sandbox="allow-forms allow-scripts allow-same-origin allow-popups" ' +
+            'referrerpolicy="no-referrer" src="'+ TEST_CHECKOUT_URL +'"></iframe>' +
+        '</div>';
 
-        var btn = e.target.closest && e.target.closest('a[href], button, [role="button"]');
-        if (!btn) return;
-
-        // Be permissive: if it *looks* like the plan button, swap for test
-        var isPlanAction =
-          (btn.tagName === 'A' && btn.href && btn.href.indexOf('https://subscriptions.zoho.com/subscribe/') === 0) ||
-          /subscribe|enroll/i.test(btn.textContent || '');
-
-        if (!isPlanAction) return;
-
-        e.preventDefault();
-        e.stopPropagation();
-        if (e.stopImmediatePropagation) e.stopImmediatePropagation();
-
-        root.innerHTML =
-          '<div class="test-wrap">' +
-            '<button type="button" class="test-back">← Back to plans</button>' +
-            '<iframe class="test-frame" title="Test Checkout" ' +
-              'sandbox="allow-forms allow-scripts allow-same-origin allow-popups" ' +
-              'referrerpolicy="no-referrer" src="'+ TEST_CHECKOUT_URL +'"></iframe>' +
-          '</div>';
-
-        // Back restores and re-arms
-        root.querySelector('.test-back').addEventListener('click', function(){
-          root.innerHTML = originalHTML;
-          initWidget();
-          setTimeout(function(){ wire(); sendHeight(); }, 150);
-        }, { once: true });
-
+      root.querySelector('.test-back').addEventListener('click', function(){
+        root.innerHTML = originalHTML;
+        initWidget();
+        // re-arm after Zoho re-hydrates
+        setTimeout(wireAfterHydration, 180);
         sendHeight();
+      }, { once:true });
+
+      sendHeight();
+    }
+
+    function armHandlers(){
+      var targets = findActionCandidates();
+      if (!targets.length) {
+        // If Zoho re-renders later, observe and re-arm
+        new MutationObserver(function(){
+          var again = findActionCandidates();
+          if (again.length) { armHandlers(); }
+        }).observe(root, { childList:true, subtree:true });
+        return;
       }
 
-      // MutationObserver to arm after Zoho hydrates dynamic DOM
-      new MutationObserver(function(){
-        try { arm(); sendHeight(); } catch(_) {}
-      }).observe(root, { childList: true, subtree: true });
+      // Attach capture-phase blockers on each candidate
+      targets.forEach(function(btn){
+        // Remove previous handlers by cloning (cheap reset)
+        var clone = btn.cloneNode(true);
+        btn.replaceWith(clone);
 
-      // also arm once in case content is already there
-      setTimeout(function(){ arm(); sendHeight(); }, 250);
-    })();
+        ['pointerdown','click','keydown'].forEach(function(type){
+          clone.addEventListener(type, function(e){
+            if (type === 'keydown' && !(e.key === 'Enter' || e.key === ' ')) return;
+            e.preventDefault();
+            e.stopPropagation();
+            if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+            swapSection();
+          }, true); // capture
+        });
+      });
+    }
+
+    waitForCard(armHandlers);
+  })();
+
   </script>
 </body>
 </html>
