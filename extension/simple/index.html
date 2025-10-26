@@ -29,64 +29,40 @@
 </head>
 <body>
 
-  <h1>Video Access Renewal</h1>
+  <h1>Video Access Renewal 1.1</h1>
 
-  <div id="widget-section">
-    <!-- Zoho Digest Embed -->
-    <div 
-      id="zf-widget-root-id-247bfiiob"
-      data-pricing-table="true"
-      data-digest="2-097d3a0dc8e50807e6288c801c1d235ed70db5096352e669636a34db879d61f8ea3e88769d72c2a3b737c2b253195bdff4bb5d54eab8dc85cdc51d8ddc5526b9" 
-      data-product_url="https://billing.zoho.com">
-    </div>
+<div id="zf-widget-root-id-basic"></div>
+<script src="https://js.zohostatic.com/books/zfwidgets/assets/js/zf-widget.js"></script>
+<script>
+  const email = new URLSearchParams(location.search).get('email') || '';
 
-    <script src="https://js.zohostatic.com/books/zfwidgets/assets/js/zf-widget.js"></script>
+  const pricingTableComponentOptionsBasic = {
+    id: 'zf-widget-root-id-basic',
+    product_id: '2-097d3a0dc8e5080752fed5a844388348a3d2dbb01bacca4b7d360e7ff89611e2ecae7e723a8c58a158bcad6fd428a6fdf4bb5d54eab8dc85cdc51d8ddc5526b9',
+    template: 'elegant',
+    pricebooks: [{
+      pricebook_id: '2896001000000011001',
+      currency_code: 'USD',
+      currency_symbol: '$',
+      plans: [{
+        plan_code: 'vid-ext-adv',
+        url: 'https://billing.zohosecure.com/subscribe/f4bb5d54eab8dc854cbe9f72ce93a778a5e12fff46ccfe5bad482bf477cf719e/vid-ext-adv'
+             + (email ? ('?email=' + encodeURIComponent(email)) : ''),
+        recurring_price: '65',
+        recurring_price_formatted: '$65.00',
+        hp_settings_id: '2896001000003247013'
+      }]
+    }],
+    plans: [{ plan_code: 'vid-ext-adv', selectedAddons: [] }],
+    language_code: 'en',
+    open_inSameTab: true
+  };
 
-    <script>
-      // read email param from URL
-      const EMAIL = new URLSearchParams(location.search).get("email") || "";
-      const ROOT_ID = "zf-widget-root-id-247bfiiob";
+  document.addEventListener('DOMContentLoaded', () => {
+    ZFWidget.init('zf-pricing-table', pricingTableComponentOptionsBasic);
+  });
+</script>
 
-      function patchLinks(root) {
-        if (!EMAIL) return;
-        // catch all Zoho hosted payment domains
-        const selector = [
-          'a[href^="https://billing.zohosecure.com/subscribe/"]',
-          'a[href^="https://billing.zoho.com/subscribe/"]',
-          'a[href^="https://subscriptions.zoho.com/subscribe/"]'
-        ].join(',');
-
-        root.querySelectorAll(selector).forEach(a => {
-          try {
-            const u = new URL(a.href);
-            u.searchParams.set("email", EMAIL);
-            a.href = u.toString();
-          } catch (err) {
-            console.warn("Could not update link", a.href);
-          }
-        });
-      }
-
-      function armWidgetPatcher() {
-        const root = document.getElementById(ROOT_ID);
-        if (!root) return;
-
-        // run immediately if widget already rendered
-        patchLinks(root);
-
-        // re-run when Zoho re-renders
-        const observer = new MutationObserver(() => patchLinks(root));
-        observer.observe(root, { childList: true, subtree: true });
-      }
-
-      // run after DOM ready
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", () => setTimeout(armWidgetPatcher, 300));
-      } else {
-        setTimeout(armWidgetPatcher, 300);
-      }
-    </script>
-  </div>
 
 </body>
 </html>
