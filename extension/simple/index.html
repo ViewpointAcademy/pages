@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Viewpoint Subscription Plans</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      background: #f5f5f5;
+      color: #222;
+      margin: 0;
+      padding: 40px 20px;
+    }
+    h1 {
+      text-align: center;
+      font-weight: 600;
+      color: #333;
+    }
+    #widget-section {
+      max-width: 800px;
+      margin: 30px auto;
+      background: #fff;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 6px 25px rgba(0,0,0,0.08);
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Video Access Renewal</h1>
+
+  <div id="widget-section">
+    <!-- Zoho Digest Embed -->
+    <div 
+      id="zf-widget-root-id-247bfiiob"
+      data-pricing-table="true"
+      data-digest="2-097d3a0dc8e50807e6288c801c1d235ed70db5096352e669636a34db879d61f8ea3e88769d72c2a3b737c2b253195bdff4bb5d54eab8dc85cdc51d8ddc5526b9" 
+      data-product_url="https://billing.zoho.com">
+    </div>
+
+    <script src="https://js.zohostatic.com/books/zfwidgets/assets/js/zf-widget.js"></script>
+
+    <script>
+      // read email param from URL
+      const EMAIL = new URLSearchParams(location.search).get("email") || "";
+      const ROOT_ID = "zf-widget-root-id-247bfiiob";
+
+      function patchLinks(root) {
+        if (!EMAIL) return;
+        // catch all Zoho hosted payment domains
+        const selector = [
+          'a[href^="https://billing.zohosecure.com/subscribe/"]',
+          'a[href^="https://billing.zoho.com/subscribe/"]',
+          'a[href^="https://subscriptions.zoho.com/subscribe/"]'
+        ].join(',');
+
+        root.querySelectorAll(selector).forEach(a => {
+          try {
+            const u = new URL(a.href);
+            u.searchParams.set("email", EMAIL);
+            a.href = u.toString();
+          } catch (err) {
+            console.warn("Could not update link", a.href);
+          }
+        });
+      }
+
+      function armWidgetPatcher() {
+        const root = document.getElementById(ROOT_ID);
+        if (!root) return;
+
+        // run immediately if widget already rendered
+        patchLinks(root);
+
+        // re-run when Zoho re-renders
+        const observer = new MutationObserver(() => patchLinks(root));
+        observer.observe(root, { childList: true, subtree: true });
+      }
+
+      // run after DOM ready
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", () => setTimeout(armWidgetPatcher, 300));
+      } else {
+        setTimeout(armWidgetPatcher, 300);
+      }
+    </script>
+  </div>
+
+</body>
+</html>
