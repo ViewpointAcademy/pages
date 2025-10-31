@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Application Submitted</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root{
+      --blue:#3057A4;
+      --ink:#222;
+      --muted:#6b7280;
+      --bg:#f5f7fa;
+      --card:#fff;
+      --border:#e6e9f2;
+      --check-green:#21b36a;
+      --check-bg:#e8f7ef;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial, sans-serif;
+      background:var(--bg);
+      padding:36px 16px;
+      color:var(--ink);
+      line-height:1.5;
+    }
+
+    /* shared width so the outside section lines up with the card */
+    .wrap{ max-width:880px; margin:0 auto; }
+
+    /* confirmation card */
+    .box{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:20px;
+      box-shadow:0 10px 30px rgba(48,87,164,.10);
+      padding:32px 28px;
+      text-align:center;
+    }
+    .check-badge{
+      width:64px; height:64px; margin:0 auto 16px;
+      border-radius:50%;
+      background:var(--check-bg);
+      display:flex; align-items:center; justify-content:center;
+      animation:pop .35s ease-out forwards;
+    }
+    .check-badge svg{ width:40px; height:40px; opacity:0; transform:scale(.6); animation:grow .35s ease-out .18s forwards; }
+    @keyframes pop{ 0%{transform:scale(.2);opacity:0;} 90%{transform:scale(1.1);} 100%{transform:scale(1);opacity:1;} }
+    @keyframes grow{ to{opacity:1; transform:scale(1);} }
+
+    h1{ color:var(--blue); margin:0 0 8px; font-size:clamp(26px,3.4vw,38px); }
+    .sub{ color:var(--muted); font-size:16px; margin:0; }
+
+    /* outside section */
+    .meanwhile{
+      margin-top:100px;   /* space below the card */
+    }
+    .section-title{
+      margin:0 0 8px;
+      color:var(--blue);
+      font-size:20px;
+      font-weight:700;
+    }
+    .section-sub{
+      margin:0 0 16px;
+      color:var(--muted);
+      font-size:14.5px;
+    }
+
+    /* gallery preview with flex overlay button */
+    .gallery-wrap{
+      position:relative;
+      border-radius:14px;
+      overflow:hidden;
+      box-shadow:0 6px 20px rgba(48,87,164,.10);
+      background:#fff;
+      border:1px solid var(--border);
+    }
+    .gallery-wrap img{
+      width:100%; display:block; border-radius:14px;
+      -webkit-mask-image:linear-gradient(to right, black 76%, transparent 96%);
+              mask-image:linear-gradient(to right, black 76%, transparent 96%);
+    }
+    .gallery-overlay{
+      position:absolute; inset:0;
+      display:flex; align-items:center; justify-content:flex-end;
+      padding-inline-end: clamp(12px, 15%, 72px);
+      box-sizing:border-box;
+      pointer-events:none;
+    }
+    .view-more{
+      pointer-events:auto;
+      display:inline-block;
+      padding:10px 20px;
+      background:#3057A4; color:#fff;
+      border-radius:999px; font-weight:700;
+      font-size:clamp(13px,1.5vw,15px);
+      text-decoration:none; white-space:nowrap;
+      box-shadow:0 8px 22px rgba(48,87,164,.25);
+      transition:background .12s ease, transform .12s ease;
+      max-width:55%; overflow:hidden; text-overflow:ellipsis;
+    }
+    .view-more:hover{ background:#274b8a; transform:translateY(-1px); }
+  </style>
+</head>
+<body>
+
+  <!-- CARD: only confirmation lives here -->
+  <div class="wrap">
+    <div class="box">
+      <div class="check-badge">
+        <svg fill="#21b36a" viewBox="-576 -576 3072 3072" xmlns="http://www.w3.org/2000/svg" stroke="#21b36a" stroke-width="96" width="40" height="40">
+          <g stroke-width="0" transform="translate(124.8,124.8) scale(0.87)">
+            <path transform="translate(-576,-576) scale(192)" fill="#e8f7ef" d="M9.166.33a2.25 2.25 0 00-2.332 0l-5.25 3.182A2.25 2.25 0 00.5 5.436v5.128a2.25 2.25 0 001.084 1.924l5.25 3.182a2.25 2.25 0 002.332 0l5.25-3.182a2.25 2.25 0 001.084-1.924V5.436a2.25 2.25 0 00-1.084-1.924L9.166.33z"></path>
+          </g>
+          <path d="M1827.701 303.065 698.835 1431.801 92.299 825.266 0 917.564 698.835 1616.4 1919.869 395.234z" fill-rule="evenodd"></path>
+        </svg>
+      </div>
+
+      <h1>Thank you<span id="who"></span>!</h1>
+      <p class="sub">Your application was submitted. Our team will review your information.</p>
+    </div>
+  </div>
+
+  <!-- OUTSIDE THE CARD -->
+  <section class="wrap meanwhile" aria-labelledby="mw-title">
+    <h2 id="mw-title" class="section-title">While you wait, have an overview</h2>
+    <p class="section-sub">These snapshots show real sessions, project work, and moments from recent cohorts, something you may soon be part of.</p>
+
+    <div class="gallery-wrap">
+      <img src="https://beta.viewpoint.me/wp-content/uploads/2025/10/View-others-succeeding-1024x620.png"
+           alt="Student successes at Viewpoint" loading="lazy" decoding="async" />
+      <div class="gallery-overlay">
+        <a href="https://viewpointlearn.com/gallery" target="_blank" class="view-more">View More</a>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    confetti({ particleCount: 85, spread: 55, origin: { y: 0.7 } });
+    const first = new URLSearchParams(location.search).get("first")?.trim();
+    if(first){ document.getElementById("who").textContent = " " + first; }
+  </script>
+</body>
+</html>
