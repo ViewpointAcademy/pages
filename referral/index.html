@@ -134,6 +134,7 @@
   // ---------- state ----------
   const state = {
     referrerEmail: null,
+    actId: null,
     refCode: null,
     earned: 0,
     pending: 0,
@@ -144,7 +145,8 @@
   // ---------- helpers ----------
   const qs = new URLSearchParams(location.search);
   state.referrerEmail = qs.get("siq_email") || null;
-  state.refCode = qs.get("ref") || (state.referrerEmail ? btoa(state.referrerEmail).slice(0,8) : 0);
+  state.actId = qs.get("cid") || 0;
+  state.refCode = qs.get("cid").slice(-6) || 0;
 
   function setRefLink(){
     const link = `https://viewpointlearn.com/apply?vrp=${encodeURIComponent(state.refCode)}`;
@@ -213,6 +215,8 @@
 async function submitReferral(payload){
   // Convert to form-encoded to avoid preflight
   const flat = new URLSearchParams();
+  //actId
+  flat.set('ref_code', payload.ref_code);
   flat.set('ref_code', payload.ref_code);
   flat.set('source', payload.source || 'referral_hub');
   flat.set('ts', payload.ts);
@@ -253,6 +257,7 @@ async function submitReferral(payload){
 
     const payload = {
       ref_code: state.refCode,
+      act_id: state.actId,
       referrer_email: state.referrerEmail,
       prospect: { name, phone, email },
       source: "referral_hub",
