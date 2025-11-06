@@ -125,28 +125,34 @@
     </div>
   </div>
 </div>
-
 <script>
   // ---------- config ----------
-  const BASE_PER_ENROLL = 250; // swap to 5% logic if you need AOV calc
+  const BASE_PER_ENROLL = 250;
   const MILESTONES = [{n:3, bonus:50},{n:5, bonus:150},{n:10, bonus:500}];
 
   // ---------- state ----------
   const state = {
     referrerEmail: null,
-    actId: null,
-    refCode: null,
+    actId: null,   // full internal id, private
+    refCode: null, // public vrp = last 5 digits
     earned: 0,
     pending: 0,
-    potential: 0, // separate line that increases on each submission (your request)
-    referrals: [] // {name, phone, email, status}
+    potential: 0,
+    referrals: []
   };
 
   // ---------- helpers ----------
   const qs = new URLSearchParams(location.search);
   state.referrerEmail = qs.get("siq_email") || null;
-  state.actId = qs.get("cid") || 0;
-  state.refCode = qs.get("cid").slice(-6) || 0;
+
+  // read act_id (private), derive vrp (public, last 5 digits)
+  const rawActId = (qs.get("act_id") || "").trim();
+  state.actId = rawActId || null;
+
+  // sanitize to digits then take last 5
+  const actDigits = (rawActId || "").replace(/\D/g, "");
+  const vrp = actDigits.slice(-5) || (state.referrerEmail ? btoa(state.referrerEmail).replace(/=+$/,"").slice(0,5) : "XXXXX");
+  state.refCode = vrp;
 
   function setRefLink(){
     const link = `https://viewpointlearn.com/apply?vrp=${encodeURIComponent(state.refCode)}`;
@@ -156,7 +162,16 @@
     openBtn.href = link;
 
     document.getElementById("copyBtn").onclick = async () => {
-      try { await navigator.clipboard.writeText(link); flash(); } catch(e){}
+      try {
+        await navigator.clipboard.writeText(link);
+      } catch(e) {
+        // fallback for older iOS
+        const ta = document.createElement('textarea');
+        ta.value = link; document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); } catch(_) {}
+        document.body.removeChild(ta);
+      }
+      flash();
     };
 
     const msg = encodeURIComponent(`I recommend Viewpoint’s women’s cohort. Quick advisor link: ${link}`);
@@ -164,9 +179,7 @@
     document.getElementById("smsBtn").href = `sms:?&body=${msg}`;
   }
 
-  function flash(){
-    confetti({particleCount:120, spread:65, origin:{y:0.6}});
-  }
+  function flash(){ confetti({particleCount:120, spread:65, origin:{y:0.6}}); }
 
   function calcEstimate(n){
     let total = n * BASE_PER_ENROLL;
@@ -202,45 +215,31 @@
     });
   }
 
-  // async function submitReferral(payload){
-  //   // TODO: wire to Zoho Flow/Creator/CRM webhook
-  //   return await fetch("https://flow.zoho.com/756547289/flow/webhook/incoming?zapikey=1001.031e7ff6723e247a1fcb76e0f034da32.82a1c9376679cdffa874abf4bd63dc4a&isdebug=false", {
-  //     method:"POST", headers:{ "Content-Type":"application/json" },
-  //     body: JSON.stringify(payload)
-  //   }).then(r=>r.json());
-  //   return { ok:true };
-  // }
+  // Band-aid browser→Flow: form-encoded + no-cors (you already chose this)
+  async function submitReferral(payload){
+    const flat = new URLSearchParams();
+    flat.set('ref_code', payload.ref_code);        // public vrp (last 5)
+    if (payload.act_id) flat.set('act_id', payload.act_id); // private internal id
+    flat.set('source', payload.source || 'referral_hub');
+    flat.set('ts', payload.ts);
+    if (payload.referrer_email) flat.set('referrer_email', payload.referrer_email);
+    flat.set('prospect_name',  payload.prospect.name || '');
+    flat.set('prospect_phone', payload.prospect.phone || '');
+    flat.set('prospect_email', payload.prospect.email || '');
 
-
-async function submitReferral(payload){
-  // Convert to form-encoded to avoid preflight
-  const flat = new URLSearchParams();
-  //actId
-  flat.set('ref_code', payload.ref_code);
-  flat.set('ref_code', payload.ref_code);
-  flat.set('source', payload.source || 'referral_hub');
-  flat.set('ts', payload.ts);
-  if (payload.referrer_email) flat.set('referrer_email', payload.referrer_email);
-  // nest prospect as fields Flow can map
-  flat.set('prospect_name',  payload.prospect.name || '');
-  flat.set('prospect_phone', payload.prospect.phone || '');
-  flat.set('prospect_email', payload.prospect.email || '');
-
-  // Send as a simple request. We cannot read the response without CORS headers.
-  try {
-    await fetch("https://flow.zoho.com/756547289/flow/webhook/incoming?zapikey=1001.031e7ff6723e247a1fcb76e0f034da32.82a1c9376679cdffa874abf4bd63dc4a&isdebug=false", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
-      body: flat.toString(),
-      mode: "no-cors" // makes the response opaque; request still goes through
-    });
-    // Pretend success; server-side must do validation and alerts.
-    return { ok: true, opaque: true };
-  } catch (e) {
-    console.error(e);
-    return { ok: false, error: 'NETWORK' };
+    try {
+      await fetch("https://flow.zoho.com/756547289/flow/webhook/incoming?zapikey=1001.031e7ff6723e247a1fcb76e0f034da32.82a1c9376679cdffa874abf4bd63dc4a&isdebug=false", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+        body: flat.toString(),
+        mode: "no-cors"
+      });
+      return { ok: true, opaque: true };
+    } catch (e) {
+      console.error(e);
+      return { ok: false, error: 'NETWORK' };
+    }
   }
-}
 
   // ---------- events ----------
   document.getElementById("countInput").addEventListener("input", e=>{
@@ -256,8 +255,8 @@ async function submitReferral(payload){
     if(!name || !phone){ alert("Name and phone are required."); return; }
 
     const payload = {
-      ref_code: state.refCode,
-      act_id: state.actId,
+      ref_code: state.refCode,       // public short code
+      act_id: state.actId,           // full internal id (private)
       referrer_email: state.referrerEmail,
       prospect: { name, phone, email },
       source: "referral_hub",
@@ -266,20 +265,16 @@ async function submitReferral(payload){
 
     const res = await submitReferral(payload);
     if(res && res.ok){
-      // optimistic UI
       state.referrals.unshift({name, phone, email, status:"Pending"});
-      state.pending  += BASE_PER_ENROLL;  // your existing pending counter
-      state.potential += BASE_PER_ENROLL; // separate "Potential Pending" line item you asked for
+      state.pending  += BASE_PER_ENROLL;
+      state.potential += BASE_PER_ENROLL;
       renderRefs();
       renderMoney();
       flash();
 
       const c = state.referrals.length;
-      if([1,3,5,10].includes(c)) {
-        confetti({particleCount:220, spread:80, origin:{y:0.6}});
-      }
+      if([1,3,5,10].includes(c)) confetti({particleCount:220, spread:80, origin:{y:0.6}});
 
-      // clear inputs
       document.getElementById("prospectName").value = "";
       document.getElementById("prospectPhone").value = "";
       document.getElementById("prospectEmail").value = "";
@@ -294,5 +289,7 @@ async function submitReferral(payload){
   renderRefs();
   document.getElementById("estimate").textContent = calcEstimate(parseInt(document.getElementById("countInput").value,10));
 </script>
+
+
 </body>
 </html>
