@@ -144,7 +144,7 @@
   // ---------- helpers ----------
   const qs = new URLSearchParams(location.search);
   state.referrerEmail = qs.get("siq_email") || null;
-  state.refCode = qs.get("ref") || (state.referrerEmail ? btoa(state.referrerEmail).slice(0,8) : "XXXXXX");
+  state.refCode = qs.get("ref") || (state.referrerEmail ? btoa(state.referrerEmail).slice(0,8) : 0);
 
   function setRefLink(){
     const link = `https://viewpointlearn.com/apply?vrp=${encodeURIComponent(state.refCode)}`;
@@ -200,14 +200,43 @@
     });
   }
 
-  async function submitReferral(payload){
-    // TODO: wire to Zoho Flow/Creator/CRM webhook
-    return await fetch("https://flow.zoho.com/756547289/flow/webhook/incoming?zapikey=1001.031e7ff6723e247a1fcb76e0f034da32.82a1c9376679cdffa874abf4bd63dc4a&isdebug=false", {
-      method:"POST", headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify(payload)
-    }).then(r=>r.json());
-    return { ok:true };
+  // async function submitReferral(payload){
+  //   // TODO: wire to Zoho Flow/Creator/CRM webhook
+  //   return await fetch("https://flow.zoho.com/756547289/flow/webhook/incoming?zapikey=1001.031e7ff6723e247a1fcb76e0f034da32.82a1c9376679cdffa874abf4bd63dc4a&isdebug=false", {
+  //     method:"POST", headers:{ "Content-Type":"application/json" },
+  //     body: JSON.stringify(payload)
+  //   }).then(r=>r.json());
+  //   return { ok:true };
+  // }
+
+
+async function submitReferral(payload){
+  // Convert to form-encoded to avoid preflight
+  const flat = new URLSearchParams();
+  flat.set('ref_code', payload.ref_code);
+  flat.set('source', payload.source || 'referral_hub');
+  flat.set('ts', payload.ts);
+  if (payload.referrer_email) flat.set('referrer_email', payload.referrer_email);
+  // nest prospect as fields Flow can map
+  flat.set('prospect_name',  payload.prospect.name || '');
+  flat.set('prospect_phone', payload.prospect.phone || '');
+  flat.set('prospect_email', payload.prospect.email || '');
+
+  // Send as a simple request. We cannot read the response without CORS headers.
+  try {
+    await fetch("https://flow.zoho.com/756547289/flow/webhook/incoming?zapikey=1001.031e7ff6723e247a1fcb76e0f034da32.82a1c9376679cdffa874abf4bd63dc4a&isdebug=false", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+      body: flat.toString(),
+      mode: "no-cors" // makes the response opaque; request still goes through
+    });
+    // Pretend success; server-side must do validation and alerts.
+    return { ok: true, opaque: true };
+  } catch (e) {
+    console.error(e);
+    return { ok: false, error: 'NETWORK' };
   }
+}
 
   // ---------- events ----------
   document.getElementById("countInput").addEventListener("input", e=>{
