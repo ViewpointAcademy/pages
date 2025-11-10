@@ -284,15 +284,25 @@
   // Your backend endpoint must call the Zoho function and normalize result:
   //  POST /api/vrp { contactId, generate }
   //  -> { ok:true, url:"https://viewpointlearn.com/apply?vrp=ABCDE" } OR { ok:false, error:"Error generating referral link" }
-  async function fetchVRP(contactId, generate){
-    const res = await fetch('https://www.zohoapis.com/crm/v7/functions/getvrpbycontactid/actions/execute?auth_type=apikey&zapikey=1003.c48afbcff860dce9f8c03a59843b8bdb.39aba92d52eaf7dae9fed98040c03f2c', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contactId, generate: !!generate })
-    });
-    if(!res.ok) throw new Error('HTTP ' + res.status);
-    return await res.json();
-  }
+async function fetchVRP(contactId, generate) {
+  const url = "https://flow.zoho.com/756547289/flow/webhook/incoming?zapikey=1001.b9e54e00e7150fb2306473cfc5a5767e.9940740d2f6852318a49026e1cad40df&isdebug=false";
+  
+  const body = new URLSearchParams({
+    contact_id: contactId,
+    generate: String(!!generate)
+  });
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+    body
+  });
+
+  if (!res.ok) throw new Error("HTTP " + res.status);
+  const data = await res.json();
+  return data; // { ok:true, url:"https://viewpointlearn.com/apply/?vrp=wsolp" }
+}
+
 
   function wireShareTargets(link){
     const openBtn = document.getElementById('openLinkBtn');
