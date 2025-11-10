@@ -369,6 +369,7 @@ async function fetchVRP(contactId, generate) {
           showRetry: generate
         });
       }
+      console.log(out);
     }catch(e){
       showShareUI({ message:'Network error. Please try again.', showRetry:true });
     }
