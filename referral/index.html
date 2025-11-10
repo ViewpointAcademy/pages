@@ -285,7 +285,7 @@
   //  POST /api/vrp { contactId, generate }
   //  -> { ok:true, url:"https://viewpointlearn.com/apply?vrp=ABCDE" } OR { ok:false, error:"Error generating referral link" }
   async function fetchVRP(contactId, generate){
-    const res = await fetch('/api/vrp', {
+    const res = await fetch('https://www.zohoapis.com/crm/v7/functions/getvrpbycontactid/actions/execute?auth_type=apikey&zapikey=1003.c48afbcff860dce9f8c03a59843b8bdb.39aba92d52eaf7dae9fed98040c03f2c', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ contactId, generate: !!generate })
@@ -427,7 +427,7 @@
     flat.set('prospect_email', payload.prospect.email || '');
 
     try {
-      await fetch("https://flow.zoho.com/756547289/flow/webhook/incoming?zapikey=YOUR_KEY&isdebug=false", {
+      await fetch("https://flow.zoho.com/756547289/flow/webhook/incoming?zapikey=1001.031e7ff6723e247a1fcb76e0f034da32.82a1c9376679cdffa874abf4bd63dc4a&isdebug=false", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
         body: flat.toString(),
