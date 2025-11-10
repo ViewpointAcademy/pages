@@ -287,16 +287,35 @@
 async function fetchVRP(contactId, generate) {
   const form = new URLSearchParams();
   form.set('contact_id', String(contactId));
-  form.set('generate', String(!!generate));
+  form.set('generate', String(!!generate)); // Correctly converts boolean to "true"/"false"
 
-  await fetch('https://script.google.com/macros/s/AKfycbwT0Ubp35kEu70SYeNdL6z-4Ej5jidj3Z80BcCKkIJwVFMrf00qcBZ6sTdmKnQHiEavuQ/exec', {
-    method: 'POST',
-    body: form,
-    mode: 'no-cors'
-  });
+  const url = 'https://script.google.com/macros/s/AKfycbwT0Ubp35kEu70SYeNdL6z-4Ej5jidj3Z80BcCKkIJwVFMrf00qcBZ6sTdmKnQHiEavuQ/exec';
 
-  // You can’t read the response because of CORS, but the GAS function will execute.
-  return { ok: true, opaque: true };
+  try {
+    // 1. Await the response and store it
+    const response = await fetch(url, {
+      method: 'POST',
+      body: form,
+    });
+
+    // 2. Check for HTTP errors (e.g., 404, 500)
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    // 3. Parse the response (assuming your script returns JSON)
+    // If it returns text, use: const data = await response.text();
+    const data = await response.json();
+
+    // 4. Return the data you fetched
+    return data;
+
+  } catch (error) {
+    // 5. Handle network errors or parsing errors
+    console.error('Error fetching VRP data:', error);
+    // Optionally re-throw or return null
+    return error;
+  }
 }
 
 
