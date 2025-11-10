@@ -294,7 +294,7 @@ async function fetchVRP(contactId, generate = false) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        contactId: contactId,
+        contact_id: contactId,
         generate: generate
       })
     });
