@@ -289,7 +289,7 @@ async function fetchVRP(contactId, generate) {
   form.set('contact_id', String(contactId));
   form.set('generate', String(!!generate)); // Correctly converts boolean to "true"/"false"
 
-  const url = 'https://script.google.com/macros/s/AKfycbwT0Ubp35kEu70SYeNdL6z-4Ej5jidj3Z80BcCKkIJwVFMrf00qcBZ6sTdmKnQHiEavuQ/exec';
+  const url = 'https://script.google.com/macros/s/AKfycbxY5kitvomEUeL8KXwtZ7B5XATpBhhmTqcE5QaiX9iMx1Yxxa84TGOta9q5j64kdZTnmw';
 
   try {
     // 1. Await the response and store it
@@ -367,32 +367,67 @@ async function fetchVRP(contactId, generate) {
     retryBtn.style.display= showRetry ? '' : 'none';
   }
 
-  async function initOrGenerateVRP({ generate=false } = {}){
-    const cid = state.actId || (new URLSearchParams(location.search).get('contactId') || '').trim();
-    if(!cid){
-      showShareUI({ message:'No contact selected.' });
+  async function initOrGenerateVRP({ generate = false } = {}) {
+  const cid = state.actId || (new URLSearchParams(location.search).get('contactId') || '').trim();
+  if (!cid) {
+    showShareUI({ message: 'No contact selected.' });
+    return;
+  }
+
+  try {
+    showShareUI({ loading: true });
+
+    const out = await fetchVRP(cid, generate);
+    // 1) Readable success with url
+    if (out && out.ok && out.url && !/Error generating referral link/i.test(out.url)) {
+      showShareUI({ link: out.url, message: 'Your link is ready.' });
+      wireShareTargets(out.url);
+      flash();
       return;
     }
-    try{
-      showShareUI({ loading:true });
-      const out = await fetchVRP(cid, generate);
-      if(out.ok && out.url && !/Error generating referral link/i.test(out.url)){
+
+    // 2) Readable state machine (if/when your proxy returns status)
+    if (out && out.ok && out.status) {
+      if (out.status === 'exists' || out.status === 'created') {
         showShareUI({ link: out.url, message: 'Your link is ready.' });
         wireShareTargets(out.url);
         flash();
-      }else{
-        const err = out.error || 'Error generating referral link';
-        showShareUI({
-          message: err,
-          showGenerate: !generate,
-          showRetry: generate
-        });
+        return;
       }
-      console.log(out);
-    }catch(e){
-      showShareUI({ message:'Network error. Please try again.', showRetry:true });
+      if (out.status === 'none') {
+        // initial check: no link yet, show Generate
+        showShareUI({ message: 'No link yet.', showGenerate: true });
+        return;
+      }
     }
+
+    // 3) Opaque mode (no-cors) fallback
+    if (out && out.ok && out.opaque) {
+      if (generate) {
+        // We just asked to generate but cannot read response.
+        // Tell the user we’re generating and auto-check once after a short delay.
+        showShareUI({ message: 'Generating…', showRetry: false, showGenerate: false });
+        setTimeout(() => initOrGenerateVRP({ generate: false }), 1500);
+      } else {
+        // Initial check with opaque response: can’t tell. Offer Generate.
+        showShareUI({ message: 'No link on file.', showGenerate: true });
+      }
+      return;
+    }
+
+    // Explicit readable error
+    const err = (out && out.error) || 'Could not get referral link.';
+    showShareUI({
+      message: err,
+      showGenerate: !generate,
+      showRetry: !!generate
+    });
+
+  } catch (e) {
+    showShareUI({ message: 'Network error. Please try again.', showRetry: true });
   }
+}
+
 
   // ---------- smart-fit tooltip (keeps bubbles in viewport) ----------
   (function(){
