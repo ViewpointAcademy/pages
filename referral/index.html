@@ -4,7 +4,13 @@
   <meta charset="utf-8" />
   <title>Viewpoint Referral Hub</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <!-- Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
   <style>
     :root{
       --blue:#3057A4; --ink:#222; --muted:#6b7280; --bg:#f5f7fa; --card:#fff; --border:#e6e9f2;
@@ -12,89 +18,130 @@
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}
-    .wrap{max-width:880px;margin:32px auto;padding:0 16px}
+    .wrap{max-width:980px;margin:32px auto;padding:0 16px}
     .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px}
-    .row{display:flex;gap:16px;flex-wrap:wrap}
-    .col{flex:1 1 260px}
     h1{font-size:22px;margin:8px 0 4px}
     h2{font-size:16px;margin:0 0 6px;color:var(--muted)}
-    .stat{font-size:28px;font-weight:700}
+    .stat{font-size:32px;font-weight:800}
+    .muted{color:var(--muted)}
+    .kpis{display:flex;gap:18px;flex-wrap:wrap;margin-top:8px}
+    .kpi{font-size:14px}
+    .kpi strong{font-size:16px}
+
+    .earn-flex{display:flex;gap:24px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+    .earn-left{min-width:260px}
+    .earn-right{min-width:300px;max-width:460px}
+    .box{border:1px dashed var(--border);border-radius:12px;padding:12px}
+
     .btn{display:inline-flex;align-items:center;gap:8px;border:none;background:var(--btn);color:#fff;padding:12px 16px;border-radius:10px;font-weight:600;cursor:pointer;text-decoration:none}
     .btn svg{width:18px;height:18px;flex:0 0 18px}
     .btn.secondary{background:var(--btn-alt);color:var(--btn-alt-ink);border:1px solid #cdd5ff}
+
     label{display:block;font-size:12px;color:var(--muted);margin:10px 0 6px}
     input,select{width:100%;padding:10px;border:1px solid var(--border);border-radius:10px}
+
+    .range-row{display:flex;align-items:center;gap:10px;margin-top:16px}
+    .range-row .count-pill{margin-left:auto;background:#eef2ff;color:#1f2a59;border:1px solid #cdd5ff;border-radius:999px;padding:6px 10px;font-weight:700;font-size:12px}
+    input[type="range"]{width:100%;appearance:none;height:6px;border-radius:999px;background:#e9edf7;outline:none;padding:0}
+    input[type="range"]::-webkit-slider-thumb{appearance:none;width:18px;height:18px;border-radius:50%;background:var(--blue);cursor:pointer}
+    input[type="range"]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--blue);cursor:pointer;border:none}
+
+    .tabs{margin-top:16px}
+    .tabbar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+    .tabbtn{padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:#fff;cursor:pointer;font-weight:600}
+    .tabbtn[aria-selected="true"]{background:#eef2ff;border-color:#cdd5ff;color:#1f2a59}
+    .tabpanel{display:none}
+    .tabpanel.active{display:block}
+
+    .inline{display:inline-flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    .link-str{font-weight:600;word-break:break-all}
+
     .list{margin-top:12px;border-top:1px dashed var(--border)}
     .item{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px dashed var(--border)}
     .badge{font-size:12px;padding:4px 8px;border-radius:999px;background:#eef2ff;color:#1f2a59}
-    .muted{color:var(--muted)}
-    .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
-    .inline{display:inline-flex;gap:8px;align-items:center;flex-wrap:wrap}
-    .stack-6{display:flex;flex-direction:column;gap:6px}
-    .link-box{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-    .link-str{font-weight:600;word-break:break-all}
-    .kpis{display:grid;grid-template-columns:1fr;gap:6px;margin-top:6px}
-    .kpis div{font-size:14px}
+
+    /* tooltip */
+    .tooltip-wrapper{position:relative;display:inline-flex;align-items:center;cursor:pointer}
+    .tooltip-bubble{
+      visibility:hidden;opacity:0;position:absolute;z-index:1000;
+      bottom:125%;left:50%;transform:translateX(-50%);
+      background:#111;color:#fff;font-size:12px;border-radius:6px;padding:6px 8px;
+      white-space:nowrap;pointer-events:none;transition:opacity .2s ease, transform .2s ease
+    }
+    .tooltip-wrapper:hover .tooltip-bubble{visibility:visible;opacity:1;transform:translateX(-50%) translateY(-4px)}
+    .tooltip-bubble::after{
+      content:"";position:absolute;top:100%;left:50%;margin-left:-5px;
+      border-width:5px;border-style:solid;border-color:#111 transparent transparent transparent
+    }
+    .tooltip-bubble[data-placement="bottom"]{
+      bottom:auto;top:125%;transform:translateX(-50%) translateY(4px)
+    }
+    .tooltip-bubble[data-placement="bottom"]::after{
+      top:auto;bottom:100%;border-color:transparent transparent #111 transparent
+    }
   </style>
 </head>
+
 <body>
 <div class="wrap">
-  <div class="row">
-    <div class="col card">
-      <h2>Your earnings</h2>
-      <div class="stat" id="earned">$0</div>
-      <div class="kpis">
-        <div class="muted">Pending: <span id="pending">$0</span></div>
-        <div class="muted">Potential Pending: <span id="potential">$0</span></div>
-      </div>
-    </div>
 
-    <div class="col card">
-      <h2>Your referral link</h2>
-      <div class="stack-6">
-        <div class="link-box">
-          <a id="openLinkBtn" class="btn" href="#" target="_blank" rel="noopener" aria-label="Open referral link">
-            <svg viewBox="0 0 255.99316 255.99316" fill="currentColor" aria-hidden="true">
-              <path d="M231.99268,35.99414v140.001a12,12,0,0,1-24,0V47.99414H79.98584a12,12,0,0,1,0-24H219.99268A12.00028,12.00028,0,0,1,231.99268,35.99414Zm-40,40.001v140a12.00028,12.00028,0,0,1-12,12H39.98584a12.00028,12.00028,0,0,1-12-12v-140a12.00028,12.00028,0,0,1,12-12H179.99268A12.00028,12.00028,0,0,1,191.99268,75.99512Zm-24,12H51.98584v116H167.99268Z"/>
-            </svg>
-            Open link
-          </a>
-
-          <button id="copyBtn" class="btn secondary" type="button" aria-label="Copy referral link">
-            <svg viewBox="0 0 255.99316 255.99316" fill="currentColor" aria-hidden="true">
-              <path d="M231.99268,35.99414v140.001a12,12,0,0,1-24,0V47.99414H79.98584a12,12,0,0,1,0-24H219.99268A12.00028,12.00028,0,0,1,231.99268,35.99414Zm-40,40.001v140a12.00028,12.00028,0,0,1-12,12H39.98584a12.00028,12.00028,0,0,1-12-12v-140a12.00028,12.00028,0,0,1,12-12H179.99268A12.00028,12.00028,0,0,1,191.99268,75.99512Zm-24,12H51.98584v116H167.99268Z"/>
-            </svg>
-            Copy
-          </button>
+  <!-- Earnings card -->
+  <div class="card" style="grid-column: 1 / -1;">
+    <div class="earn-flex">
+      <div class="earn-left">
+        <h2>Your earnings</h2>
+        <div class="stat" id="earned">$0</div>
+        <div class="kpis">
+          <div class="kpi muted">Pending<br><strong id="pending">$0</strong></div>
+          <div class="kpi muted">Potential Pending<br><strong id="potential">$0</strong></div>
         </div>
+      </div>
 
-        <div id="refLink" class="mono link-str">https://viewpointlearn.com/r/XXXXXX</div>
+      <!-- Potential earnings -->
+      <div class="earn-right">
+        <h2>Potential earnings</h2>
+        <div class="box">
+          <label for="refType">Referral type</label>
+          <select id="refType">
+            <option value="cold">We reach out ($75 each)</option>
+            <option value="pre">They call us ($250 each)</option>
+          </select>
 
-        <div class="inline" style="margin-top:4px">
-          <a id="waBtn" class="btn secondary" href="#" target="_blank" rel="noopener" aria-label="Share via WhatsApp">
-            <svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true">
-              <path d="M16 .4A15.6 15.6 0 0 0 .4 16a15.4 15.4 0 0 0 2.1 7.9L0 32l8.3-2.2A15.6 15.6 0 1 0 16 .4zm0 28A12.4 12.4 0 0 1 8 26l-4.8 1.3L5 22.7A12.6 12.6 0 1 1 16 28.4zm6.4-9.2c-.3-.2-1.6-.8-1.8-.9s-.4-.2-.6.2-.7.9-.9 1.1-.3.3-.6.1a10.2 10.2 0 0 1-5.1-4.5c-.4-.6.4-.6 1.1-2s-.2-1.8-.3-2-.7-1.5-1-1.7-.5-.2-.7-.2h-.6a1.2 1.2 0 0 0-.9.4 3.6 3.6 0 0 0-1.2 2.7 6.3 6.3 0 0 0 1.3 3.2 14.2 14.2 0 0 0 5.5 5c2.1.9 2.9 1 4 .8a3.4 3.4 0 0 0 2.3-1.7 2.8 2.8 0 0 0 .2-1.7z"/>
-            </svg>
-            WhatsApp
-          </a>
+          <div class="range-row">
+            <label for="countRange" style="margin:0;color:var(--muted)">How many likely referrals?</label>
+            <span class="count-pill" id="countVal">1</span>
+          </div>
+          <input id="countRange" type="range" min="1" max="500" step="1" value="1" />
 
-          <a id="smsBtn" class="btn secondary" href="#" target="_blank" rel="noopener" aria-label="Share via SMS">
-            <svg viewBox="0 0 192 192" fill="none" aria-hidden="true">
-              <path stroke="currentColor" stroke-linejoin="round" stroke-width="12" d="M30 54c0-13.255 10.745-24 24-24h84c13.255 0 24 10.745 24 24v84c0 13.255-10.745 24-24 24H30V54Z"/>
-              <path stroke="currentColor" stroke-linecap="round" stroke-width="12" d="M54 96h84m-84 24h60M54 72h36"/>
-            </svg>
-            SMS
-          </a>
+          <div style="margin-top:10px">
+            <div class="muted" id="bonusNote">Bonuses: 3 = +$50, 5 = +$150, 10 = +$500.</div>
+            <div style="margin-top:6px;font-weight:700">Estimated: <span id="estimate">$75</span></div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="card" style="margin-top:16px">
-    <div class="row" style="align-items:flex-end">
-      <div class="col">
+  <!-- Tabs -->
+  <div class="card" style="grid-column: 1 / -1; margin-top:16px ">
+    <div class="tabs">
+      <div class="tabbar" role="tablist">
+        <button class="tabbtn" id="tab-cold" role="tab" aria-selected="true">Add contact (we reach out)</button>
+        <button class="tabbtn" id="tab-pre"  role="tab" aria-selected="false">Share link (they call us)</button>
+      </div>
+
+      <!-- Tab A -->
+      <section id="panel-cold" class="tabpanel active" role="tabpanel" aria-labelledby="tab-cold">
         <h1>Add a referral</h1>
-        <p class="muted" style="margin:0 0 12px">Enter a name and phone. We’ll reach out. You get paid when they enroll.</p>
+        <p class="muted" style="margin:0 0 12px;display:flex;align-items:center;gap:4px">
+          Enter a name and phone. You earn <strong>$75</strong> per signup.
+          <span class="tooltip-wrapper">
+            <i class="bi bi-info-circle" style="font-size:15px;color:#6b7280"></i>
+            <span class="tooltip-bubble">Bonuses: +$15 at 3, +$50 at 5, +$150 at 10.</span>
+          </span>
+        </p>
+
         <label for="prospectName">Full name</label>
         <input id="prospectName" placeholder="e.g., Sarah Cohen" />
         <label for="prospectPhone">Phone</label>
@@ -104,87 +151,91 @@
         <div style="margin-top:12px">
           <button class="btn" id="addBtn" type="button">Add referral</button>
         </div>
-      </div>
+      </section>
 
-      <div class="col">
-        <h1>Potential earnings</h1>
-        <label for="countInput">How many likely referrals?</label>
-        <input id="countInput" type="number" min="1" step="1" value="1" />
-        <div style="margin-top:10px">
-          <div class="muted">Rate: 5% base up to $500. Milestones: 3 = +$50 bonus, 5 = +$150, 10 = +$500.</div>
-          <div style="margin-top:6px;font-weight:700">Estimated: <span id="estimate">$250</span></div>
+      <!-- Tab B -->
+      <section id="panel-pre" class="tabpanel" role="tabpanel" aria-labelledby="tab-pre">
+        <h1>Share your referral link</h1>
+        <p class="muted" style="margin:0 0 12px;display:flex;align-items:center;gap:4px">
+          Share your link or have them mention your name. You earn <strong>$250</strong> per signup.
+          <span class="tooltip-wrapper">
+            <i class="bi bi-info-circle" style="font-size:15px;color:#6b7280"></i>
+            <span class="tooltip-bubble">Bonuses: +$50 at 3, +$150 at 5, +$500 at 10.</span>
+          </span>
+        </p>
+
+        <!-- Controls -->
+        <div class="inline" style="margin-bottom:8px">
+          <a id="openLinkBtn" class="btn" href="#" target="_blank" rel="noopener" aria-label="Open referral link" style="display:none">
+            Open link
+          </a>
+          <button id="copyBtn" class="btn secondary" type="button" aria-label="Copy referral link" style="display:none">
+            Copy
+          </button>
+          <button id="generateBtn" class="btn" type="button" style="display:none">Generate link</button>
+          <button id="retryBtn" class="btn secondary" type="button" style="display:none">Try again</button>
+        </div>
+
+        <!-- Link / status -->
+        <div class="mono link-str" id="refLink" style="min-height:22px"></div>
+        <div class="muted" id="linkStatus" style="font-size:12px;margin-top:4px"></div>
+
+        <!-- Share buttons -->
+        <div class="inline" style="margin-top:8px">
+          <a id="waBtn" class="btn secondary" href="#" target="_blank" rel="noopener" aria-label="Share via WhatsApp" style="display:none">WhatsApp</a>
+          <a id="smsBtn" class="btn secondary" href="#" target="_blank" rel="noopener" aria-label="Share via SMS" style="display:none">SMS</a>
+        </div>
+      </section>
+
+      <div style="margin-top:18px">
+        <h1>Your referrals</h1>
+        <div class="list" id="refList">
+          <div class="item muted"><span>No referrals yet.</span><span></span></div>
         </div>
       </div>
     </div>
   </div>
-
-  <div class="card" style="margin-top:16px">
-    <h1>Your referrals</h1>
-    <div class="list" id="refList">
-      <div class="item muted" id="emptyRow"><span>No referrals yet.</span><span></span></div>
-    </div>
-  </div>
 </div>
+
 <script>
   // ---------- config ----------
-  const BASE_PER_ENROLL = 250;
-  const MILESTONES = [{n:3, bonus:50},{n:5, bonus:150},{n:10, bonus:500}];
+  const RATE_PRE  = 250; // they call us
+  const RATE_COLD = 75;  // we reach out
+  const MILESTONES_PRE  = [{n:3, bonus:50},{n:5, bonus:150},{n:10, bonus:500}];
+  const MILESTONES_COLD = [{n:3, bonus:15},{n:5, bonus:50},{n:10, bonus:150}];
 
   // ---------- state ----------
   const state = {
     referrerEmail: null,
-    actId: null,   // full internal id, private
-    refCode: null, // public vrp = last 5 digits
+    actId: null,   // full internal id (private)
+    refCode: null, // public vrp if needed (legacy)
     earned: 0,
     pending: 0,
     potential: 0,
-    referrals: []
+    referrals: [] // {name, phone, email, status, type}
   };
 
-  // ---------- helpers ----------
+  // ---------- params ----------
   const qs = new URLSearchParams(location.search);
   state.referrerEmail = qs.get("siq_email") || null;
-
-  // read act_id (private), derive vrp (public, last 5 digits)
   const rawActId = (qs.get("act_id") || "").trim();
   state.actId = rawActId || null;
+  const actDigits = (rawActId || "").replace(/\D/g,"");
+  state.refCode = actDigits.slice(-5) || (state.referrerEmail ? btoa(state.referrerEmail).replace(/=+$/,"").slice(0,5) : "XXXXX");
 
-  // sanitize to digits then take last 5
-  const actDigits = (rawActId || "").replace(/\D/g, "");
-  const vrp = actDigits.slice(-5) || (state.referrerEmail ? btoa(state.referrerEmail).replace(/=+$/,"").slice(0,5) : "XXXXX");
-  state.refCode = vrp;
-
-  function setRefLink(){
-    const link = `https://viewpointlearn.com/apply?vrp=${encodeURIComponent(state.refCode)}`;
-    document.getElementById("refLink").textContent = link;
-
-    const openBtn = document.getElementById("openLinkBtn");
-    openBtn.href = link;
-
-    document.getElementById("copyBtn").onclick = async () => {
-      try {
-        await navigator.clipboard.writeText(link);
-      } catch(e) {
-        // fallback for older iOS
-        const ta = document.createElement('textarea');
-        ta.value = link; document.body.appendChild(ta); ta.select();
-        try { document.execCommand('copy'); } catch(_) {}
-        document.body.removeChild(ta);
-      }
-      flash();
-    };
-
-    const msg = encodeURIComponent(`I recommend Viewpoint’s women’s cohort. Quick advisor link: ${link}`);
-    document.getElementById("waBtn").href  = `https://wa.me/?text=${msg}`;
-    document.getElementById("smsBtn").href = `sms:?&body=${msg}`;
-  }
-
+  // ---------- helpers ----------
   function flash(){ confetti({particleCount:120, spread:65, origin:{y:0.6}}); }
 
-  function calcEstimate(n){
-    let total = n * BASE_PER_ENROLL;
-    MILESTONES.forEach(m => { if(n >= m.n) total += m.bonus; });
+  function calcEstimate(count, type){
+    const rate = type === "pre" ? RATE_PRE : RATE_COLD;
+    const ladder = type === "pre" ? MILESTONES_PRE : MILESTONES_COLD;
+    let total = count * rate;
+    ladder.forEach(m => { if(count >= m.n) total += m.bonus; });
     return `$${total.toLocaleString()}`;
+  }
+
+  function ladderText(arr){
+    return "Bonuses: " + arr.map(m => `${m.n} = +$${m.bonus}`).join(", ") + ".";
   }
 
   function renderMoney(){
@@ -204,22 +255,170 @@
       return;
     }
     state.referrals.forEach(r => {
+      const rate = r.type === "pre" ? RATE_PRE : RATE_COLD;
+      const label = r.type === "pre" ? "They called us" : "We reached out";
       const row = document.createElement("div");
       row.className = "item";
       row.innerHTML = `<div>
           <div><strong>${r.name}</strong> <span class="muted">(${r.phone})</span></div>
           <div class="muted">${r.email || ""}</div>
         </div>
-        <div><span class="badge">${r.status}</span></div>`;
+        <div style="text-align:right">
+          <div><span class="badge">${r.status}</span></div>
+          <div class="muted" style="margin-top:4px; font-size:12px">${label} • $${rate}</div>
+        </div>`;
       list.appendChild(row);
     });
   }
 
-  // Band-aid browser→Flow: form-encoded + no-cors (you already chose this)
+  function updateEstimate(){
+    const n = parseInt(document.getElementById("countRange").value, 10);
+    const type = document.getElementById("refType").value;
+    document.getElementById("countVal").textContent = String(n);
+    const ladder = type === "pre" ? MILESTONES_PRE : MILESTONES_COLD;
+    document.getElementById("bonusNote").textContent = ladderText(ladder);
+    document.getElementById("estimate").textContent = calcEstimate(n, type);
+  }
+
+  // ---------- VRP via backend proxy ----------
+  // Your backend endpoint must call the Zoho function and normalize result:
+  //  POST /api/vrp { contactId, generate }
+  //  -> { ok:true, url:"https://viewpointlearn.com/apply?vrp=ABCDE" } OR { ok:false, error:"Error generating referral link" }
+  async function fetchVRP(contactId, generate){
+    const res = await fetch('/api/vrp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contactId, generate: !!generate })
+    });
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    return await res.json();
+  }
+
+  function wireShareTargets(link){
+    const openBtn = document.getElementById('openLinkBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const waBtn   = document.getElementById('waBtn');
+    const smsBtn  = document.getElementById('smsBtn');
+
+    openBtn.href = link;
+
+    copyBtn.onclick = async () => {
+      try { await navigator.clipboard.writeText(link); }
+      catch {
+        const ta = document.createElement('textarea');
+        ta.value = link; document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); } catch(_) {}
+        document.body.removeChild(ta);
+      }
+      flash();
+    };
+
+    const msg = encodeURIComponent(`I recommend Viewpoint’s women’s cohort. Quick advisor link: ${link}`);
+    waBtn.href  = `https://wa.me/?text=${msg}`;
+    smsBtn.href = `sms:?&body=${msg}`;
+  }
+
+  function showShareUI({ link, loading=false, showGenerate=false, showRetry=false, message='' }){
+    const refLink   = document.getElementById('refLink');
+    const status    = document.getElementById('linkStatus');
+    const openBtn   = document.getElementById('openLinkBtn');
+    const copyBtn   = document.getElementById('copyBtn');
+    const waBtn     = document.getElementById('waBtn');
+    const smsBtn    = document.getElementById('smsBtn');
+    const genBtn    = document.getElementById('generateBtn');
+    const retryBtn  = document.getElementById('retryBtn');
+
+    refLink.textContent = link || '';
+    status.textContent  = loading ? 'Checking for your link…' : message || '';
+
+    openBtn.style.display = link ? '' : 'none';
+    copyBtn.style.display = link ? '' : 'none';
+    waBtn.style.display   = link ? '' : 'none';
+    smsBtn.style.display  = link ? '' : 'none';
+
+    genBtn.style.display  = showGenerate ? '' : 'none';
+    retryBtn.style.display= showRetry ? '' : 'none';
+  }
+
+  async function initOrGenerateVRP({ generate=false } = {}){
+    const cid = state.actId || (new URLSearchParams(location.search).get('contactId') || '').trim();
+    if(!cid){
+      showShareUI({ message:'No contact selected.' });
+      return;
+    }
+    try{
+      showShareUI({ loading:true });
+      const out = await fetchVRP(cid, generate);
+      if(out.ok && out.url && !/Error generating referral link/i.test(out.url)){
+        showShareUI({ link: out.url, message: 'Your link is ready.' });
+        wireShareTargets(out.url);
+        flash();
+      }else{
+        const err = out.error || 'Error generating referral link';
+        showShareUI({
+          message: err,
+          showGenerate: !generate,
+          showRetry: generate
+        });
+      }
+    }catch(e){
+      showShareUI({ message:'Network error. Please try again.', showRetry:true });
+    }
+  }
+
+  // ---------- smart-fit tooltip (keeps bubbles in viewport) ----------
+  (function(){
+    const margin = 8;
+    document.querySelectorAll('.tooltip-wrapper').forEach(wrap=>{
+      const bub = wrap.querySelector('.tooltip-bubble');
+      if(!bub) return;
+
+      function positionBubble(){
+        bub.style.visibility = 'hidden';
+        bub.style.display = 'block';
+        bub.removeAttribute('data-placement');
+        bub.style.left = '50%';
+        bub.style.transform = 'translateX(-50%)';
+
+        let r = bub.getBoundingClientRect();
+
+        if (r.top < margin){
+          bub.setAttribute('data-placement','bottom');
+          r = bub.getBoundingClientRect();
+        }
+
+        let offsetX = 0;
+        if (r.right > window.innerWidth - margin){
+          offsetX = (window.innerWidth - margin) - r.right;
+        } else if (r.left < margin){
+          offsetX = margin - r.left;
+        }
+
+        const isBottom = bub.getAttribute('data-placement') === 'bottom';
+        const y = isBottom ? 4 : -4;
+        bub.style.transform = `translateX(calc(-50% + ${offsetX}px)) translateY(${y}px)`;
+
+        bub.style.visibility = '';
+        bub.style.display = '';
+      }
+
+      wrap.addEventListener('mouseenter', positionBubble);
+      ['scroll','resize'].forEach(ev=>{
+        window.addEventListener(ev, ()=> {
+          if (getComputedStyle(bub).visibility === 'visible') positionBubble();
+        }, { passive:true });
+      });
+    });
+  })();
+
+  // ---------- Flow submit (referrals we reach out to) ----------
   async function submitReferral(payload){
+    // Use your existing Flow/Creator/CRM webhook via your backend if possible.
+    // This sample posts directly to Flow; switch to your own proxy for CORS-free reads.
     const flat = new URLSearchParams();
-    flat.set('ref_code', payload.ref_code);        // public vrp (last 5)
-    if (payload.act_id) flat.set('act_id', payload.act_id); // private internal id
+    flat.set('ref_code', payload.ref_code);
+    if (payload.act_id) flat.set('act_id', payload.act_id);
+    flat.set('type', payload.type);
     flat.set('source', payload.source || 'referral_hub');
     flat.set('ts', payload.ts);
     if (payload.referrer_email) flat.set('referrer_email', payload.referrer_email);
@@ -228,7 +427,7 @@
     flat.set('prospect_email', payload.prospect.email || '');
 
     try {
-      await fetch("https://flow.zoho.com/756547289/flow/webhook/incoming?zapikey=1001.031e7ff6723e247a1fcb76e0f034da32.82a1c9376679cdffa874abf4bd63dc4a&isdebug=false", {
+      await fetch("https://flow.zoho.com/756547289/flow/webhook/incoming?zapikey=YOUR_KEY&isdebug=false", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
         body: flat.toString(),
@@ -241,13 +440,29 @@
     }
   }
 
-  // ---------- events ----------
-  document.getElementById("countInput").addEventListener("input", e=>{
-    const n = Math.max(1, parseInt(e.target.value || "1",10));
-    e.target.value = n;
-    document.getElementById("estimate").textContent = calcEstimate(n);
+  // ---------- tabs ----------
+  const tabCold   = document.getElementById("tab-cold");
+  const tabPre    = document.getElementById("tab-pre");
+  const panelCold = document.getElementById("panel-cold");
+  const panelPre  = document.getElementById("panel-pre");
+  function selectTab(which){
+    const cold = which === "cold";
+    tabCold.setAttribute("aria-selected", cold ? "true" : "false");
+    tabPre.setAttribute("aria-selected",  cold ? "false" : "true");
+    panelCold.classList.toggle("active", cold);
+    panelPre.classList.toggle("active",  !cold);
+  }
+  tabCold.addEventListener("click", ()=>selectTab("cold"));
+  tabPre.addEventListener("click",  ()=>selectTab("pre"));
+
+  // ---------- estimator ----------
+  document.getElementById("countRange").addEventListener("input", updateEstimate);
+  document.getElementById("refType").addEventListener("change", e=>{
+    if(e.target.value === "pre") confetti({particleCount:60, spread:60, origin:{y:0.7}});
+    updateEstimate();
   });
 
+  // ---------- submit contact ----------
   document.getElementById("addBtn").addEventListener("click", async ()=>{
     const name  = document.getElementById("prospectName").value.trim();
     const phone = document.getElementById("prospectPhone").value.replace(/[^\d+]/g,"");
@@ -255,9 +470,10 @@
     if(!name || !phone){ alert("Name and phone are required."); return; }
 
     const payload = {
-      ref_code: state.refCode,       // public short code
-      act_id: state.actId,           // full internal id (private)
+      ref_code: state.refCode,
+      act_id: state.actId,
       referrer_email: state.referrerEmail,
+      type: "cold",
       prospect: { name, phone, email },
       source: "referral_hub",
       ts: new Date().toISOString()
@@ -265,12 +481,10 @@
 
     const res = await submitReferral(payload);
     if(res && res.ok){
-      state.referrals.unshift({name, phone, email, status:"Pending"});
-      state.pending  += BASE_PER_ENROLL;
-      state.potential += BASE_PER_ENROLL;
-      renderRefs();
-      renderMoney();
-      flash();
+      state.referrals.unshift({name, phone, email, status:"Pending", type:"cold"});
+      state.pending  += RATE_COLD;
+      state.potential += RATE_COLD;
+      renderRefs(); renderMoney(); flash();
 
       const c = state.referrals.length;
       if([1,3,5,10].includes(c)) confetti({particleCount:220, spread:80, origin:{y:0.6}});
@@ -283,13 +497,16 @@
     }
   });
 
+  // ---------- share tab buttons ----------
+  document.getElementById('generateBtn').addEventListener('click', ()=> initOrGenerateVRP({ generate:true }));
+  document.getElementById('retryBtn').addEventListener('click',    ()=> initOrGenerateVRP({ generate:true }));
+
   // ---------- init ----------
-  setRefLink();
   renderMoney();
   renderRefs();
-  document.getElementById("estimate").textContent = calcEstimate(parseInt(document.getElementById("countInput").value,10));
+  updateEstimate();
+  // On load: check for existing link (no generation)
+  initOrGenerateVRP({ generate:false });
 </script>
-
-
 </body>
 </html>
