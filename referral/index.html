@@ -353,7 +353,7 @@ async function fetchVRP(contactId, generate = false) {
   async function initOrGenerateVRP({ generate = false } = {}) {
   const cid = state.actId || (new URLSearchParams(location.search).get('contactId') || '').trim();
   if (!cid) {
-    showShareUI({ message: 'No contact selected.' });
+    showShareUI({ message: 'No contact selected.', isEerror: true });
     return;
   }
 
@@ -363,7 +363,7 @@ async function fetchVRP(contactId, generate = false) {
     const out = await fetchVRP(cid, generate);
     // 1) Readable success with url
     if (out && out.ok && out.url && !/Error generating referral link/i.test(out.url)) {
-      showShareUI({ link: out.url, message: 'Your link is ready.' });
+      showShareUI({ link: out.url, message: '' }); //Your link is ready.
       wireShareTargets(out.url);
       flash();
       return;
@@ -372,14 +372,9 @@ async function fetchVRP(contactId, generate = false) {
     // 2) Readable state machine (if/when your proxy returns status)
     if (out && out.ok && out.status) {
       if (out.status === 'exists' || out.status === 'created') {
-        showShareUI({ link: out.url, message: 'Your link is ready.' });
+        showShareUI({ link: out.url, message: ''}); //, message: 'Your link is ready.' 
         wireShareTargets(out.url);
         flash();
-        return;
-      }
-      if (out.status === 'none') {
-        // initial check: no link yet, show Generate
-        showShareUI({ message: 'No link yet.', showGenerate: true });
         return;
       }
     }
@@ -399,15 +394,18 @@ async function fetchVRP(contactId, generate = false) {
     }
 
     // Explicit readable error
+    //if the error contains No contact 
+
     const err = (out && out.error) || 'Could not get referral link.';
     showShareUI({
       message: err,
       showGenerate: !generate,
-      showRetry: !!generate
+      showRetry: !!generate,
+      isEerror: true
     });
 
   } catch (e) {
-    showShareUI({ message: 'Network error. Please try again.', showRetry: true });
+    showShareUI({ message: 'Network error. Please try again.', showRetry: true, isEerror: true });
   }
 }
 
