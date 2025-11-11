@@ -327,7 +327,7 @@ async function fetchVRP(contactId, generate = false) {
     smsBtn.href = `sms:?&body=${msg}`;
   }
 
-  function showShareUI({ link, loading=false, showGenerate=false, showRetry=false, message='' }){
+  function showShareUI({ link, loading=false, showGenerate=false, showRetry=false, message='', isEerror=false }){
     const refLink   = document.getElementById('refLink');
     const status    = document.getElementById('linkStatus');
     const openBtn   = document.getElementById('openLinkBtn');
@@ -339,6 +339,7 @@ async function fetchVRP(contactId, generate = false) {
 
     refLink.textContent = link || '';
     status.textContent  = loading ? 'Checking for your link…' : message || '';
+    status.className    = isEerror ? 'text-warning' : 'muted';
 
     openBtn.style.display = link ? '' : 'none';
     copyBtn.style.display = link ? '' : 'none';
