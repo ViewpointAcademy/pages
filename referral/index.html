@@ -36,7 +36,8 @@
     .btn{display:inline-flex;align-items:center;gap:8px;border:none;background:var(--btn);color:#fff;padding:12px 16px;border-radius:10px;font-weight:600;cursor:pointer;text-decoration:none}
     .btn svg{width:18px;height:18px;flex:0 0 18px}
     .btn.secondary{background:var(--btn-alt);color:var(--btn-alt-ink);border:1px solid #cdd5ff}
-
+    .btn.secondary#copyBtn{padding:6px 6px;border-radius:50%;background:transparent;}
+    .btn.secondary#copyBtn:hover{background:var(--btn-alt);}
     label{display:block;font-size:12px;color:var(--muted);margin:10px 0 6px}
     input,select{width:100%;padding:10px;border:1px solid var(--border);border-radius:10px}
 
@@ -47,8 +48,8 @@
     input[type="range"]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--blue);cursor:pointer;border:none}
 
     .tabs{margin-top:16px}
-    .tabbar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
-    .tabbtn{padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:#fff;cursor:pointer;font-weight:600}
+    .tabbar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;justify-content: center;}
+    .tabbtn{padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:#fff;cursor:pointer;font-weight:600;max-width: 45%;}
     .tabbtn[aria-selected="true"]{background:#eef2ff;border-color:#cdd5ff;color:#1f2a59}
     .tabpanel{display:none}
     .tabpanel.active{display:block}
@@ -179,18 +180,48 @@
          <!-- inset div with flex vide grid left and right colum  -->
           <div style="display:flex;align-items:center;gap:4px">
               <div class="mono link-str" id="refLink" style="min-height:22px"></div>
+              <!-- svg in the button -->
               <div>
-                <button id="copyBtn" class="btn secondary" type="button" aria-label="Copy referral link" style="display:none">
-                Copy
-              </button>
-            </div>
-        </div>
-        <div class="muted" id="linkStatus" style="font-size:12px;margin-top:4px"></div>
+                <div>
+                <span class="tooltip-wrapper">
+                  <button id="copyBtn" class="btn secondary" type="button" aria-label="Copy referral link" style="display:none;">
+                 <img src="./copy.svg" alt="Copy" width="16" height="16" />                   
+                  </button>
+                <span class="tooltip-bubble">Copy Link</span>
+              </span>
 
+                </div>
+              </div>
+          </div>
+        <div class="muted" id="linkStatus" style="font-size:12px;margin-top:4px"></div>
+<script>
+document.getElementById('copyBtn').addEventListener('click', () => {
+    const copyBtn = document.getElementById('copyBtn');
+    const img = copyBtn.querySelector('img');
+    const transitionDuration = 100;
+    img.style.opacity = 0;
+
+    setTimeout(() => {
+        img.src = './check.svg';
+        img.style.opacity = 1;
+        setTimeout(() => {
+            img.style.opacity = 0;
+            setTimeout(() => {
+                img.src = './copy.svg';
+                img.style.opacity = 1;
+            }, transitionDuration);
+
+        }, 3000); // How long the "check" icon stays visible
+
+    }, transitionDuration);
+});
+</script>
         <!-- Share buttons -->
         <div class="inline" style="margin-top:8px">
-          <a id="waBtn" class="btn secondary" href="#" target="_blank" rel="noopener" aria-label="Share via WhatsApp" style="display:none">WhatsApp</a>
-          <a id="smsBtn" class="btn secondary" href="#" target="_blank" rel="noopener" aria-label="Share via SMS" style="display:none">SMS</a>
+          <a id="waBtn" class="btn secondary" href="#" target="_blank" rel="noopener" aria-label="Share via WhatsApp" style="display:none"> <img src="./whatsapp.svg" alt="Copy" width="20" height="20" />                   
+WhatsApp</a>
+          <a id="smsBtn" class="btn secondary" href="#" target="_blank" rel="noopener" aria-label="Share via SMS" style="display:none"> <img src="./sms.svg" alt="Copy" width="20" height="20" />                   
+SMS</a>
         </div>
       </section>
 
@@ -252,6 +283,59 @@
     document.getElementById("pending").textContent   = `$${state.pending.toLocaleString()}`;
     document.getElementById("potential").textContent = `$${state.potential.toLocaleString()}`;
   }
+  
+  // ---------- fetch referrals ----------
+  //https://zoho-proxy.ephraim-7a6.workers.dev/getreferrals
+  //https://zoho-proxy.ephraim-7a6.workers.dev/referrals?contact_id=4449829000036800352
+  //exsample response: {"status":"ok","message":{"status":"ok","vendor_Id":4.4498290000624317e+18,"count":3,"items":[{"Type":"Contact","Name":"Aron Weissmandl","Id":"4449829000070459931","Phone":"8458282812","Email":"rabbiweissmandl@gmail.com","Referral_Method":""},{"Type":"DealWon","Id":"4449829000060423035","Name":"Sruly Scharf","Phone":"+19296172661","Email":"srulyscharf@gmail.com","Referral_Amount":"","Referral_Method":""},{"Type":"DealWon","Id":"4449829000055592036","Name":"Jonathan Pasternak","Phone":"+1845-263-0329","Email":"jonathanpasternak70@gmail.com","Referral_Amount":"","Referral_Method":""}]}}
+  //create function getRefs() that fetches the referrals and updates the state.referrals array
+  async function getRefs(){
+    const cid = state.actId || (new URLSearchParams(location.search).get('contactId') || '').trim();  
+    if (!cid) {
+      return;
+    }
+    // Fetch referrals from backend proxy
+    const url = 'https://zoho-proxy.ephraim-7a6.workers.dev/referrals?contact_id=' + encodeURIComponent(cid);
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await res.json();
+    console.log('Fetched referral data:', data);
+    if (data.status === 'ok' && data.message && data.message.items) {
+      //add items to state.referrals
+
+      state.referrals = data.message.items.map(item => ({
+        name: item.Name || '',
+        phone: item.Phone || '',
+        email: item.Email || '',
+        status: item.Type === 'DealWon' ? 'Signed Up' : 'Pending',
+        earned: item.Type === 'DealWon' ? item.Referral_Amount : 0,
+        //Referral_Method options : Via Link, Phone In, Name Only, flag pre or cold
+        type: item.Regerral_Method === 'Via Link' ? 'pre' : (item.Referral_Method === 'Phone In' || item.Referral_Method === 'Name Only') ? 'pre' : 
+'cold'
+      }));
+      console.log('Fetched referrals:', state.referrals);
+      renderRefs();
+    }
+  }
+
+
+    // Simulated fetch - replace with real API call
+    // For demo purposes, we use static data
+    //fetch     const out = await fetchVRP(cid, generate);
+//     async function fetchVRP(contactId, generate = false) {
+//   const url = 'https://zoho-proxy.ephraim-7a6.workers.dev/referrallink';
+//   const res = await fetch(url, {
+//     method: 'POST',
+//     headers: { 'Content-Type': 'application/json' },
+//     body: JSON.stringify({ contact_id: String(contactId), generate: !!generate })
+//   });
+//   const data = await res.json();
+//   if (data.status === 'ok') return { ok: true, url: data.url || null, message: data.message };
+//   return { ok: false, error: data.message || 'Unknown error' };
+// }
+
 
   function renderRefs(){
     const list = document.getElementById("refList");
@@ -372,13 +456,13 @@ async function fetchVRP(contactId, generate = false) {
     if (out && out.ok && out.url && !/Error generating referral link/i.test(out.url)) {
       showShareUI({ link: out.url, message: '' }); //Your link is ready.
       wireShareTargets(out.url);
-      flash();
+      // flash();
       return;
     }
 
     // 2) Readable state machine (if/when your proxy returns status)
     if (out && out.ok && out.status) {
-      if (out.status === 'exists' || out.status === 'created') {
+      if ( out.status === 'created') { //out.status === 'exists' ||
         showShareUI({ link: out.url, message: ''}); //, message: 'Your link is ready.' 
         wireShareTargets(out.url);
         flash();
@@ -554,6 +638,7 @@ async function fetchVRP(contactId, generate = false) {
 
   // ---------- init ----------
   renderMoney();
+  getRefs();
   renderRefs();
   updateEstimate();
   // On load: check for existing link (no generation)
