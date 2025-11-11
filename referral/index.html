@@ -374,31 +374,34 @@ function normalizeProxy(raw) {
     smsBtn.href = `sms:?&body=${msg}`;
   }
 
-function showShareUI({ link, loading=false, showGenerate=false, showRetry=false, message='', isError=false }){
-  const refLink   = document.getElementById('refLink');
-  const status    = document.getElementById('linkStatus');
-  const openBtn   = document.getElementById('openLinkBtn');
-  const copyBtn   = document.getElementById('copyBtn');
-  const waBtn     = document.getElementById('waBtn');
-  const smsBtn    = document.getElementById('smsBtn');
-  const genBtn    = document.getElementById('generateBtn');
-  const retryBtn  = document.getElementById('retryBtn');
+  function showShareUI({ link, loading=false, showGenerate=false, showRetry=false, message='' }){
+    const refLink   = document.getElementById('refLink');
+    const status    = document.getElementById('linkStatus');
+    const openBtn   = document.getElementById('openLinkBtn');
+    const copyBtn   = document.getElementById('copyBtn');
+    const waBtn     = document.getElementById('waBtn');
+    const smsBtn    = document.getElementById('smsBtn');
+    const genBtn    = document.getElementById('generateBtn');
+    const retryBtn  = document.getElementById('retryBtn');
 
-  refLink.textContent = link || '';
-  status.textContent  = loading ? 'Checking for your link…' : (message || '');
+    refLink.textContent = link || '';
+    status.textContent  = loading ? 'Checking for your link…' : message || '';
 
-  if (isError) status.classList.add('text-warning');
-  else status.classList.remove('text-warning');
+    /* *** ADDED: Add/remove warning class based on isError *** */
+    if (isError) {
+        status.classList.add('text-warning');
+    } else {
+        status.classList.remove('text-warning');
+    }
 
-  openBtn.style.display = link ? '' : 'none';
-  copyBtn.style.display = link ? '' : 'none';
-  waBtn.style.display   = link ? '' : 'none';
-  smsBtn.style.display  = link ? '' : 'none';
+    openBtn.style.display = link ? '' : 'none';
+    copyBtn.style.display = link ? '' : 'none';
+    waBtn.style.display   = link ? '' : 'none';
+    smsBtn.style.display  = link ? '' : 'none';
 
-  genBtn.style.display   = showGenerate ? '' : 'none';
-  retryBtn.style.display = showRetry ? '' : 'none';
-}
-
+    genBtn.style.display  = showGenerate ? '' : 'none';
+    retryBtn.style.display= showRetry ? '' : 'none';
+  }
 
   async function initOrGenerateVRP({ generate = false } = {}) {
   const cid = state.actId || (new URLSearchParams(location.search).get('contactId') || '').trim();
