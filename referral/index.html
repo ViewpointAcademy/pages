@@ -220,7 +220,7 @@
   // ---------- params ----------
   const qs = new URLSearchParams(location.search);
   state.referrerEmail = qs.get("siq_email") || null;
-  const rawActId = (qs.get("act_id") || "").trim();
+  const rawActId = (qs.get("contact_id") || "").trim();
   state.actId = rawActId || null;
   const actDigits = (rawActId || "").replace(/\D/g,"");
   state.refCode = actDigits.slice(-5) || (state.referrerEmail ? btoa(state.referrerEmail).replace(/=+$/,"").slice(0,5) : "XXXXX");
@@ -493,7 +493,7 @@ function normalizeProxy(raw) {
     // This sample posts directly to Flow; switch to your own proxy for CORS-free reads.
     const flat = new URLSearchParams();
     flat.set('ref_code', payload.ref_code);
-    if (payload.act_id) flat.set('act_id', payload.act_id);
+    if (payload.contact_id) flat.set('contact_id', payload.contact_id);
     flat.set('type', payload.type);
     flat.set('source', payload.source || 'referral_hub');
     flat.set('ts', payload.ts);
@@ -547,7 +547,7 @@ function normalizeProxy(raw) {
 
     const payload = {
       ref_code: state.refCode,
-      act_id: state.actId,
+      contact_id: state.actId,
       referrer_email: state.referrerEmail,
       type: "cold",
       prospect: { name, phone, email },
