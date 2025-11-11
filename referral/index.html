@@ -287,38 +287,63 @@
   //  POST /api/vrp { contactId, generate }
   //  -> { ok:true, url:"https://viewpointlearn.com/apply?vrp=ABCDE" } OR { ok:false, error:"Error generating referral link" }
 async function fetchVRP(contactId, generate = false) {
-  const u = new URL('https://zoho-proxy.ephraim-7a6.workers.dev/referrallink');
-  u.searchParams.set('contact_id', String(contactId));
-  u.searchParams.set('generate', String(!!generate));
+  const proxyUrl = 'https://zoho-proxy.ephraim-7a6.workers.dev/referrallink';
+  try {
+    const res = await fetch(proxyUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contact_id: String(contactId), generate: !!generate })
+    });
 
-  const res  = await fetch(u.toString(), { method: 'GET' });
-  const text = await res.text();              // Worker returns Deluge JSON string
-  try { return JSON.parse(text); } catch {    // {status:"ok", url:"..." } or {status:"error", message:"..."}
-    return { status: 'error', message: 'Bad JSON from proxy' };
+    // Read as text, then try to parse
+    const text = await res.text();
+    let raw;
+    try { raw = JSON.parse(text); } catch { raw = text; }
+
+    console.log('Proxy response:', raw);
+
+    return normalizeProxy(raw);
+
+  } catch (err) {
+    console.error('Error calling proxy:', err);
+    return { ok: false, error: 'Network or proxy error' };
   }
 }
 
 
 function normalizeProxy(raw) {
-  // Already normalized?
-  if (raw && typeof raw === 'object' && 'ok' in raw) return raw;
+  // Already normalized contract
+  if (raw && typeof raw === 'object' && ('ok' in raw || 'status' in raw)) {
+    if ('ok' in raw) return raw; // { ok: true/false, url?, error? }
+    // Deluge-style: { status: "ok" | "error", url?, message? }
+    if (raw.status === 'ok' && raw.url) return { ok: true, url: raw.url, status: 'exists' };
+    if (raw.status === 'ok' && raw.message === 'No referral link found')
+      return { ok: true, status: 'none' };
+    return { ok: false, error: raw.message || 'Unknown error' };
+  }
 
-  // Zoho-style success with details.output
+  // Zoho full envelope from Worker (if you ever stop unwrapping)
   if (raw?.details?.output) {
     const out = String(raw.details.output || '');
     if (/^https?:\/\//i.test(out)) return { ok: true, url: out, status: 'exists' };
-    // Zoho sometimes returns error text in output
-    return { ok: false, error: out || 'Unknown Zoho output' };
+    try {
+      const obj = JSON.parse(out);
+      return normalizeProxy(obj);
+    } catch {
+      return { ok: false, error: out || 'Unknown Zoho output' };
+    }
   }
 
-  // Raw string URL?
-  if (typeof raw === 'string' && /^https?:\/\//i.test(raw)) {
-    return { ok: true, url: raw, status: 'exists' };
+  // Bare JSON string or quoted URL
+  if (typeof raw === 'string') {
+    if (/^https?:\/\//i.test(raw)) return { ok: true, url: raw, status: 'exists' };
+    try { return normalizeProxy(JSON.parse(raw)); } catch { /* fall through */ }
+    return { ok: false, error: raw || 'Bad proxy response' };
   }
 
-  // Fallback
-  return { ok: false, error: raw?.message || 'Bad proxy response' };
+  return { ok: false, error: 'Bad proxy response' };
 }
+
 
 
 
@@ -349,34 +374,31 @@ function normalizeProxy(raw) {
     smsBtn.href = `sms:?&body=${msg}`;
   }
 
-  function showShareUI({ link, loading=false, showGenerate=false, showRetry=false, message='' }){
-    const refLink   = document.getElementById('refLink');
-    const status    = document.getElementById('linkStatus');
-    const openBtn   = document.getElementById('openLinkBtn');
-    const copyBtn   = document.getElementById('copyBtn');
-    const waBtn     = document.getElementById('waBtn');
-    const smsBtn    = document.getElementById('smsBtn');
-    const genBtn    = document.getElementById('generateBtn');
-    const retryBtn  = document.getElementById('retryBtn');
+function showShareUI({ link, loading=false, showGenerate=false, showRetry=false, message='', isError=false }){
+  const refLink   = document.getElementById('refLink');
+  const status    = document.getElementById('linkStatus');
+  const openBtn   = document.getElementById('openLinkBtn');
+  const copyBtn   = document.getElementById('copyBtn');
+  const waBtn     = document.getElementById('waBtn');
+  const smsBtn    = document.getElementById('smsBtn');
+  const genBtn    = document.getElementById('generateBtn');
+  const retryBtn  = document.getElementById('retryBtn');
 
-    refLink.textContent = link || '';
-    status.textContent  = loading ? 'Checking for your link…' : message || '';
+  refLink.textContent = link || '';
+  status.textContent  = loading ? 'Checking for your link…' : (message || '');
 
-    /* *** ADDED: Add/remove warning class based on isError *** */
-    if (isError) {
-        status.classList.add('text-warning');
-    } else {
-        status.classList.remove('text-warning');
-    }
+  if (isError) status.classList.add('text-warning');
+  else status.classList.remove('text-warning');
 
-    openBtn.style.display = link ? '' : 'none';
-    copyBtn.style.display = link ? '' : 'none';
-    waBtn.style.display   = link ? '' : 'none';
-    smsBtn.style.display  = link ? '' : 'none';
+  openBtn.style.display = link ? '' : 'none';
+  copyBtn.style.display = link ? '' : 'none';
+  waBtn.style.display   = link ? '' : 'none';
+  smsBtn.style.display  = link ? '' : 'none';
 
-    genBtn.style.display  = showGenerate ? '' : 'none';
-    retryBtn.style.display= showRetry ? '' : 'none';
-  }
+  genBtn.style.display   = showGenerate ? '' : 'none';
+  retryBtn.style.display = showRetry ? '' : 'none';
+}
+
 
   async function initOrGenerateVRP({ generate = false } = {}) {
   const cid = state.actId || (new URLSearchParams(location.search).get('contactId') || '').trim();
