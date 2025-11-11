@@ -80,6 +80,8 @@
     .tooltip-bubble[data-placement="bottom"]::after{
       top:auto;bottom:100%;border-color:transparent transparent #111 transparent
     }
+    .text-warning { color: #d9534f; font-weight: 600; }
+
   </style>
 </head>
 
@@ -285,26 +287,17 @@
   //  POST /api/vrp { contactId, generate }
   //  -> { ok:true, url:"https://viewpointlearn.com/apply?vrp=ABCDE" } OR { ok:false, error:"Error generating referral link" }
 async function fetchVRP(contactId, generate = false) {
-  const proxyUrl = 'https://zoho-proxy.ephraim-7a6.workers.dev/referrallink';
-  try {
-    const res = await fetch(proxyUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contact_id: contactId, generate })
-    });
+  const u = new URL('https://zoho-proxy.ephraim-7a6.workers.dev/referrallink');
+  u.searchParams.set('contact_id', String(contactId));
+  u.searchParams.set('generate', String(!!generate));
 
-    const raw = await res.json();
-    console.log('Proxy response:', raw);
-
-    // Normalize Zoho/Worker shapes to { ok, url, status? }
-    const data = normalizeProxy(raw);
-    return data;
-
-  } catch (err) {
-    console.error('Error calling proxy:', err);
-    return { ok: false, error: 'Network or proxy error' };
+  const res  = await fetch(u.toString(), { method: 'GET' });
+  const text = await res.text();              // Worker returns Deluge JSON string
+  try { return JSON.parse(text); } catch {    // {status:"ok", url:"..." } or {status:"error", message:"..."}
+    return { status: 'error', message: 'Bad JSON from proxy' };
   }
 }
+
 
 function normalizeProxy(raw) {
   // Already normalized?
@@ -366,11 +359,18 @@ function normalizeProxy(raw) {
     const genBtn    = document.getElementById('generateBtn');
     const retryBtn  = document.getElementById('retryBtn');
 
-    refLink.textContent = link || '';
-    status.textContent  = loading ? 'Checking for your link…' : message || '';
+    refLink.textContent = link || '';
+    status.textContent  = loading ? 'Checking for your link…' : message || '';
 
-    openBtn.style.display = link ? '' : 'none';
-    copyBtn.style.display = link ? '' : 'none';
+    /* *** ADDED: Add/remove warning class based on isError *** */
+    if (isError) {
+        status.classList.add('text-warning');
+    } else {
+        status.classList.remove('text-warning');
+    }
+
+    openBtn.style.display = link ? '' : 'none';
+    copyBtn.style.display = link ? '' : 'none';
     waBtn.style.display   = link ? '' : 'none';
     smsBtn.style.display  = link ? '' : 'none';
 
@@ -381,8 +381,8 @@ function normalizeProxy(raw) {
   async function initOrGenerateVRP({ generate = false } = {}) {
   const cid = state.actId || (new URLSearchParams(location.search).get('contactId') || '').trim();
   if (!cid) {
-    showShareUI({ message: 'No contact selected.' });
-    return;
+    showShareUI({ message: 'No contact selected.', isError: true });
+    return;
   }
 
   try {
@@ -428,14 +428,15 @@ function normalizeProxy(raw) {
 
     // Explicit readable error
     const err = (out && out.error) || 'Could not get referral link.';
-    showShareUI({
-      message: err,
-      showGenerate: !generate,
-      showRetry: !!generate
-    });
+    showShareUI({
+      message: err,
+      showGenerate: false,  // Hide generate button on error
+      showRetry: true,      // Show retry button instead
+      isError: true       // Show warning color
+    });
 
   } catch (e) {
-    showShareUI({ message: 'Network error. Please try again.', showRetry: true });
+    showShareUI({ message: 'Network error. Please try again.', showRetry: true, isError: true });
   }
 }
 
