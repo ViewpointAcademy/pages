@@ -285,7 +285,7 @@
   //  POST /api/vrp { contactId, generate }
   //  -> { ok:true, url:"https://viewpointlearn.com/apply?vrp=ABCDE" } OR { ok:false, error:"Error generating referral link" }
 async function fetchVRP(contactId, generate = false) {
-  const proxyUrl = 'https://zoho-proxy.ephraim-7a6.workers.dev';
+  const proxyUrl = 'https://zoho-proxy.ephraim-7a6.workers.dev/referrals';
   try {
     const res = await fetch(proxyUrl, {
       method: 'POST',
