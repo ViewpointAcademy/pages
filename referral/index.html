@@ -168,18 +168,23 @@
 
         <!-- Controls -->
         <div class="inline" style="margin-bottom:8px">
-          <a id="openLinkBtn" class="btn" href="#" target="_blank" rel="noopener" aria-label="Open referral link" style="display:none">
+          <!-- <a id="openLinkBtn" class="btn" href="#" target="_blank" rel="noopener" aria-label="Open referral link" style="display:none">
             Open link
-          </a>
-          <button id="copyBtn" class="btn secondary" type="button" aria-label="Copy referral link" style="display:none">
-            Copy
-          </button>
+          </a> -->
           <button id="generateBtn" class="btn" type="button" style="display:none">Generate link</button>
           <button id="retryBtn" class="btn secondary" type="button" style="display:none">Try again</button>
         </div>
 
         <!-- Link / status -->
-        <div class="mono link-str" id="refLink" style="min-height:22px"></div>
+         <!-- inset div with flex vide grid left and right colum  -->
+          <div style="display:flex;align-items:center;gap:4px">
+              <div class="mono link-str" id="refLink" style="min-height:22px"></div>
+              <div>
+                <button id="copyBtn" class="btn secondary" type="button" aria-label="Copy referral link" style="display:none">
+                Copy
+              </button>
+            </div>
+        </div>
         <div class="muted" id="linkStatus" style="font-size:12px;margin-top:4px"></div>
 
         <!-- Share buttons -->
