@@ -136,7 +136,7 @@
       <!-- Tab A -->
       <section id="panel-cold" class="tabpanel active" role="tabpanel" aria-labelledby="tab-cold">
         <h1>Add a referral</h1>
-        <p class="muted" style="margin:0 0 12px;display:flex;align-items:center;gap:4px">
+        <p class="muted" style="margin:0 0 12px;">
           Enter a name and phone. You earn <strong>$75</strong> per signup.
           <span class="tooltip-wrapper">
             <i class="bi bi-info-circle" style="font-size:15px;color:#6b7280"></i>
@@ -158,7 +158,7 @@
       <!-- Tab B -->
       <section id="panel-pre" class="tabpanel" role="tabpanel" aria-labelledby="tab-pre">
         <h1>Share your referral link</h1>
-        <p class="muted" style="margin:0 0 12px;display:flex;align-items:center;gap:4px">
+        <p class="muted" style="margin:0 0 12px;">
           Share your link or have them mention your name. You earn <strong>$250</strong> per signup.
           <span class="tooltip-wrapper">
             <i class="bi bi-info-circle" style="font-size:15px;color:#6b7280"></i>
@@ -327,7 +327,7 @@ async function fetchVRP(contactId, generate = false) {
     smsBtn.href = `sms:?&body=${msg}`;
   }
 
-  function showShareUI({ link, loading=false, showGenerate=false, showRetry=false, message='' }){
+  function showShareUI({ link, loading=false, showGenerate=false, showRetry=false, message='', isEerror=false }){
     const refLink   = document.getElementById('refLink');
     const status    = document.getElementById('linkStatus');
     const openBtn   = document.getElementById('openLinkBtn');
@@ -339,6 +339,7 @@ async function fetchVRP(contactId, generate = false) {
 
     refLink.textContent = link || '';
     status.textContent  = loading ? 'Checking for your link…' : message || '';
+    status.className    = isEerror ? 'text-warning' : 'muted';
 
     openBtn.style.display = link ? '' : 'none';
     copyBtn.style.display = link ? '' : 'none';
@@ -352,7 +353,7 @@ async function fetchVRP(contactId, generate = false) {
   async function initOrGenerateVRP({ generate = false } = {}) {
   const cid = state.actId || (new URLSearchParams(location.search).get('contactId') || '').trim();
   if (!cid) {
-    showShareUI({ message: 'No contact selected.' });
+    showShareUI({ message: 'No contact selected.', isEerror: true });
     return;
   }
 
@@ -362,7 +363,7 @@ async function fetchVRP(contactId, generate = false) {
     const out = await fetchVRP(cid, generate);
     // 1) Readable success with url
     if (out && out.ok && out.url && !/Error generating referral link/i.test(out.url)) {
-      showShareUI({ link: out.url, message: 'Your link is ready.' });
+      // showShareUI({ link: out.url, message: 'Your link is ready.' });
       wireShareTargets(out.url);
       flash();
       return;
@@ -402,11 +403,12 @@ async function fetchVRP(contactId, generate = false) {
     showShareUI({
       message: err,
       showGenerate: !generate,
-      showRetry: !!generate
+      showRetry: !!generate,
+      isEerror: true
     });
 
   } catch (e) {
-    showShareUI({ message: 'Network error. Please try again.', showRetry: true });
+    showShareUI({ message: 'Network error. Please try again.', showRetry: true, isEerror: true });
   }
 }
 
