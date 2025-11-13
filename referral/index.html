@@ -15,6 +15,7 @@
     :root{
       --blue:#3057A4; --ink:#222; --muted:#6b7280; --bg:#f5f7fa; --card:#fff; --border:#e6e9f2;
       --btn:#3057A4; --btn-alt:#eef2ff; --btn-alt-ink:#1f2a59;
+      --green: #28a745;
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}
@@ -22,7 +23,8 @@
     .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px}
     h1{font-size:22px;margin:8px 0 4px}
     h2{font-size:16px;margin:0 0 6px;color:var(--muted)}
-    .stat{font-size:32px;font-weight:800}
+    .stat{font-size:32px;font-weight:600}
+    .earnings{color:var(--green)}
     .muted{color:var(--muted)}
     .kpis{display:flex;gap:18px;flex-wrap:wrap;margin-top:8px}
     .kpi{font-size:14px}
@@ -61,6 +63,9 @@
     .list{margin-top:12px;border-top:1px dashed var(--border)}
     .item{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px dashed var(--border)}
     .badge{font-size:12px;padding:4px 8px;border-radius:999px;background:#eef2ff;color:#1f2a59}
+    .badge-success{background:#d1fae5;color:#065f46}
+    .badge-neutral{background:#e5e7eb;color:#374151}
+        /* .badge-success{background:#e6f9ef;color:#166534;border:1px solid #6ee7b7;font-weight:600} */
 
     /* tooltip */
     .tooltip-wrapper{position:relative;display:inline-flex;align-items:center;cursor:pointer}
@@ -82,6 +87,46 @@
       top:auto;bottom:100%;border-color:transparent transparent #111 transparent
     }
     .text-warning { color: #d9534f; font-weight: 600; }
+.loader-block {
+  padding: 12px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.loader-line {
+  height: 12px;
+  width: 100%;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.loader-line.short {
+  width: 60%;
+}
+
+.shimmer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -40%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.6) 50%,
+    rgba(255,255,255,0) 100%
+  );
+  animation: shimmer 1.2s infinite;
+}
+
+@keyframes shimmer {
+  0% { left: -40%; }
+  100% { left: 100%; }
+}
 
   </style>
 </head>
@@ -94,10 +139,9 @@
     <div class="earn-flex">
       <div class="earn-left">
         <h2>Your earnings</h2>
-        <div class="stat" id="earned">$0</div>
-        <div class="kpis">
+        <div class="stat earnings" id="earned">$0</div>
+        <div class="kpis" id="kpis">
           <div class="kpi muted">Pending<br><strong id="pending">$0</strong></div>
-          <div class="kpi muted">Potential Pending<br><strong id="potential">$0</strong></div>
         </div>
       </div>
 
@@ -251,7 +295,6 @@ SMS</a>
     refCode: null, // public vrp if needed (legacy)
     earned: 0,
     pending: 0,
-    potential: 0,
     referrals: [] // {name, phone, email, status, type}
   };
 
@@ -281,44 +324,184 @@ SMS</a>
   function renderMoney(){
     document.getElementById("earned").textContent    = `$${state.earned.toLocaleString()}`;
     document.getElementById("pending").textContent   = `$${state.pending.toLocaleString()}`;
-    document.getElementById("potential").textContent = `$${state.potential.toLocaleString()}`;
   }
   
   // ---------- fetch referrals ----------
   //https://zoho-proxy.ephraim-7a6.workers.dev/getreferrals
   //https://zoho-proxy.ephraim-7a6.workers.dev/referrals?contact_id=4449829000036800352
-  //exsample response: {"status":"ok","message":{"status":"ok","vendor_Id":4.4498290000624317e+18,"count":3,"items":[{"Type":"Contact","Name":"Aron Weissmandl","Id":"4449829000070459931","Phone":"8458282812","Email":"rabbiweissmandl@gmail.com","Referral_Method":""},{"Type":"DealWon","Id":"4449829000060423035","Name":"Sruly Scharf","Phone":"+19296172661","Email":"srulyscharf@gmail.com","Referral_Amount":"","Referral_Method":""},{"Type":"DealWon","Id":"4449829000055592036","Name":"Jonathan Pasternak","Phone":"+1845-263-0329","Email":"jonathanpasternak70@gmail.com","Referral_Amount":"","Referral_Method":""}]}}
+  //eg: {"status":"ok","vendor_Id":4449829000062431700,"count":3,"items":[{"Type":"Contact","Name":"Aron Weissmandl","Id":"4449829000070459931","Phone":"8458282812","Email":"rabbiweissmandl@gmail.com","Referral_Method":""},{"Type":"DealWon","Id":"4449829000060423035","Name":"Sruly Scharf","Phone":"+19296172661","Email":"srulyscharf@gmail.com","Referral_Amount":587.5,"Referral_Method":"Phone In"},{"Type":"DealWon","Id":"4449829000055592036","Name":"Jonathan Pasternak","Phone":"+1845-263-0329","Email":"jonathanpasternak70@gmail.com","Referral_Amount":0,"Referral_Method":"Phone In"}]}
   //create function getRefs() that fetches the referrals and updates the state.referrals array
-  async function getRefs(){
-    const cid = state.actId || (new URLSearchParams(location.search).get('contactId') || '').trim();  
-    if (!cid) {
-      return;
-    }
-    // Fetch referrals from backend proxy
-    const url = 'https://zoho-proxy.ephraim-7a6.workers.dev/referrals?contact_id=' + encodeURIComponent(cid);
-    const res = await fetch(url, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' }
-    });
-    const data = await res.json();
-    console.log('Fetched referral data:', data);
-    if (data.status === 'ok' && data.message && data.message.items) {
-      //add items to state.referrals
 
-      state.referrals = data.message.items.map(item => ({
-        name: item.Name || '',
-        phone: item.Phone || '',
-        email: item.Email || '',
-        status: item.Type === 'DealWon' ? 'Signed Up' : 'Pending',
-        earned: item.Type === 'DealWon' ? item.Referral_Amount : 0,
-        //Referral_Method options : Via Link, Phone In, Name Only, flag pre or cold
-        type: item.Regerral_Method === 'Via Link' ? 'pre' : (item.Referral_Method === 'Phone In' || item.Referral_Method === 'Name Only') ? 'pre' : 
-'cold'
-      }));
-      console.log('Fetched referrals:', state.referrals);
-      renderRefs();
-    }
+
+  function normalizeRefResponse(data){
+  // supports both {status, items} and {status, message:{items}}
+  if (data && data.message && Array.isArray(data.message.items)) {
+    return { ok: data.status === 'ok', items: data.message.items };
   }
+  return { ok: data && data.status === 'ok' && Array.isArray(data.items), items: (data && data.items) || [] };
+}
+
+function mapTypeByMethod(method){
+  const m = (method || '').toLowerCase();
+  if (m.includes('link') || m.includes('phone in') || m.includes('name only')) return 'inreach';
+  return 'outreach';
+}
+
+
+function renderLoaderRefs() {
+  const list = document.getElementById("refList");
+
+  list.innerHTML = `
+    <div class="loader-block">
+      <div class="loader-line shimmer" style="height:20px;" ></div>
+      <div class="loader-line shimmer short" style="height:12px;"></div>
+    </div>
+  `;
+
+  const earned = document.getElementById("earned");
+  earned.innerHTML = `<div class="loader-line shimmer" style="height:40px; width: 80px;"></div>`;
+  const pending = document.getElementById("pending");
+  pending.innerHTML = `<div class="loader-line shimmer" style="height:16px; width: 60px;"></div>`;
+}
+
+
+async function getRefs(){
+  renderLoaderRefs();
+
+  const cid = state.actId || (new URLSearchParams(location.search).get('contactId') || '').trim();
+  if (!cid) {
+    // no contact → clear loader and show empty state
+    state.referrals = [];
+    state.earned = 0;
+    state.pending = 0;
+    renderMoney();
+    renderRefs();
+    return;
+  }
+
+  const url  = 'https://zoho-proxy.ephraim-7a6.workers.dev/referrals?contact_id=' + encodeURIComponent(cid);
+  const res  = await fetch(url, { headers: { 'Content-Type': 'application/json' } });
+  const data = await res.json();
+
+  const items = (data && data.message && data.message.items)
+    ? data.message.items
+    : (Array.isArray(data?.items) ? data.items : []);
+
+  // 👉 IMPORTANT: if zero items, clear loader & show "No referrals yet"
+  if (!items.length) {
+    state.referrals = [];
+    state.earned = 0;
+    state.pending = 0;
+    renderMoney();   // put back $0 / $0 instead of skeleton divs
+    renderRefs();    // this will render the "No referrals yet." row
+    return;
+  }
+
+  state.referrals = items.map(item => {
+    const status = item.Type === 'DealWon' ? 'Signed Up' : 'Pending';
+    const earned = Number(item.Referral_Amount || 0) || 0;
+    const type   = mapTypeByMethod(item.Referral_Method);
+    return {
+      name:  item.Name  || '',
+      phone: item.Phone || '',
+      email: item.Email || '',
+      status,
+      earned,
+      type,                       // inreach | outreach
+      methodRaw: item.Referral_Method || ''
+    };
+  });
+
+  // normalize legacy types
+  state.referrals = state.referrals.map(r => ({ ...r, type: normalizeType(r.type) }));
+
+  recalcTotals();
+  renderRefs();
+}
+
+
+function valueForEarnings(r){
+  // If Closed Won has a numeric amount, use it; otherwise default to the base rate by direction
+  const amt = Number(r.earned || 0);
+  return amt > 0 ? amt : baseRateFor(r.type);
+}
+
+function recalcTotals(){
+  const won = state.referrals.filter(r => r.status === 'Signed Up');
+  state.earned = won.reduce((sum, r) => sum + valueForEarnings(r), 0);
+
+  const pending = state.referrals.filter(r => r.status !== 'Signed Up');
+  const pipeline = pending.reduce((sum, r) => sum + baseRateFor(r.type), 0);
+
+  state.pending = pipeline + (Number(state.estimate) || 0);
+  renderMoney();
+}
+
+
+
+function renderRefs(){
+  const list = document.getElementById("refList");
+  list.innerHTML = "";
+  if (state.referrals.length === 0){
+    const row = document.createElement("div");
+    row.className = "item muted";
+    row.innerHTML = `<span>No referrals yet.</span><span></span>`;
+    list.appendChild(row);
+    return;
+  }
+
+  const fmt = n => `$${Number(n).toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+
+  state.referrals.forEach(r => {
+    const label  = directionLabel(r.type);
+    const amount = displayAmountFor(r);
+
+    const row = document.createElement("div");
+    row.className = "item";
+const isSigned = r.status === 'Signed Up';
+const badgeClass = isSigned ? 'badge badge-success' : 'badge';
+
+row.innerHTML = `<div>
+    <div><strong>${r.name}</strong> <span class="muted">(${r.phone})</span></div>
+    <div class="muted">${r.email || ""}</div>
+  </div>
+  <div style="text-align:right">
+    <div><span class="${badgeClass}">${r.status}</span></div>
+    <div class="muted" style="margin-top:4px; font-size:12px">${label} • ${fmt(amount)}</div>
+  </div>`;
+    list.appendChild(row);
+  });
+}
+
+function normalizeType(t){
+  const x = String(t || '').toLowerCase();
+  if (x === 'inreach' || x === 'pre') return 'inreach';
+  if (x === 'outreach' || x === 'cold') return 'outreach';
+  return 'inreach'; // default
+}
+
+// Default to inreach unless explicitly "Name Only"
+function mapTypeByMethod(method){
+  const m = String(method || '').trim().toLowerCase();
+  if (m === 'name only') return 'outreach';
+  return 'inreach';
+}
+
+function directionLabel(t){
+  const norm = normalizeType(t);
+  return norm === 'inreach' ? 'They reached out' : 'We reached out';
+}
+
+function baseRateFor(t){
+  const norm = normalizeType(t);
+  return norm === 'inreach' ? RATE_PRE : RATE_COLD;
+}
+
+function displayAmountFor(ref){
+  const earned = Number(ref.earned || 0);
+  if (earned > 0) return earned;     // prefer actual amount from deal
+  return baseRateFor(ref.type);      // else show base rate for direction
+}
 
 
     // Simulated fetch - replace with real API call
@@ -336,42 +519,16 @@ SMS</a>
 //   return { ok: false, error: data.message || 'Unknown error' };
 // }
 
+function updateEstimate(){
+  const n = parseInt(document.getElementById("countRange").value, 10);
+  const type = document.getElementById("refType").value;
+  document.getElementById("countVal").textContent = String(n);
+  const ladder = type === "pre" ? MILESTONES_PRE : MILESTONES_COLD;
+  document.getElementById("bonusNote").textContent = ladderText(ladder);
+  document.getElementById("estimate").textContent = calcEstimate(n, type);
+  // No change to KPI numbers
+}
 
-  function renderRefs(){
-    const list = document.getElementById("refList");
-    list.innerHTML = "";
-    if(state.referrals.length === 0){
-      const row = document.createElement("div");
-      row.className = "item muted";
-      row.innerHTML = `<span>No referrals yet.</span><span></span>`;
-      list.appendChild(row);
-      return;
-    }
-    state.referrals.forEach(r => {
-      const rate = r.type === "pre" ? RATE_PRE : RATE_COLD;
-      const label = r.type === "pre" ? "They called us" : "We reached out";
-      const row = document.createElement("div");
-      row.className = "item";
-      row.innerHTML = `<div>
-          <div><strong>${r.name}</strong> <span class="muted">(${r.phone})</span></div>
-          <div class="muted">${r.email || ""}</div>
-        </div>
-        <div style="text-align:right">
-          <div><span class="badge">${r.status}</span></div>
-          <div class="muted" style="margin-top:4px; font-size:12px">${label} • $${rate}</div>
-        </div>`;
-      list.appendChild(row);
-    });
-  }
-
-  function updateEstimate(){
-    const n = parseInt(document.getElementById("countRange").value, 10);
-    const type = document.getElementById("refType").value;
-    document.getElementById("countVal").textContent = String(n);
-    const ladder = type === "pre" ? MILESTONES_PRE : MILESTONES_COLD;
-    document.getElementById("bonusNote").textContent = ladderText(ladder);
-    document.getElementById("estimate").textContent = calcEstimate(n, type);
-  }
 
   // ---------- VRP via backend proxy ----------
   // Your backend endpoint must call the Zoho function and normalize result:
@@ -598,39 +755,63 @@ async function fetchVRP(contactId, generate = false) {
   });
 
   // ---------- submit contact ----------
-  document.getElementById("addBtn").addEventListener("click", async ()=>{
-    const name  = document.getElementById("prospectName").value.trim();
-    const phone = document.getElementById("prospectPhone").value.replace(/[^\d+]/g,"");
-    const email = document.getElementById("prospectEmail").value.trim();
-    if(!name || !phone){ alert("Name and phone are required."); return; }
+document.getElementById("addBtn").addEventListener("click", async () => {
+  const btn   = document.getElementById("addBtn");
+  const name  = document.getElementById("prospectName").value.trim();
+  const phone = document.getElementById("prospectPhone").value.replace(/[^\d+]/g, "");
+  const email = document.getElementById("prospectEmail").value.trim();
 
-    const payload = {
-      ref_code: state.refCode,
-      contact_id: state.actId,
-      referrer_email: state.referrerEmail,
-      type: "cold",
-      prospect: { name, phone, email },
-      source: "referral_hub",
-      ts: new Date().toISOString()
-    };
+  if (!name || !phone) { alert("Name and phone are required."); return; }
 
+  // prevent double clicks
+  btn.disabled = true;
+
+  const payload = {
+    ref_code: state.refCode,
+    contact_id: state.actId,
+    referrer_email: state.referrerEmail,
+    type: "cold",                 // outbound submission
+    prospect: { name, phone, email },
+    source: "referral_hub",
+    ts: new Date().toISOString()
+  };
+
+  try {
     const res = await submitReferral(payload);
-    if(res && res.ok){
-      state.referrals.unshift({name, phone, email, status:"Pending", type:"cold"});
-      state.pending  += RATE_COLD;
-      state.potential += RATE_COLD;
-      renderRefs(); renderMoney(); flash();
+    if (res && res.ok) {
+      // local echo: pending outreach item
+      state.referrals.unshift({
+        name, phone, email,
+        status: "Pending",
+        type: "outreach",
+        earned: 0
+      });
 
+      recalcTotals();   // recomputes earned/pending/potential from state
+      renderRefs();
+      flash();
+
+      // milestone confetti
       const c = state.referrals.length;
-      if([1,3,5,10].includes(c)) confetti({particleCount:220, spread:80, origin:{y:0.6}});
+      if ([1, 3, 5, 10].includes(c)) {
+        confetti({ particleCount: 220, spread: 80, origin: { y: 0.6 } });
+      }
 
-      document.getElementById("prospectName").value = "";
+      // reset form
+      document.getElementById("prospectName").value  = "";
       document.getElementById("prospectPhone").value = "";
       document.getElementById("prospectEmail").value = "";
     } else {
       alert("Could not add referral. Try again.");
     }
-  });
+  } catch (e) {
+    console.error(e);
+    alert("Network error. Try again.");
+  } finally {
+    btn.disabled = false;
+  }
+});
+
 
   // ---------- share tab buttons ----------
   document.getElementById('generateBtn').addEventListener('click', ()=> initOrGenerateVRP({ generate:true }));
@@ -639,8 +820,8 @@ async function fetchVRP(contactId, generate = false) {
   // ---------- init ----------
   renderMoney();
   getRefs();
-  renderRefs();
-  updateEstimate();
+  // renderRefs();
+  // updateEstimate();
   // On load: check for existing link (no generation)
   initOrGenerateVRP({ generate:false });
 </script>
