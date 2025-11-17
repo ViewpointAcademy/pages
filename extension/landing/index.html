@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reactivate Your Course Videos | Viewpoint Academy</title>
+
+  <style>
+    :root {
+      --vp-blue: #3057A4;
+      --bg: #f7f9fc;
+      --card-bg: #ffffff;
+      --text-main: #222222;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+    }
+
+    .page {
+      max-width: 960px;
+      margin: 50px auto 70px;
+      padding: 0 20px;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 18px;
+    }
+
+    .hero h1 {
+      font-size: 30px;
+      margin: 0 0 10px;
+      color: var(--vp-blue);
+    }
+
+    .hero p {
+      margin: 0;
+      font-size: 16px;
+      color: var(--text-muted);
+    }
+
+    .hero-image {
+      max-width: 380px;
+      width: 100%;
+      margin: 26px auto 10px;
+      display: block;
+    }
+
+    /* Toggle */
+    .toggle-row {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .toggle {
+      display: inline-flex;
+      background: #e5edff;
+      border-radius: 999px;
+      padding: 3px;
+      gap: 3px;
+    }
+
+    .toggle-btn {
+      border: none;
+      background: transparent;
+      padding: 7px 16px;
+      font-size: 13px;
+      border-radius: 999px;
+      cursor: pointer;
+      color: #111827;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .toggle-btn.active {
+      background: var(--vp-blue);
+      color: #fff;
+    }
+
+    .toggle-btn span.sub {
+      font-size: 11px;
+      opacity: 0.9;
+    }
+
+    /* Card (used only when USE_MODAL = true) */
+    .card-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+
+    .plan-card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+      padding: 24px 26px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .plan-label {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .plan-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #111827;
+    }
+
+    .plan-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 18px;
+    }
+
+    .price-row { margin-bottom: 12px; }
+
+    .price-old {
+      font-size: 13px;
+      text-decoration: line-through;
+      color: #9ca3af;
+      margin-right: 6px;
+    }
+
+    .price-main {
+      font-size: 32px;
+      font-weight: 700;
+      margin-right: 4px;
+    }
+
+    .price-period {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .badge-save {
+      display: inline-flex;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #ecfdf3;
+      color: #15803d;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+    }
+
+    .features {
+      list-style: none;
+      padding: 0;
+      margin: 14px 0 22px;
+      font-size: 13px;
+      color: var(--text-muted);
+      text-align: left;
+    }
+
+    .features li {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    .features li::before {
+      content: "✓";
+      color: #16a34a;
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    .btn-primary {
+      border: none;
+      border-radius: 999px;
+      padding: 11px 18px;
+      background: var(--vp-blue);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      max-width: 260px;
+      margin: 0 auto 6px;
+      display: inline-block;
+    }
+
+    .btn-primary:hover { background: #23448a; }
+
+    .helper-text {
+      text-align: center;
+      margin-top: 26px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .helper-text a { color: var(--vp-blue); text-decoration: none; }
+
+    footer {
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+      margin: 40px 0 20px;
+    }
+
+    footer a { color: var(--vp-blue); text-decoration: none; }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .modal-backdrop.open { display: flex; }
+
+    .modal {
+      background: #f9fafb;
+      border-radius: 14px;
+      width: 100%;
+      max-width: 960px;
+      height: 680px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 20px 55px rgba(15,23,42,0.35);
+    }
+
+    .modal-header {
+      background: var(--vp-blue);
+      color: #ffffff;
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .modal-close {
+      border: none;
+      background: transparent;
+      color: inherit;
+      font-size: 20px;
+      cursor: pointer;
+      padding: 0 4px;
+    }
+
+    .modal-body {
+      background: #e5edf8;
+      padding: 10px;
+      height: 100%;
+      flex: 1;
+    }
+
+    .modal-body iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 8px;
+    }
+
+    /* Your updated inline form styling */
+    #inlineEmbed {
+      display: none;
+      margin-top: 10px;
+      max-width: 720px;
+      height: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      background: transparent;
+      box-shadow: none;
+      border: none;
+      padding: 0;
+    }
+
+    #inlineEmbed iframe {
+      width: 100%;
+      height: 700px;
+      border: none;
+      display: block;
+      background: transparent;
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="hero">
+    <h1>Reactivate Your Course Videos</h1>
+    <p>Your video replay access expired, but you can easily renew your video access below.</p>
+    <img
+      src="https://storage.googleapis.com/vpa_public/internal/video-unlock-thumb.png"
+      alt="Unlock your course videos"
+      class="hero-image"
+    />
+  </div>
+
+  <div class="toggle-row">
+    <div class="toggle">
+      <button class="toggle-btn active" data-plan="monthly">Monthly</button>
+      <button class="toggle-btn" data-plan="yearly">Yearly <span class="sub">(Save 15%)</span></button>
+    </div>
+  </div>
+
+  <!-- Card: only used when USE_MODAL = true -->
+  <div class="card-wrap">
+    <div class="plan-card">
+      <div class="plan-label">Video Access</div>
+      <div class="plan-title">Course Replay Extension</div>
+      <div class="plan-sub">Watch your course replays on your own schedule.</div>
+
+      <div class="price-row">
+        <span class="price-old" id="priceOld">$150</span>
+        <span class="price-main" id="priceMain">$120</span>
+        <span class="price-period" id="pricePeriod">per month</span>
+      </div>
+
+      <div class="badge-save" id="yearlyBadge" style="display:none;">Save 15%</div>
+
+      <ul class="features">
+        <li>Full access to your replay library</li>
+        <li>Organized by syllabus</li>
+        <li>On-demand 24/7</li>
+        <li>Cancel anytime</li>
+      </ul>
+
+      <button class="btn-primary" id="btnAccess">Access Now</button>
+    </div>
+  </div>
+
+  <!-- Inline embed: used when USE_MODAL = false -->
+  <div id="inlineEmbed">
+    <iframe id="inlineFrame"></iframe>
+  </div>
+
+  <div class="helper-text">
+    To cancel a renewal, email
+    <a href="mailto:accounting@viewpointlearn.com">accounting@viewpointlearn.com</a>
+    or call (212) 989-7177 at least 3 business days before your next billing date.
+  </div>
+</div>
+
+<footer>
+  Visit <a href="https://help.viewpointlearn.com" target="_blank">help.viewpointlearn.com</a>
+</footer>
+
+<!-- Modal -->
+<div class="modal-backdrop" id="checkoutBackdrop">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Secure Checkout</div>
+      <button class="modal-close" id="modalClose">&times;</button>
+    </div>
+    <div class="modal-body">
+      <iframe id="checkoutFrame"></iframe>
+    </div>
+  </div>
+</div>
+
+<script>
+  // true  = show card + modal
+  // false = hide card, inline embedded form only
+  let USE_MODAL = false;
+
+  const PLAN_URLS = {
+    monthly:
+      "https://billing.zohosecure.com/subscribe/f4bb5d54eab8dc854cbe9f72ce93a778a5e12fff46ccfe5bad482bf477cf719e/vid-ext-adv",
+    yearly:
+      "https://billing.zohosecure.com/subscribe/f4bb5d54eab8dc854cbe9f72ce93a778a5e12fff46ccfe5bad482bf477cf719e/vid-ext-adv-annu"
+  };
+
+  const params = new URLSearchParams(window.location.search);
+  const couponCode = params.get("coupon_code") || "";
+  const modalFlag = params.get("model") || "";
+
+  let currentPlan = "monthly";
+  let firstEmbedLoad = true;
+
+  const toggleBtns  = document.querySelectorAll(".toggle-btn");
+  const priceOld    = document.getElementById("priceOld");
+  const priceMain   = document.getElementById("priceMain");
+  const pricePeriod = document.getElementById("pricePeriod");
+  const yearlyBadge = document.getElementById("yearlyBadge");
+
+  const cardWrap    = document.querySelector(".card-wrap");
+  const btnAccess   = document.getElementById("btnAccess");
+
+  const inlineEmbed = document.getElementById("inlineEmbed");
+  const inlineFrame = document.getElementById("inlineFrame");
+
+  const modalBackdrop = document.getElementById("checkoutBackdrop");
+  const modalClose    = document.getElementById("modalClose");
+  const checkoutFrame = document.getElementById("checkoutFrame");
+
+//if "model" param is set to "true", force modal mode
+    if (modalFlag.toLowerCase() === "true") {
+        USE_MODAL = true;
+    }
+
+  function updateDisplay(plan) {
+    currentPlan = plan;
+
+    toggleBtns.forEach(btn => {
+      btn.classList.toggle("active", btn.getAttribute("data-plan") === plan);
+    });
+
+    if (plan === "monthly") {
+      priceOld.textContent   = "$150";
+      priceMain.textContent  = "$120";
+      pricePeriod.textContent = "per month";
+      yearlyBadge.style.display = "none";
+    } else {
+      priceOld.textContent   = "$1,440";
+      priceMain.textContent  = "$1,224";
+      pricePeriod.textContent = "per year (15% off)";
+      yearlyBadge.style.display = "inline-flex";
+    }
+  }
+
+  function getCheckoutUrl() {
+    let url = PLAN_URLS[currentPlan];
+    if (couponCode) {
+      url += (url.includes("?") ? "&" : "?") +
+             "coupon_code=" + encodeURIComponent(couponCode);
+    }
+    return url;
+  }
+
+  // MODAL MODE
+  function openCheckoutModal() {
+    checkoutFrame.src = getCheckoutUrl();
+    modalBackdrop.classList.add("open");
+  }
+
+  function closeCheckoutModal() {
+    checkoutFrame.src = "";
+    modalBackdrop.classList.remove("open");
+  }
+
+  modalClose.addEventListener("click", closeCheckoutModal);
+  modalBackdrop.addEventListener("click", e => {
+    if (e.target === modalBackdrop) closeCheckoutModal();
+  });
+
+  // EMBED MODE
+  function embedCheckoutInline() {
+    inlineFrame.src = getCheckoutUrl();
+    inlineEmbed.style.display = "block";
+
+    if (!firstEmbedLoad) {
+      inlineEmbed.scrollIntoView({ behavior: "smooth" });
+    }
+    firstEmbedLoad = false;
+  }
+
+  // Toggle buttons
+  toggleBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const plan = btn.getAttribute("data-plan");
+      updateDisplay(plan);
+      if (!USE_MODAL) {
+        embedCheckoutInline();
+      }
+    });
+  });
+
+  // Initial layout based on mode
+  if (USE_MODAL) {
+    cardWrap.style.display = "flex";
+    inlineEmbed.style.display = "none";
+    if (btnAccess) {
+      btnAccess.addEventListener("click", openCheckoutModal);
+    }
+  } else {
+    cardWrap.style.display = "none";
+    inlineEmbed.style.display = "block";
+    embedCheckoutInline(); // initial embed, no scroll
+  }
+
+  // Init content
+  updateDisplay("monthly");
+</script>
+</body>
+</html>
