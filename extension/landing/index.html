@@ -395,6 +395,7 @@
   const params = new URLSearchParams(window.location.search);
   const couponCode = params.get("coupon_code") || "";
   const modalFlag = params.get("model") || "";
+  const emailParam = params.get("email") || "";
 
   let currentPlan = "monthly";
   let firstEmbedLoad = true;
@@ -445,6 +446,10 @@
     if (couponCode) {
       url += (url.includes("?") ? "&" : "?") +
              "coupon_code=" + encodeURIComponent(couponCode);
+    }
+    if (emailParam) {
+      url += (url.includes("?") ? "&" : "?") +
+             "email=" + encodeURIComponent(emailParam);
     }
     return url;
   }
