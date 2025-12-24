@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mekomos Journey 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            -webkit-tap-highlight-color: transparent; 
+            scroll-behavior: smooth;
+        }
+        .app-container { display: flex; flex-direction: column; min-height: 100vh; }
+        .glass-header { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); position: relative; z-index: 50; }
+        .day-section { position: relative; display: flex; gap: 16px; }
+        .day-sidebar { width: 56px; flex-shrink: 0; position: relative; }
+        .sticky-wrapper { position: sticky; top: 24px; z-index: 20; height: fit-content; }
+        .date-badge {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            width: 56px; height: 68px; background: white; border: 2px solid #1e1b4b;
+            border-radius: 18px; box-shadow: 0 8px 20px rgba(30, 27, 75, 0.12);
+        }
+        .rsvp-active { background-color: white !important; color: #1e1b4b !important; transform: scale(1.05); }
+        .timeline-line-bg { position: absolute; left: 27px; top: 0; bottom: 0; width: 2px; background: #f1f5f9; z-index: 0; }
+        .card-expand-content { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px dashed #f1f5f9; }
+        .card-expand-content.open, .card-expand-content.always-open { display: block; }
+        .category-pill { font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; display: flex; align-items: center; gap: 4px; }
+        
+        .nav-link-minimal {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            font-weight: 800;
+            color: #4f46e5;
+            background: #f5f3ff;
+            padding: 8px 14px;
+            border-radius: 12px;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+        .nav-link-minimal:active { transform: scale(0.95); background: #ede9fe; }
+
+        #bottom-status-bar.hidden-bar { transform: translate(-50%, 150%); opacity: 0; }
+        #name-modal, #admin-modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(8px); z-index: 100; align-items: center; justify-content: center; padding: 24px; }
+        #name-modal.active, #admin-modal.active { display: flex; }
+
+        .lang-switch { position: absolute; top: 12px; right: 12px; display: flex; background: rgba(255,255,255,0.1); padding: 4px; border-radius: 12px; }
+        .lang-btn { font-size: 9px; font-weight: 800; padding: 4px 8px; border-radius: 8px; transition: all 0.2s; color: white; opacity: 0.6; }
+        .lang-btn.active { background: white; color: #1e1b4b; opacity: 1; }
+        
+        [dir="rtl"] { text-align: right; }
+        [dir="rtl"] .day-section { flex-direction: row-reverse; }
+        [dir="rtl"] .category-pill { flex-direction: row-reverse; }
+        [dir="rtl"] .nav-link-minimal { flex-direction: row-reverse; }
+    </style>
+</head>
+<body class="bg-slate-50 flex justify-center">
+
+    <div class="w-full max-w-md bg-white min-h-screen shadow-2xl flex flex-col relative overflow-visible app-container">
+        
+        <!-- Header -->
+        <header class="glass-header pt-14 pb-10 px-8 text-white relative">
+            <div class="lang-switch">
+                <button onclick="setLanguage('en')" id="btn-en" class="lang-btn active">EN</button>
+                <button onclick="setLanguage('yi')" id="btn-yi" class="lang-btn">ייד</button>
+            </div>
+
+            <div class="relative z-10">
+                <span id="txt-dates" class="text-[10px] font-extrabold tracking-[0.3em] uppercase text-indigo-300">Feb 10 — Feb 15, 2026</span>
+                <h1 id="txt-hero" class="text-4xl font-extrabold leading-tight tracking-tight mt-1">Mekomos<br><span class="text-indigo-400">Hakdoshim</span></h1>
+                
+                <div class="mt-8 bg-white/5 backdrop-blur-md p-5 rounded-3xl border border-white/10 shadow-inner">
+                    <p id="txt-attendance" class="text-[11px] font-bold uppercase tracking-widest text-indigo-200 mb-4 text-center">Trip Attendance</p>
+                    <div class="flex gap-2">
+                        <button onclick="handleVote('going')" id="global-going" class="flex-1 py-3 rounded-2xl text-[11px] font-extrabold border border-white/10 text-indigo-100">YES</button>
+                        <button onclick="handleVote('maybe')" id="global-maybe" class="flex-1 py-3 rounded-2xl text-[11px] font-extrabold border border-white/10 text-indigo-100">MAYBE</button>
+                        <button onclick="handleVote('no')" id="global-no" class="flex-1 py-3 rounded-2xl text-[11px] font-extrabold border border-white/10 text-indigo-100">NO</button>
+                    </div>
+                </div>
+                
+                <div class="mt-4 flex justify-center">
+                    <button onclick="copyAuthLink()" class="text-[9px] font-bold text-indigo-200 underline opacity-60 hover:opacity-100">Copy Sync Link for Other Devices</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 px-6 pb-32 relative bg-white">
+            <div class="pt-8 mb-6 flex justify-between items-end border-b border-slate-100 pb-4">
+                <div>
+                    <h2 id="txt-roster" class="text-xl font-bold text-slate-900 tracking-tight">Group Roster</h2>
+                    <p id="txt-live" class="text-[10px] text-slate-400 font-bold uppercase">Live Updates</p>
+                </div>
+                <div class="flex flex-col items-end gap-2">
+                    <div id="attendee-count" class="text-[10px] font-black text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">0 Joined</div>
+                    <button onclick="openNameModal()" class="flex items-center gap-1 text-[10px] font-bold text-indigo-500 bg-white border border-indigo-100 px-2 py-1 rounded-lg shadow-sm">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        <span id="txt-edit-name">Edit Name</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="attendees-list" class="mb-8 flex flex-wrap gap-2"></div>
+
+            <h2 id="txt-itinerary" class="text-xl font-bold text-slate-900 tracking-tight mb-8">Itinerary</h2>
+            <div class="relative" id="timeline-container">
+                <div class="timeline-line-bg"></div>
+            </div>
+        </main>
+
+        <!-- Status Bar -->
+        <div class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-48px)] max-w-[340px] bg-slate-900/95 backdrop-blur-xl rounded-3xl py-4 px-6 flex justify-between items-center shadow-2xl z-50 border border-white/10 transition-all duration-500 hidden-bar" id="bottom-status-bar">
+            <span class="text-xs font-bold text-white" id="status-text">RSVP Updated</span>
+            <div class="w-9 h-9 bg-indigo-500 rounded-2xl flex items-center justify-center text-white">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- Name Modal -->
+    <div id="name-modal" onclick="closeNameModalOnBackdrop(event)">
+        <div class="bg-white w-full max-w-xs rounded-[2.5rem] p-8 shadow-2xl" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-start mb-2">
+                <h3 id="txt-modal-title" class="text-2xl font-extrabold text-slate-900">Display Name</h3>
+                <button onclick="closeNameModal()" class="text-slate-300 p-1"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+            </div>
+            <p id="txt-modal-sub" class="text-xs text-slate-500 mb-6">Enter your name for the group list.</p>
+            <input type="text" id="user-name-input" placeholder="Your Name" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold focus:border-indigo-500 focus:outline-none mb-4">
+            <button onclick="submitName()" id="txt-save-btn" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black text-[11px] tracking-widest uppercase shadow-lg shadow-indigo-200">SAVE CHANGES</button>
+        </div>
+    </div>
+
+    <!-- Admin Modal -->
+    <div id="admin-modal" onclick="this.classList.remove('active')">
+        <div class="bg-white w-full max-w-xs rounded-[2.5rem] p-8 shadow-2xl" onclick="event.stopPropagation()">
+            <h3 class="text-xl font-bold text-slate-900 mb-2">Admin: <span id="admin-target-name"></span></h3>
+            <p class="text-xs text-slate-500 mb-6">UID: <span id="admin-target-uid" class="font-mono"></span></p>
+            
+            <div class="grid grid-cols-1 gap-2">
+                <button onclick="adminUpdateStatus('going')" class="bg-emerald-500 text-white py-3 rounded-xl font-bold text-xs uppercase">Set to Going</button>
+                <button onclick="adminUpdateStatus('maybe')" class="bg-slate-500 text-white py-3 rounded-xl font-bold text-xs uppercase">Set to Maybe</button>
+                <button onclick="adminUpdateStatus('no')" class="bg-rose-500 text-white py-3 rounded-xl font-bold text-xs uppercase">Set to No</button>
+                <button onclick="adminUpdateStatus(null)" class="bg-white border border-slate-200 text-slate-400 py-3 rounded-xl font-bold text-xs uppercase mt-4">Remove RSVP</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'mekomos-trip-2026';
+
+        // Add UIDs here to enable admin features
+        const adminUids = []; 
+        let currentAdminTarget = null;
+
+        let currentUser = null, userData = null, currentStatus = null, pendingVote = null;
+        let currentLang = 'en';
+
+        const i18n = {
+            en: {
+                dates: "Feb 10 (23 Shevat) — Feb 15, 2026",
+                hero: "Mekomos<br><span class='text-indigo-400'>Hakdoshim</span>",
+                attendance: "Trip Attendance",
+                roster: "Group Roster",
+                live: "Live Updates",
+                editName: "Edit Name",
+                itinerary: "Itinerary",
+                modalTitle: "Display Name",
+                modalSub: "Enter your name for the group list.",
+                saveBtn: "SAVE CHANGES",
+                directions: "Directions",
+                showLess: "Show Less",
+                showDetails: "Show Details",
+                types: { travel: "Travel", prayer: "Prayer", hotel: "Hotel", shabbos: "Shabbos" },
+                days: { Tue: "Tue", Wed: "Wed", Thu: "Thu", Fri: "Fri", Sat: "Sat", Sun: "Sun" }
+            },
+            yi: {
+                dates: "כ״ג שבט — כ״ח שבט, תשפ״ו",
+                hero: "מקומות<br><span class='text-indigo-400'>הקדושים</span>",
+                attendance: "ווער קומט מיט?",
+                roster: "די גרופע",
+                live: "לייוו דערהיינטיגונג",
+                editName: "טויש נאמען",
+                itinerary: "סדר הנסיעה",
+                modalTitle: "נאמען",
+                modalSub: "לייגט אריין אייער נאמען.",
+                saveBtn: "היטן טוישונגען",
+                directions: "וועג-ווייזער",
+                showLess: "ווייניגער",
+                showDetails: "מער פרטים",
+                types: { travel: "רייזע", prayer: "תפילה", hotel: "אכסניא", shabbos: "שבת" },
+                days: { Tue: "ג׳", Wed: "ד׳", Thu: "ה׳", Fri: "עש״ק", Sat: "שב״ק", Sun: "ז׳" }
+            }
+        };
+
+        const icons = {
+            travel: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>`,
+            prayer: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>`,
+            hotel: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M17 21v-2a1 1 0 00-1-1H8a1 1 0 00-1 1v2"/><path d="M4 18V7a2 2 0 012-2h12a2 2 0 012 2v11"/></svg>`,
+            shabbos: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>`,
+            navigate: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>`,
+            chevron: `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>`
+        };
+
+        const itinerary = [
+            { day: "Tue", dateNum: "10", stops: [
+                { id: 1, type: "travel", time: "9:00 PM", title: {en:"Departure from NY", yi:"אפפליען פון ניו יארק"}, loc: "JFK Terminal 4", query: "JFK Airport Terminal 4", desc: {en:"Night flight departure for Europe. Today is 23 Shevat.", yi:"אפפליען ביינאכט קיין אייראפע. היינט איז כ״ג שבט."} }
+            ] },
+            { day: "Wed", dateNum: "11", stops: [
+                { id: 11, type: "travel", time: "10:45 AM", title: {en:"Stop in Zurich (ZRH)", yi:"אפשטעל אין ציריך (ZRH)"}, loc: "Zurich Airport", query: "ZRH Airport", desc: {en:"Layoever in Zurich for 1h 40m.", yi:"אפשטעל אין ציריך פאר א שעה און פערציג מינוט."} },
+                { id: 2, type: "travel", time: "2:05 PM", title: {en:"Arrival Budapest", yi:"אנקומען קיין בודאפעסט"}, loc: "Arrival — BUD Airport", query: "Budapest Airport", desc: {en:"Arrival and coach pickup.", yi:"אנקומען צום לופטפעלד."} },
+                { id: 4, type: "hotel", time: "Night", title: {en:"Meal & Lodging", yi:"סעודה & לינה"}, loc: {en:"Kerestir", yi:"קערעסטיר"}, query: "Kerestir Guest House", desc: {en:"Stay in the holy town of Kerestir.", yi:"איבערנאכטן אין די הייליגע שטאט קערעסטיר."} }
+            ]},
+            { day: "Thu", dateNum: "12", stops: [
+                { id: 41, type: "prayer", time: "Early AM", title: {en:"Morning Routine", yi:"תפילת שחרית"}, loc: {en:"Kerestir", yi:"קערעסטיר"}, query: null, desc: {en:"Mikvah, Shachris and breakfast.", yi:"מקוה, שחרית און פרישטאג."} },
+                { id: 3, type: "prayer", time: "Morning", title: {en:"Reb Shayala", yi:"רבי ישעי'לעס ציון"}, loc: {en:"Bodrogkeresztúr", yi:"קערעסטיר"}, query: "Reb Shayala's Guest House, Bodrogkeresztúr", desc: {en:"Tefillos at the holy Tziyun.", yi:"תפילות ביים הייליגן ציון פון הרה״ק ר׳ ישעי׳לע קערעסטירער זי״ע."} },
+                { id: 5, type: "prayer", time: "9:30 AM", title: {en:"Liska", yi:"ליסקא"}, loc: {en:"Reb Hershele Liske", yi:"הרה״ק ר׳ הערשעלע ליסקער"}, query: "Olaszliszka Cemetery", desc: {en:"Davening at the holy Ohel.", yi:"תפילות ביים הייליגן אהל אין ליסקא."} },
+                { id: 6, type: "prayer", time: "11:30 AM", title: {en:"Ihel", yi:"אוהעל"}, loc: {en:"Yismach Moshe", yi:"דער הייליגער ישמח משה"}, query: "Sátoraljaújhely Jewish Cemetery", desc: {en:"Tefillah at the Yismach Moshe.", yi:"תפילות ביים הייליגן ישמח משה זי״ע."} },
+                { id: 7, type: "prayer", time: "3:30 PM", title: {en:"Sanz", yi:"צאנז"}, loc: {en:"Divrei Chaim", yi:"דער הייליגער דברי חיים"}, query: "Nowy Sącz Jewish Cemetery", desc: {en:"Tefillah at the Divrei Chaim.", yi:"תפילות ביים הייליגן דברי חיים זי״ע."} },
+                { id: 8, type: "hotel", time: "Night", title: {en:"Kruka Lodging", yi:"קראקא"}, loc: {en:"Krakow", yi:"קראקא"}, query: "Kazimierz Krakow", desc: {en:"Arrival in Krakow.", yi:"אנקומען קיין קראקא."} }
+            ]},
+            { day: "Fri", dateNum: "13", stops: [
+                { id: 81, type: "prayer", time: "8:00 AM", title: {en:"Morning Routine", yi:"שחרית אין קראקא"}, loc: {en:"Krakow", yi:"קראקא"}, query: null, desc: {en:"Mikvah and Shachris.", yi:"מקוה און שחרית."} },
+                { id: 9, type: "travel", time: "10:30 AM", title: {en:"Auschwitz", yi:"אוישוויץ"}, loc: {en:"Oswiecim", yi:"אוישוויץ"}, query: "Auschwitz-Birkenau Memorial", desc: {en:"Visit to the site of the Churban.", yi:"באזוך אין די טרויעריג באקאנטע אוישוויץ-בירקענאו לאגערן."} },
+                { id: 10, type: "shabbos", time: "4:32 PM", title: {en:"Shabbos in Kruka", yi:"שבת אין קראקא"}, loc: {en:"Krakow", yi:"קראקא"}, query: "Kazimierz, Kraków", desc: {en:"Shabbos Shekalim, Parshas Mishpatim.", yi:"שבת שקלים, פרשת משפטים."} }
+            ]},
+            { day: "Sat", dateNum: "14", stops: [
+                { id: 11, type: "shabbos", time: "Morning", title: {en:"Tefillas Shabbos", yi:"שחרית שב״ק"}, loc: {en:"Krakow Shuls", yi:"קראקא שולן"}, query: null, desc: {en:"Shabbos Shekalim. Next week: Terumah.", yi:"שבת שקלים. קומענדיגע וואך: תרומה."} },
+                { id: 13, type: "travel", time: "9:30 PM", title: {en:"Melava Malka", yi:"מלוה מלכה"}, loc: {en:"Krakow", yi:"קראקא"}, query: null, desc: {en:"Post-Shabbos kumzitz.", yi:"מלוה מלכה און א היימישע קומזיץ."} }
+            ]},
+            { day: "Sun", dateNum: "15", stops: [
+                { id: 14, type: "prayer", time: "8:00 AM", title: {en:"Krakow Cemetery", yi:"קראקא בית החיים"}, loc: {en:"Rema & Others", yi:"דער רמ״א און אנדערע צדיקים"}, query: "Old Jewish Cemetery, Kraków", desc: {en:"Tefillos before departure.", yi:"תפילות ביים רמ״א זי״ע און די אנדערע צדיקים אין קראקא."} },
+                { id: 15, type: "travel", time: "2:45 PM", title: {en:"Departure from KRK", yi:"אפפליען פון קראקא"}, loc: {en:"KRK Airport", yi:"קראקא לופטפעלד"}, query: "Kraków Airport", desc: {en:"Boarding for return flight.", yi:"אפפליען צוריק אהיים."} },
+                { id: 151, type: "travel", time: "4:30 PM", title: {en:"Stop in Zurich (ZRH)", yi:"אפשטעל אין ציריך (ZRH)"}, loc: {en:"Zurich Airport", yi:"ציריך לופטפעלד"}, query: "ZRH Airport", desc: {en:"Short 45 minute layover.", yi:"א קורצע אפשטעל פון 45 מינוט אין ציריך."} },
+                { id: 16
