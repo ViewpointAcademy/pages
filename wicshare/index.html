@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WIC Kosher Share Connect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-overlay {
+            display: none;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+        }
+
+        .animate-in {
+            animation: slideUp 0.3s ease-out forwards;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-900">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-40 w-full bg-white/80 border-b border-slate-200 backdrop-blur-md">
+        <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center text-white font-bold">W</div>
+                <span class="font-extrabold text-lg tracking-tight text-emerald-900">WIC SHARE</span>
+            </div>
+            <div class="hidden sm:block text-xs font-bold text-emerald-600 uppercase tracking-widest bg-emerald-50 px-3 py-1 rounded-full">
+                Community Driven
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-5xl mx-auto px-6 py-10">
+        
+        <!-- Hero Header -->
+        <header class="mb-12 text-center sm:text-left">
+            <h1 class="text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">Welcome back!</h1>
+            <p class="text-lg text-slate-600 max-w-2xl">Sharing extra WIC groceries helps local families and reduces waste. Choose an action below to get started.</p>
+        </header>
+
+        <!-- Main Action Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+            
+            <!-- Donation Card -->
+            <button onclick="openForm('https://forms.gle/wmcEWaV4zRHo6FNy7')" class="group relative flex flex-col items-start p-8 bg-white border border-slate-200 rounded-3xl text-left hover:border-emerald-500 hover:shadow-xl hover:shadow-emerald-900/5 transition-all duration-300">
+                <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+                    🥛
+                </div>
+                <h3 class="text-xl font-bold mb-2">I have extras to share</h3>
+                <p class="text-slate-500 mb-6">List your surplus milk, eggs, or formula for families in need.</p>
+                <span class="mt-auto inline-flex items-center font-bold text-emerald-600 group-hover:gap-2 transition-all">
+                    Start Donation Form →
+                </span>
+            </button>
+
+            <!-- Request Card -->
+            <button onclick="openForm('https://forms.gle/51YweecSZnCpQYkr5')" class="group relative flex flex-col items-start p-8 bg-white border border-slate-200 rounded-3xl text-left hover:border-blue-500 hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300">
+                <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+                    📦
+                </div>
+                <h3 class="text-xl font-bold mb-2">I'd like to receive a box</h3>
+                <p class="text-slate-500 mb-6">Request essential groceries for your family this week.</p>
+                <span class="mt-auto inline-flex items-center font-bold text-blue-600 group-hover:gap-2 transition-all">
+                    Submit Request →
+                </span>
+            </button>
+
+        </div>
+
+        <!-- Catalog Section -->
+        <section class="bg-white rounded-3xl border border-slate-200 p-8">
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="text-xl font-extrabold flex items-center gap-2">
+                    <span class="w-2 h-6 bg-emerald-500 rounded-full"></span>
+                    What we accept
+                </h2>
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Unopened & Unexpired</span>
+            </div>
+            
+            <div class="flex flex-wrap gap-3">
+                <div class="px-4 py-2 bg-slate-50 border border-slate-100 rounded-full text-sm font-semibold hover:bg-white transition-colors">🥛 Low-Fat Milk</div>
+                <div class="px-4 py-2 bg-slate-50 border border-slate-100 rounded-full text-sm font-semibold hover:bg-white transition-colors">🥣 WIC Cereal</div>
+                <div class="px-4 py-2 bg-slate-50 border border-slate-100 rounded-full text-sm font-semibold hover:bg-white transition-colors">🍎 Canned Juice</div>
+                <div class="px-4 py-2 bg-slate-50 border border-slate-100 rounded-full text-sm font-semibold hover:bg-white transition-colors">🥚 Fresh Eggs</div>
+                <div class="px-4 py-2 bg-slate-50 border border-slate-100 rounded-full text-sm font-semibold hover:bg-white transition-colors">🍞 Whole Wheat Bread</div>
+                <div class="px-4 py-2 bg-slate-50 border border-slate-100 rounded-full text-sm font-semibold hover:bg-white transition-colors">🍦 Greek Yogurt</div>
+                <div class="px-4 py-2 bg-slate-50 border border-slate-100 rounded-full text-sm font-semibold hover:bg-white transition-colors">🥜 Peanut Butter</div>
+                <div class="px-4 py-2 bg-slate-50 border border-slate-100 rounded-full text-sm font-semibold hover:bg-white transition-colors">🫘 Beans & Lentils</div>
+                <div class="px-4 py-2 bg-slate-50 border border-slate-100 rounded-full text-sm font-semibold hover:bg-white transition-colors">🍼 Baby Formula</div>
+                <div class="px-4 py-2 bg-slate-50 border border-slate-100 rounded-full text-sm font-semibold hover:bg-white transition-colors">🐟 Canned Tuna</div>
+                <div class="px-4 py-2 bg-slate-50 border border-slate-100 rounded-full text-sm font-semibold hover:bg-white transition-colors">👶 Baby Cereal</div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal Backdrop -->
+    <div id="modalOverlay" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl overflow-hidden animate-in h-[90vh]">
+            <!-- Header -->
+            <div class="flex items-center justify-between p-4 border-b">
+                <h3 class="font-bold text-slate-700 ml-2">WIC Share Form</h3>
+                <button onclick="closeForm()" class="p-2 hover:bg-slate-100 rounded-full text-slate-500 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <!-- Form Frame -->
+            <iframe id="formFrame" class="w-full h-full" src="" frameborder="0">Loading...</iframe>
+        </div>
+    </div>
+
+    <footer class="mt-auto py-10 text-center text-slate-400 text-sm">
+        <p>© 2026 WIC Share Connect Initiative</p>
+    </footer>
+
+    <script>
+        const modal = document.getElementById('modalOverlay');
+        const frame = document.getElementById('formFrame');
+
+        function openForm(url) {
+            // Use standard viewform for cleaner embedding if shortlink provided
+            frame.src = url;
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeForm() {
+            modal.style.display = 'none';
+            frame.src = '';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close on backdrop click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeForm();
+        });
+    </script>
+</body>
+</html>
