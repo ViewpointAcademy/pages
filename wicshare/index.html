@@ -56,7 +56,7 @@
             </div>
             <div class="hidden sm:flex items-center gap-4">
                 <span class="text-[10px] font-bold text-emerald-700 uppercase tracking-widest bg-emerald-100/80 px-3 py-1.5 rounded-lg">
-                    Live: Seattle Chapter
+                    Live: Brooklyn, NY
                 </span>
             </div>
         </div>
@@ -173,7 +173,7 @@
             <div class="flex gap-6">
                 <a href="#" class="text-xs font-bold text-slate-400 hover:text-emerald-600 transition-colors">Privacy</a>
                 <a href="#" class="text-xs font-bold text-slate-400 hover:text-emerald-600 transition-colors">Terms</a>
-                <button onclick="openForm('https://forms.gle/dnFhe8as8yhb5eys9')" class="text-xs font-bold text-slate-400 hover:text-emerald-600 transition-colors cursor-pointer">Contact</button>
+                <button onclick="openForm('https://forms.gle/51YweecSZnCpQYkr5')" class="text-xs font-bold text-slate-400 hover:text-emerald-600 transition-colors cursor-pointer">Contact</button>
             </div>
         </div>
     </footer>
@@ -181,6 +181,11 @@
     <script>
         const modal = document.getElementById('modalOverlay');
         const frame = document.getElementById('formFrame');
+
+        // Ensure the modal is hidden on initial load
+        window.addEventListener('load', () => {
+            modal.style.display = 'none';
+        });
 
         function openForm(url) {
             frame.src = url;
