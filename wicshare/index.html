@@ -11,104 +11,135 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #f8fafc;
+            background-image: radial-gradient(#e2e8f0 0.5px, transparent 0.5px);
+            background-size: 24px 24px;
         }
 
         .glass-card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
         }
 
         .modal-overlay {
             display: none;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(4px);
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(8px);
         }
 
         .animate-in {
-            animation: slideUp 0.3s ease-out forwards;
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
         @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
+            from { transform: translateY(30px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
+        }
+
+        .btn-shadow-emerald:hover {
+            box-shadow: 0 20px 25px -5px rgba(16, 185, 129, 0.1), 0 8px 10px -6px rgba(16, 185, 129, 0.1);
+        }
+
+        .btn-shadow-blue:hover {
+            box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.1), 0 8px 10px -6px rgba(59, 130, 246, 0.1);
         }
     </style>
 </head>
-<body class="min-h-screen text-slate-900">
+<body class="min-h-screen flex flex-col text-slate-900">
 
     <!-- Navigation -->
-    <nav class="sticky top-0 z-40 w-full bg-white/80 border-b border-slate-200 backdrop-blur-md">
+    <nav class="sticky top-0 z-40 w-full bg-white/70 border-b border-slate-200/60 backdrop-blur-xl">
         <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center text-white font-bold">W</div>
-                <span class="font-extrabold text-lg tracking-tight text-emerald-900">WIC SHARE</span>
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 bg-emerald-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg shadow-emerald-200">W</div>
+                <span class="font-extrabold text-xl tracking-tight text-slate-900">WIC<span class="text-emerald-600">KOSHER</span></span>
             </div>
-            <div class="hidden sm:block text-xs font-bold text-emerald-600 uppercase tracking-widest bg-emerald-50 px-3 py-1 rounded-full">
-                Community Driven
+            <div class="hidden sm:flex items-center gap-4">
+                <span class="text-[10px] font-bold text-emerald-700 uppercase tracking-widest bg-emerald-100/80 px-3 py-1.5 rounded-lg">
+                    Live: Seattle Chapter
+                </span>
             </div>
         </div>
     </nav>
 
-    <main class="max-w-5xl mx-auto px-6 py-10">
+    <main class="max-w-5xl mx-auto px-6 py-12 w-full">
         
         <!-- Hero Header -->
-        <header class="mb-12 text-center sm:text-left">
-            <h1 class="text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">Welcome back!</h1>
-            <p class="text-lg text-slate-600 max-w-2xl">Sharing extra WIC groceries helps local families and reduces waste. Choose an action below to get started.</p>
+        <header class="mb-14 relative">
+            <div class="absolute -left-4 top-0 w-1 h-full bg-emerald-500 rounded-full hidden md:block"></div>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 mb-4 tracking-tight">Support your neighbors.</h1>
+            <p class="text-lg text-slate-600 max-w-2xl leading-relaxed">A community-run space to share surplus WIC groceries. Simple, safe, and entirely local.</p>
         </header>
 
+        <!-- Stats Bar -->
+        <div class="grid grid-cols-3 gap-4 mb-12 bg-white/50 border border-slate-200/60 p-4 rounded-3xl">
+            <div class="text-center border-r border-slate-200">
+                <div class="text-xl font-bold text-emerald-600">124</div>
+                <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Donations</div>
+            </div>
+            <div class="text-center border-r border-slate-200">
+                <div class="text-xl font-bold text-blue-600">89</div>
+                <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Boxes Shared</div>
+            </div>
+            <div class="text-center">
+                <div class="text-xl font-bold text-orange-500">2.4k</div>
+                <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Lbs Saved</div>
+            </div>
+        </div>
+
         <!-- Main Action Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
             
             <!-- Donation Card -->
-            <button onclick="openForm('https://forms.gle/wmcEWaV4zRHo6FNy7')" class="group relative flex flex-col items-start p-8 bg-white border border-slate-200 rounded-3xl text-left hover:border-emerald-500 hover:shadow-xl hover:shadow-emerald-900/5 transition-all duration-300">
-                <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+            <button onclick="openForm('https://forms.gle/wmcEWaV4zRHo6FNy7')" class="group relative flex flex-col items-start p-10 bg-white border border-slate-200 rounded-[2rem] text-left hover:border-emerald-500 btn-shadow-emerald transition-all duration-500">
+                <div class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-3xl mb-8 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500">
                     🥛
                 </div>
-                <h3 class="text-xl font-bold mb-2">I have extras to share</h3>
-                <p class="text-slate-500 mb-6">List your surplus milk, eggs, or formula for families in need.</p>
-                <span class="mt-auto inline-flex items-center font-bold text-emerald-600 group-hover:gap-2 transition-all">
-                    Start Donation Form →
-                </span>
+                <h3 class="text-2xl font-bold mb-3">Share Extras</h3>
+                <p class="text-slate-500 mb-8 leading-relaxed">Have unexpired milk, eggs, or formula? Post them here for a neighbor to pick up.</p>
+                <div class="mt-auto flex items-center gap-2 font-bold text-emerald-600">
+                    <span class="bg-emerald-50 px-4 py-2 rounded-xl group-hover:bg-emerald-600 group-hover:text-white transition-colors">Start Donation Form</span>
+                    <span class="transform group-hover:translate-x-1 transition-transform">→</span>
+                </div>
             </button>
 
             <!-- Request Card -->
-            <button onclick="openForm('https://forms.gle/51YweecSZnCpQYkr5')" class="group relative flex flex-col items-start p-8 bg-white border border-slate-200 rounded-3xl text-left hover:border-blue-500 hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300">
-                <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+            <button onclick="openForm('https://forms.gle/51YweecSZnCpQYkr5')" class="group relative flex flex-col items-start p-10 bg-white border border-slate-200 rounded-[2rem] text-left hover:border-blue-500 btn-shadow-blue transition-all duration-500">
+                <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-3xl mb-8 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
                     📦
                 </div>
-                <h3 class="text-xl font-bold mb-2">I'd like to receive a box</h3>
-                <p class="text-slate-500 mb-6">Request essential groceries for your family this week.</p>
-                <span class="mt-auto inline-flex items-center font-bold text-blue-600 group-hover:gap-2 transition-all">
-                    Submit Request →
-                </span>
+                <h3 class="text-2xl font-bold mb-3">Receive Help</h3>
+                <p class="text-slate-500 mb-8 leading-relaxed">In need of essentials this week? Submit a request for a community support box.</p>
+                <div class="mt-auto flex items-center gap-2 font-bold text-blue-600">
+                    <span class="bg-blue-50 px-4 py-2 rounded-xl group-hover:bg-blue-600 group-hover:text-white transition-colors">Submit Request</span>
+                    <span class="transform group-hover:translate-x-1 transition-transform">→</span>
+                </div>
             </button>
 
         </div>
 
         <!-- Catalog Section -->
-        <section class="bg-white rounded-3xl border border-slate-200 p-8">
-            <div class="flex items-center justify-between mb-8">
-                <h2 class="text-xl font-extrabold flex items-center gap-2">
-                    <span class="w-2 h-6 bg-emerald-500 rounded-full"></span>
-                    What we accept
-                </h2>
-                <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Unopened & Unexpired</span>
+        <section class="bg-slate-900 rounded-[2rem] p-10 text-white shadow-2xl">
+            <div class="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4">
+                <div>
+                    <h2 class="text-2xl font-extrabold mb-1">Eligible Items</h2>
+                    <p class="text-slate-400 text-sm">We only accept unexpired, factory-sealed WIC items.</p>
+                </div>
+                <div class="h-px flex-1 bg-slate-800 mx-6 hidden md:block"></div>
+                <span class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] border border-slate-800 px-3 py-1 rounded-md">Safety First</span>
             </div>
             
             <div class="flex flex-wrap gap-3">
-                <div class="px-4 py-2 bg-slate-50 border border-slate-100 rounded-full text-sm font-semibold hover:bg-white transition-colors">🥛 Low-Fat Milk</div>
-                <div class="px-4 py-2 bg-slate-50 border border-slate-100 rounded-full text-sm font-semibold hover:bg-white transition-colors">🥣 WIC Cereal</div>
-                <div class="px-4 py-2 bg-slate-50 border border-slate-100 rounded-full text-sm font-semibold hover:bg-white transition-colors">🍎 Canned Juice</div>
-                <div class="px-4 py-2 bg-slate-50 border border-slate-100 rounded-full text-sm font-semibold hover:bg-white transition-colors">🥚 Fresh Eggs</div>
-                <div class="px-4 py-2 bg-slate-50 border border-slate-100 rounded-full text-sm font-semibold hover:bg-white transition-colors">🍞 Whole Wheat Bread</div>
-                <div class="px-4 py-2 bg-slate-50 border border-slate-100 rounded-full text-sm font-semibold hover:bg-white transition-colors">🍦 Greek Yogurt</div>
-                <div class="px-4 py-2 bg-slate-50 border border-slate-100 rounded-full text-sm font-semibold hover:bg-white transition-colors">🥜 Peanut Butter</div>
-                <div class="px-4 py-2 bg-slate-50 border border-slate-100 rounded-full text-sm font-semibold hover:bg-white transition-colors">🫘 Beans & Lentils</div>
-                <div class="px-4 py-2 bg-slate-50 border border-slate-100 rounded-full text-sm font-semibold hover:bg-white transition-colors">🍼 Baby Formula</div>
-                <div class="px-4 py-2 bg-slate-50 border border-slate-100 rounded-full text-sm font-semibold hover:bg-white transition-colors">🐟 Canned Tuna</div>
-                <div class="px-4 py-2 bg-slate-50 border border-slate-100 rounded-full text-sm font-semibold hover:bg-white transition-colors">👶 Baby Cereal</div>
+                <div class="px-5 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-sm font-medium hover:bg-emerald-500/10 hover:border-emerald-500/50 transition-all cursor-default">🥛 Low-Fat Milk</div>
+                <div class="px-5 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-sm font-medium hover:bg-emerald-500/10 hover:border-emerald-500/50 transition-all cursor-default">🥣 WIC Cereal</div>
+                <div class="px-5 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-sm font-medium hover:bg-emerald-500/10 hover:border-emerald-500/50 transition-all cursor-default">🍎 Canned Juice</div>
+                <div class="px-5 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-sm font-medium hover:bg-emerald-500/10 hover:border-emerald-500/50 transition-all cursor-default">🥚 Fresh Eggs</div>
+                <div class="px-5 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-sm font-medium hover:bg-emerald-500/10 hover:border-emerald-500/50 transition-all cursor-default">🍞 Whole Wheat Bread</div>
+                <div class="px-5 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-sm font-medium hover:bg-emerald-500/10 hover:border-emerald-500/50 transition-all cursor-default">🍦 Greek Yogurt</div>
+                <div class="px-5 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-sm font-medium hover:bg-emerald-500/10 hover:border-emerald-500/50 transition-all cursor-default">🥜 Peanut Butter</div>
+                <div class="px-5 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-sm font-medium hover:bg-emerald-500/10 hover:border-emerald-500/50 transition-all cursor-default">🫘 Beans & Lentils</div>
+                <div class="px-5 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-sm font-medium hover:bg-emerald-500/10 hover:border-emerald-500/50 transition-all cursor-default">🍼 Baby Formula</div>
+                <div class="px-5 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-sm font-medium hover:bg-emerald-500/10 hover:border-emerald-500/50 transition-all cursor-default">🐟 Canned Tuna</div>
             </div>
         </section>
 
@@ -116,12 +147,15 @@
 
     <!-- Modal Backdrop -->
     <div id="modalOverlay" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl overflow-hidden animate-in h-[90vh]">
+        <div class="relative w-full max-w-4xl bg-white rounded-[2rem] shadow-2xl overflow-hidden animate-in h-[90vh]">
             <!-- Header -->
-            <div class="flex items-center justify-between p-4 border-b">
-                <h3 class="font-bold text-slate-700 ml-2">WIC Share Form</h3>
-                <button onclick="closeForm()" class="p-2 hover:bg-slate-100 rounded-full text-slate-500 transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            <div class="flex items-center justify-between p-6 border-b border-slate-100">
+                <div class="flex items-center gap-3">
+                    <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                    <h3 class="font-bold text-slate-800">Secure Community Form</h3>
+                </div>
+                <button onclick="closeForm()" class="group p-2 hover:bg-slate-50 rounded-xl transition-all">
+                    <svg class="w-6 h-6 text-slate-400 group-hover:text-slate-900 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
             <!-- Form Frame -->
@@ -129,8 +163,19 @@
         </div>
     </div>
 
-    <footer class="mt-auto py-10 text-center text-slate-400 text-sm">
-        <p>© 2026 WIC Share Connect Initiative</p>
+    <footer class="mt-auto py-12 border-t border-slate-200/60 bg-white/50">
+        <div class="max-w-5xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-2 opacity-50">
+                <div class="w-6 h-6 bg-slate-900 rounded flex items-center justify-center text-[10px] text-white font-bold">W</div>
+                <span class="text-xs font-bold tracking-widest uppercase">WIC Kosher Share Connect</span>
+            </div>
+            <p class="text-slate-400 text-xs font-medium">© 2026 Initiative. Not affiliated with government WIC agencies.</p>
+            <div class="flex gap-6">
+                <a href="#" class="text-xs font-bold text-slate-400 hover:text-emerald-600 transition-colors">Privacy</a>
+                <a href="#" class="text-xs font-bold text-slate-400 hover:text-emerald-600 transition-colors">Terms</a>
+                <button onclick="openForm('https://forms.gle/dnFhe8as8yhb5eys9')" class="text-xs font-bold text-slate-400 hover:text-emerald-600 transition-colors cursor-pointer">Contact</button>
+            </div>
+        </div>
     </footer>
 
     <script>
@@ -138,7 +183,6 @@
         const frame = document.getElementById('formFrame');
 
         function openForm(url) {
-            // Use standard viewform for cleaner embedding if shortlink provided
             frame.src = url;
             modal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
@@ -150,7 +194,6 @@
             document.body.style.overflow = 'auto';
         }
 
-        // Close on backdrop click
         modal.addEventListener('click', (e) => {
             if (e.target === modal) closeForm();
         });
