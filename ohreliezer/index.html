@@ -27,15 +27,16 @@
             </div>
 
             <div class="relative z-10">
-                <div class="flex items-center gap-4 mb-1">
-                    <img src="./images/ohr-eliezer-white.svg" alt="Ohr Eliezer" class="header-logo w-12 h-14 md:w-14 md:h-16 lg:w-16 lg:h-20 flex-shrink-0 opacity-90">
+                <div class="flex flex-col items-center text-center lg:flex-row lg:items-center lg:text-left lg:gap-4 mb-1">
+                    <span id="txt-dates" class="text-[9px] md:text-[10px] font-extrabold tracking-[0.3em] uppercase text-indigo-300/80 mb-2 lg:hidden">Feb 10 — Feb 15, 2026</span>
+                    <img src="./images/ohr-eliezer-white.svg" alt="Ohr Eliezer" class="header-logo w-14 h-16 md:w-16 md:h-20 lg:w-16 lg:h-20 flex-shrink-0 opacity-90 mb-3 lg:mb-0">
                     <div>
-                        <span id="txt-dates" class="text-[9px] md:text-[10px] font-extrabold tracking-[0.3em] uppercase text-indigo-300/80">Feb 10 — Feb 15, 2026</span>
+                        <span id="txt-dates-desktop" class="hidden lg:block text-[10px] font-extrabold tracking-[0.3em] uppercase text-indigo-300/80">Feb 10 — Feb 15, 2026</span>
                         <h1 id="txt-hero" class="text-2xl md:text-3xl lg:text-4xl font-extrabold leading-tight tracking-tight">Mekomos<br><span class="text-indigo-400">Hakdoshim</span></h1>
                     </div>
                 </div>
 
-                <div class="mt-6 bg-white/5 backdrop-blur-md p-5 rounded-3xl border border-white/10 shadow-inner max-w-sm m-auto lg:m-0">
+                <div class="mt-6 bg-white/5 backdrop-blur-md p-5 rounded-3xl border border-white/10 shadow-inner max-w-sm m-auto lg:my-[36px] lg:mx-0">
                     <p id="txt-attendance" class="text-[11px] font-bold uppercase tracking-widest text-indigo-200 mb-4 text-center">Joining?</p>
                     <div class="flex gap-2">
                         <button onclick="handleVote('going')" id="global-going" class="flex-1 py-3 rounded-2xl text-[11px] font-extrabold border border-white/10 text-indigo-100 hover:bg-white/10 transition-all">YES</button>

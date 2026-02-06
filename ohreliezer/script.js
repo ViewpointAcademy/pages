@@ -237,6 +237,7 @@
             
             const t = i18n[lang];
             document.getElementById('txt-dates').innerText = t.dates;
+            document.getElementById('txt-dates-desktop').innerText = t.dates;
             document.getElementById('txt-hero').innerHTML = t.hero;
             document.getElementById('txt-attendance').innerText = t.attendance;
             document.getElementById('txt-roster').innerText = t.roster;
