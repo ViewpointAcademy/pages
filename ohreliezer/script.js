@@ -60,8 +60,8 @@
                 directions: "דיירעקציע",
                 showLess: "ווייניגער",
                 showDetails: "מער פרטים",
-                info: "מידע לנסיעה",
-                packing: "רשימת חפצים",
+                info: "איפערמאציע",
+                packing: "ליסטע",
                 types: { travel: "רייזע", prayer: "תפילה", hotel: "אכסניא", shabbos: "שבת" },
                 days: { Tue: "ג׳", Wed: "ד׳", Thu: "ה׳", Fri: "עש״ק", Sat: "שב״ק", Sun: "א׳" }
             }
@@ -82,7 +82,7 @@
 
         const itinerary = [
             { day: "Tue", dateNum: "10", stops: [
-                { id: 1, type: "travel", time: "9:00 PM", title: {en:"Departure from NY", yi:"אפפליען פון ניו יארק"}, loc: "JFK Airport", query: "JFK Airport Terminal", desc: {en:"Depart on Swiss Air LX15. Shachris on flight if possible.", yi:"אפפליען מיט סוויס ער LX15. שחרית אויפן פלי אויב מעגליך."} }
+                { id: 1, type: "travel", time: "9:00 PM", title: {en:"Departure from NY", yi:"מען פליט פון ניו יארק"}, loc: "JFK Airport", query: "JFK Airport Terminal", desc: {en:"Depart on Swiss Air LX15. Shachris on flight if possible.", yi:"מען פליט מיט סוויס ער LX15. שחרית אויפן פליגער אויב מעגליך."} }
             ] },
             { day: "Wed", dateNum: "11", stops: [
                 { id: 20, type: "travel", time: "2:05 PM", title: {en:"Arrival Budapest", yi:"אנקומען קיין בודאפעסט"}, loc: "Budapest Airport", query: "Budapest Airport", desc: {en:"Arrival. Mincha at baggage claim. Breakfast/lunch on bus.", yi:"אנקומען. מנחה ביים באגאזש. פרישטאג/מיטאג אויפן באס."} },
@@ -92,7 +92,7 @@
                 { id: 24, type: "hotel", time: "10:25 PM", title: {en:"Hotel Minnaro", yi:"האטעל מינארא"}, loc: {en:"Tokaj", yi:"טאקאי"}, query: "Hotel & Winery & SPA & Restaurant Minnaro Tokaj Hungary", desc: {en:"Check-in. Coffee/tea/snacks available overnight.", yi:"אריינטשעקן. קאווע/טיי/סנעקס דורכאויס די נאכט."} }
             ]},
             { day: "Thu", dateNum: "12", stops: [
-                { id: 30, type: "prayer", time: "7:30 AM", title: {en:"Morning in Tokaj", yi:"פרימארגן אין טאקאי"}, loc: {en:"Hotel Minnaro", yi:"האטעל מינארא"}, query: null, desc: {en:"Hotel checkout, Mikvah & Shachris. Two buses depart.", yi:"אויסטשעקן, מקוה און שחרית. צוויי באסן פארן אפ."} },
+                { id: 30, type: "prayer", time: "7:30 AM", title: {en:"Morning in Tokaj", yi:"פרימארגן אין טאקאי"}, loc: {en:"Hotel Minnaro", yi:"האטעל מינארא"}, query: null, desc: {en:"Hotel checkout, Mikvah & Shachris. Two buses depart.", yi:"ארויסטשעקן, מקוה און שחרית. צוויי באסן פארן אפ."} },
                 { id: 31, type: "prayer", time: "8:45 AM", title: {en:"Kerestir Breakfast", yi:"פרישטאג אין קערעסטיר"}, loc: {en:"Kerestir Shul", yi:"קערעסטירער שול"}, query: "Reb Shayala's Guest House, Bodrogkeresztúr", desc: {en:"Breakfast in shul.", yi:"פרישטאג אין שול."} },
                 { id: 32, type: "prayer", time: "10:00 AM", title: {en:"Kerestir Cemetery", yi:"קערעסטירער בית החיים"}, loc: {en:"Reb Shayala's Tziyun", yi:"רבי ישעי׳לעס ציון"}, query: "Reb Shayala's Guest House, Bodrogkeresztúr", desc: {en:"Very important — leaving on time is critical.", yi:"זייער וויכטיג — מען מוז פארן אויף דער צייט."} },
                 { id: 33, type: "prayer", time: "11:15 AM", title: {en:"Liska", yi:"ליסקא"}, loc: {en:"Reb Hershele Lisker", yi:"הרה״ק ר׳ הערשעלע ליסקער"}, query: "Olaszliszka Cemetery", desc: {en:"Quick cemetery stop.", yi:"א שנעלער באזוך אויפן בית החיים."} },
@@ -120,10 +120,10 @@
                 { id: 54, type: "travel", time: "3:30 AM", title: {en:"Return to Krakow", yi:"צוריק קיין קראקא"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Return to hotel.", yi:"צוריק צום האטעל."} }
             ]},
             { day: "Sun", dateNum: "15", stops: [
-                { id: 60, type: "travel", time: "8:45 AM", title: {en:"Hotel Checkout", yi:"אויסטשעקן"}, loc: {en:"Krakow", yi:"קראקא"}, query: null, desc: {en:"Checkout. Daven & breakfast on bus.", yi:"אויסטשעקן. דאווענען און פרישטאג אויפן באס."} },
+                { id: 60, type: "travel", time: "8:45 AM", title: {en:"Hotel Checkout", yi:"ארויסטשעקן"}, loc: {en:"Krakow", yi:"קראקא"}, query: null, desc: {en:"Checkout. Daven & breakfast on bus.", yi:"ארויסטשעקן. דאווענען און פרישטאג אויפן באס."} },
                 { id: 61, type: "travel", time: "10:15 AM", title: {en:"Auschwitz", yi:"אוישוויץ"}, loc: {en:"Oswiecim", yi:"אוישוויץ"}, query: "Auschwitz-Birkenau Memorial", desc: {en:"Guided visit with R' Yaakov Farber.", yi:"געפירטער באזוך מיט ר׳ יעקב פארבער."} },
                 { id: 62, type: "travel", time: "1:30 PM", title: {en:"Departure from KRK", yi:"אפפליען פון קראקא"}, loc: {en:"KRK Airport", yi:"קראקא לופטפעלד"}, query: "Kraków Airport", desc: {en:"Departure to NY.", yi:"אפפליען קיין ניו יארק."} },
-                { id: 63, type: "travel", time: "8:30 PM", title: {en:"Arrival in NY", yi:"אנקומען קיין ניו יארק"}, loc: "JFK Airport", query: "JFK Airport", desc: {en:"Welcome home!", yi:"ברוך הבא אהיים!"} }
+                { id: 63, type: "travel", time: "8:30 PM", title: {en:"Arrival in NY", yi:"אנקומען קיין ניו יארק"}, loc: "JFK Airport", query: "JFK Airport", desc: {en:"Welcome home!", yi:"בעזה״ש צוריק אהיים!"} }
             ]}
         ];
 
@@ -137,12 +137,12 @@
                 { heading: "Religious Items Note", items: ["Siddur & Chumash donated by R' Shloma Goldstein", "Tehillim is available at every Tzion", "Lecht mostly available, but recommended to take a few"] }
             ],
             yi: [
-                { heading: "באגאזש", items: ["1 טשעקד בעג ביז 50 פונט איז פריי"] },
+                { heading: "באגאזש", items: ["1 טשעקד בעג ביז 50 פונט איז אומזיסט"] },
                 { heading: "טעלעפאן", items: ["זייט זיכער אז אייער טעלעפאן ארבעט אינטערנאציאנאל מיט א רעזאנאבלע פרייז פער טאג", "אויב נישט, רענט א טעלעפאן אדער SIM קארטל פארן טריפ"] },
                 { heading: "וועטער", items: ["דער וועטער אין אייראפע איז ענליך צום וועטער דא"] },
-                { heading: "האטעל", items: ["מיני בארס אין צימערן קאסטן טייער — אויב איר נעמט עפעס, געדענקט אז עס איז אייער חשבון", "עס וועט זיין א ספעציעלער צימער מיט פריי געטראנקן, סנעקס, קוקיס"] },
-                { heading: "הילף אויפן טריפ", items: ["עמיצער פון לינסא רייזט מיט אונז, ער וועט קענען העלפן מיט אייערע באדערפענישן"] },
-                { heading: "רעליגיעזע זאכן נאטיץ", items: ["סידור און חומש בנדבת ר' שלמה גאלדשטיין", "תהלים איז דא ביי יעדן ציון", "לעכט איז מערסטנס דא, אבער רעקאמענדירט צו נעמען א פאר"] }
+                { heading: "האטעל", items: ["מיני בארס אין צימערן קאסטן טייער — אויב איר נעמט עפעס, געדענקט אז עס איז אייער חשבון", "עס וועט זיין א ספעציעלער צימער מיט געטראנקן, סנעקס, קוקיס"] },
+                { heading: "הילף אויפן טריפ", items: ["עמיצער פון 'לנסוע' וועט מיטרייזן מיט אונז, צו זיין גרייט פאר הילף מיט אייערע באדערפענישן"] },
+                { heading: "תשמישי קדושה", items: ["סידור און חומש בנדבת ר' שלמה גאלדשטיין", "תהלים איז דא ביי יעדן ציון", "לעכט איז מערסטנס דא, אבער רעקאמענדירט צו נעמען א פאר"] }
             ]
         };
 

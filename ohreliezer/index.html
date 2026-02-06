@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Heebo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- link style.css and script.js -->
     
     <meta charset="UTF-8">
@@ -17,7 +17,7 @@
     <div class="w-full mx-auto bg-white min-h-screen shadow-2xl flex flex-col lg:flex-row relative overflow-visible app-container">
 
         <!-- SIDEBAR (desktop) / HEADER (mobile) -->
-        <header id="header" class="glass-header pt-10 md:pt-14 pb-8 md:pb-10 px-4 md:px-8 text-white relative lg:sidebar-header">
+        <header id="header" class="glass-header pt-8 md:pt-10 pb-8 md:pb-10 px-4 md:px-8 text-white relative lg:sidebar-header">
             <!-- Offline Indicator -->
             <div id="offline-badge" class="hidden absolute top-4 left-4 bg-amber-500/20 text-amber-300 text-[8px] font-black px-2 py-0.5 rounded-full border border-amber-500/30">OFFLINE MODE</div>
 
@@ -27,10 +27,15 @@
             </div>
 
             <div class="relative z-10">
-                <span id="txt-dates" class="text-xs md:text-[10px] font-extrabold tracking-[0.3em] uppercase text-indigo-300">Feb 10 — Feb 15, 2026</span>
-                <h1 id="txt-hero" class="text-3xl md:text-4xl font-extrabold leading-tight tracking-tight mt-1">Mekomos<br><span class="text-indigo-400">Hakdoshim</span></h1>
+                <div class="flex items-center gap-4 mb-1">
+                    <img src="./images/ohr-eliezer-white.svg" alt="Ohr Eliezer" class="header-logo w-12 h-14 md:w-14 md:h-16 lg:w-16 lg:h-20 flex-shrink-0 opacity-90">
+                    <div>
+                        <span id="txt-dates" class="text-[9px] md:text-[10px] font-extrabold tracking-[0.3em] uppercase text-indigo-300/80">Feb 10 — Feb 15, 2026</span>
+                        <h1 id="txt-hero" class="text-2xl md:text-3xl lg:text-4xl font-extrabold leading-tight tracking-tight">Mekomos<br><span class="text-indigo-400">Hakdoshim</span></h1>
+                    </div>
+                </div>
 
-                <div class="mt-8 bg-white/5 backdrop-blur-md p-5 rounded-3xl border border-white/10 shadow-inner max-w-sm m-auto lg:m-0">
+                <div class="mt-6 bg-white/5 backdrop-blur-md p-5 rounded-3xl border border-white/10 shadow-inner max-w-sm m-auto lg:m-0">
                     <p id="txt-attendance" class="text-[11px] font-bold uppercase tracking-widest text-indigo-200 mb-4 text-center">Joining?</p>
                     <div class="flex gap-2">
                         <button onclick="handleVote('going')" id="global-going" class="flex-1 py-3 rounded-2xl text-[11px] font-extrabold border border-white/10 text-indigo-100 hover:bg-white/10 transition-all">YES</button>

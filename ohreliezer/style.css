@@ -1,7 +1,10 @@
-body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            -webkit-tap-highlight-color: transparent; 
+body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
             scroll-behavior: smooth;
+        }
+        [dir="rtl"] {
+            font-family: 'Heebo', sans-serif;
         }
         .app-container { 
             display: flex; 
