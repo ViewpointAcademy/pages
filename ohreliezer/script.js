@@ -867,7 +867,7 @@
             if (tab === 'info') renderInfo();
             if (tab === 'packing') renderPackingList();
             if (pushHash) {
-                history.replaceState(null, '', '#' + tab);
+                history.pushState({ tab }, '', '#' + tab);
             }
         };
 
@@ -876,7 +876,7 @@
             return tabRoutes[hash] || 'itinerary';
         }
 
-        window.addEventListener('hashchange', () => {
+        window.addEventListener('popstate', () => {
             switchTab(getTabFromHash(), false);
         });
 
