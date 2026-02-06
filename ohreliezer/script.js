@@ -256,6 +256,8 @@
         let comments = [];
         let replyingTo = null; // { id, user_name, text }
         let lastReadCommentTime = localStorage.getItem('lastReadCommentTime') || '';
+        let lastNotifiedCommentTime = localStorage.getItem('lastNotifiedCommentTime') || '';
+        let notificationPermissionAsked = false;
 
         const catStyles = { travel: "bg-blue-50 text-blue-600", prayer: "bg-indigo-50 text-indigo-600", hotel: "bg-emerald-50 text-emerald-600", shabbos: "bg-amber-50 text-amber-700" };
 
@@ -357,15 +359,23 @@
                 }
 
                 // Load RSVPs, checklist, and start polling
-                await fetchRsvps();
-                await fetchChecklist();
-                await fetchCustomItems();
-                await fetchComments();
+                // Wrap fetches in individual try-catch to prevent one failure from breaking polling setup
+                try { await fetchRsvps(); } catch (e) { console.warn("Could not load RSVPs:", e); }
+                try { await fetchChecklist(); } catch (e) { console.warn("Could not load checklist:", e); }
+                try { await fetchCustomItems(); } catch (e) { console.warn("Could not load custom items:", e); }
+                try { await fetchComments(); } catch (e) { console.warn("Could not load comments:", e); }
                 // Re-render packing list now that data is loaded
                 if (currentTab === 'packing') renderPackingList();
                 if (currentTab === 'comments') renderComments();
                 setupRsvpPolling();
                 setupCommentPolling();
+
+                // Request notification permission once on load if not yet decided
+                try {
+                    if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+                        Notification.requestPermission();
+                    }
+                } catch(e) {}
 
                 // Mark comments as read if on comments tab, and update badge
                 if (currentTab === 'comments') markCommentsRead();
@@ -978,7 +988,10 @@
         function checkNewNotifications(prevCount) {
             if (!currentUser || !userData || !userData.name) return;
             if (prevCount === 0) return; // Don't notify on first load
-            const newOnes = comments.filter(c => c.created_at > lastReadCommentTime && c.uid !== currentUser.uid);
+
+            // Only check comments newer than what we last notified about
+            const cutoff = lastNotifiedCommentTime || lastReadCommentTime;
+            const newOnes = comments.filter(c => c.created_at > cutoff && c.uid !== currentUser.uid);
             if (newOnes.length === 0) return;
 
             const myName = userData.name;
@@ -986,19 +999,74 @@
                 const isMention = c.comment_text && c.comment_text.includes('@' + myName);
                 const isReplyToMe = c.reply_to && comments.find(p => p.id === c.reply_to && p.uid === currentUser.uid);
                 if (isMention || isReplyToMe) {
-                    // Show a toast notification
                     const label = isMention ? (c.user_name + ' mentioned you') : (c.user_name + ' replied to you');
-                    showStatusBar(label);
-                    // Also try browser notification
-                    if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-                        new Notification('Mekomos Chat', { body: label, icon: './images/ohr-eliezer-white.svg' });
-                    } else if (typeof Notification !== 'undefined' && Notification.permission !== 'denied') {
-                        Notification.requestPermission();
-                    }
-                    break; // Only one notification per poll cycle
+
+                    // Update last notified time so we don't re-trigger
+                    lastNotifiedCommentTime = c.created_at;
+                    localStorage.setItem('lastNotifiedCommentTime', lastNotifiedCommentTime);
+
+                    // Show persistent toast
+                    showChatNotification(label, c.id);
+
+                    // Browser notification (only if already granted, never prompt)
+                    try {
+                        if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+                            new Notification('Mekomos Chat', { body: label, icon: './images/ohr-eliezer-white.svg' });
+                        }
+                    } catch(e) {}
+
+                    break; // One notification per cycle
                 }
             }
+
+            // Update last notified time to prevent re-checking old comments
+            if (newOnes.length > 0 && !lastNotifiedCommentTime) {
+                lastNotifiedCommentTime = newOnes[0].created_at;
+                localStorage.setItem('lastNotifiedCommentTime', lastNotifiedCommentTime);
+            }
         }
+
+        function showChatNotification(message, commentId) {
+            // Remove any existing notification
+            const existing = document.getElementById('chat-notification');
+            if (existing) existing.remove();
+
+            const toast = document.createElement('div');
+            toast.id = 'chat-notification';
+            toast.className = 'chat-notification';
+            toast.innerHTML = '<div class="flex items-center gap-3 min-w-0">'
+                + '<div class="w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center flex-shrink-0">'
+                + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>'
+                + '</div>'
+                + '<p class="text-sm font-bold text-slate-800 truncate">' + message + '</p>'
+                + '</div>'
+                + '<div class="flex items-center gap-2 flex-shrink-0">'
+                + '<button onclick="openChatNotification(\'' + (commentId || '') + '\')" class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition-colors">Open</button>'
+                + '<button onclick="dismissChatNotification()" class="text-slate-400 hover:text-slate-600 p-1">'
+                + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
+                + '</button>'
+                + '</div>';
+            document.body.appendChild(toast);
+
+            // Animate in
+            requestAnimationFrame(() => toast.classList.add('chat-notification-visible'));
+        }
+
+        window.openChatNotification = function(commentId) {
+            dismissChatNotification();
+            switchTab('comments');
+            if (commentId) {
+                setTimeout(() => scrollToComment(commentId), 300);
+            }
+        };
+
+        window.dismissChatNotification = function() {
+            const toast = document.getElementById('chat-notification');
+            if (toast) {
+                toast.classList.remove('chat-notification-visible');
+                setTimeout(() => toast.remove(), 300);
+            }
+        };
 
         window.submitComment = async function() {
             const input = document.getElementById('comment-input');
@@ -1447,7 +1515,7 @@
             });
             if (tab === 'info') renderInfo();
             if (tab === 'packing') renderPackingList();
-            if (tab === 'comments') { renderComments(); markCommentsRead(); }
+            if (tab === 'comments') { renderComments(); markCommentsRead(); dismissChatNotification(); }
             if (pushHash) {
                 history.pushState({ tab }, '', '#' + tab);
             }
