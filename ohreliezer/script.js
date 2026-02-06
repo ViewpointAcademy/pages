@@ -839,13 +839,15 @@
                         ${section.items.map(item => {
                             const isLocked = item.locked === true;
                             const checked = isLocked || checkedItems.has(item.id);
-                            const detailMarkup = item.detail ? `<span class="check-info-wrap" onclick="event.stopPropagation()"><svg class="check-info-icon" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg><span class="check-inline-detail">— ${escapeHtml(item.detail)}</span></span>` : '';
+                            const detailMarkup = item.detail ? `<span class="check-info-wrap" onclick="event.stopPropagation()"><svg class="check-info-icon" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg><span class="check-inline-detail">${escapeHtml(item.detail)}</span></span>` : '';
                             return `
-                            <li class="check-item flex items-center gap-3 ${isLocked ? 'opacity-60 cursor-default' : 'cursor-pointer'} select-none" ${isLocked ? '' : `onclick="toggleCheckItem('${item.id}')"`}>
-                                <div class="check-box ${checked ? 'checked' : ''}">
+                            <li class="check-item flex items-start gap-3 ${isLocked ? 'opacity-60 cursor-default' : 'cursor-pointer'} select-none" ${isLocked ? '' : `onclick="toggleCheckItem('${item.id}')"`}>
+                                <div class="check-box mt-0.5 ${checked ? 'checked' : ''}">
                                     ${checked ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>' : ''}
                                 </div>
-                                <span class="text-xs ${checked ? 'line-through text-slate-400' : 'text-slate-700'}">${escapeHtml(item.label)}${detailMarkup}</span>
+                                <div class="flex-1 min-w-0">
+                                    <span class="text-xs ${checked ? 'line-through text-slate-400' : 'text-slate-700'}">${escapeHtml(item.label)}</span>${detailMarkup}
+                                </div>
                             </li>`;
                         }).join('')}
                     </ul>

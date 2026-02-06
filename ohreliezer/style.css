@@ -136,27 +136,35 @@ body {
 
         /* Info icon + inline detail */
         .check-info-wrap {
-            display: inline;
-            margin-left: 4px;
-            vertical-align: middle;
+            display: block;
+            margin-top: 2px;
         }
         .check-info-icon {
-            display: inline-block;
-            vertical-align: middle;
-            color: #cbd5e1;
-            transition: color 0.15s;
-        }
-        .check-info-wrap:hover .check-info-icon {
-            color: #6366f1;
+            display: none;
         }
         .check-inline-detail {
             font-size: 10px;
             color: #94a3b8;
-            margin-left: 4px;
         }
-        /* Desktop: hide detail text until icon is hovered */
+        /* Desktop: inline on same line, hidden until icon hover */
         @media (min-width: 768px) {
+            .check-info-wrap {
+                display: inline;
+                margin-top: 0;
+                margin-left: 4px;
+                vertical-align: middle;
+            }
+            .check-info-icon {
+                display: inline-block;
+                vertical-align: middle;
+                color: #cbd5e1;
+                transition: color 0.15s;
+            }
+            .check-info-wrap:hover .check-info-icon {
+                color: #6366f1;
+            }
             .check-inline-detail {
+                margin-left: 4px;
                 opacity: 0;
                 transition: opacity 0.15s;
             }
