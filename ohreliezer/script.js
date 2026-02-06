@@ -854,9 +854,11 @@
                             const shouldAutoExpand = hasQuery && !hasLongNotes;
                             const locLabel = typeof s.loc === 'object' ? s.loc[currentLang] : s.loc;
                             
+                            const safeQuery = encodeURIComponent(s.query).replace(/'/g, '%27');
+                            const safeTitle = encodeURIComponent(s.title[currentLang]).replace(/'/g, '%27');
                             const dirLink = hasQuery ? `
-                                        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.query)}"
-                                           onclick="return handleDirectionsClick(event, '${encodeURIComponent(s.query)}', '${encodeURIComponent(s.title[currentLang])}', ${s.id})"
+                                        <a href="https://www.google.com/maps/search/?api=1&query=${safeQuery}"
+                                           onclick="return handleDirectionsClick(event, '${safeQuery}', '${safeTitle}', ${s.id})"
                                            target="_blank" class="nav-link-minimal">
                                             ${icons.navigate} <span>${t.directions}</span>
                                         </a>` : '';
