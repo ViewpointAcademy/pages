@@ -119,8 +119,8 @@
             ] },
             { day: "Wed", dateNum: "11", stops: [
                 { id: 20, type: "travel", time: "2:05 PM", title: {en:"Arrival Budapest", yi:"אנקומען קיין בודאפעסט"}, loc: "Budapest Airport", query: "Budapest Airport", desc: {en:"Arrival. Mincha at baggage claim. Breakfast/lunch on bus.", yi:"אנקומען. מנחה ביים באגאזש. פרישטאג/מיטאג אויפן באס."} },
-                { id: 21, type: "prayer", time: "5:30 PM", title: {en:"Ratzfert Cemetery", yi:"ראצפערט בית החיים"}, loc: {en:"Ratzfert", yi:"ראצפערט"}, query: "Rácalmás Jewish Cemetery, Hungary", desc: {en:"Mikvah, toilets, cemetery visit.", yi:"מקוה, באזוך אויפן בית החיים."} },
-                { id: 22, type: "prayer", time: "7:00 PM", title: {en:"Kalov Cemetery", yi:"קאלוב בית החיים"}, loc: {en:"Kalov", yi:"קאלוב"}, query: "Nagykálló Jewish Cemetery, Hungary", desc: {en:"Cemetery visit.", yi:"באזוך אויפן בית החיים."} },
+                { id: 21, type: "prayer", time: "5:30 PM", title: {en:"Ratzfert Cemetery", yi:"ראצפערט בית החיים"}, loc: {en:"Ratzfert", yi:"ראצפערט"}, query: "Rácalmás Jewish Cemetery, Hungary", desc: {en:"Mikvah, toilets, cemetery visit.", yi:"מקוה, מתפלל זיין ביים ציון."} },
+                { id: 22, type: "prayer", time: "7:00 PM", title: {en:"Kalov Cemetery", yi:"קאלוב בית החיים"}, loc: {en:"Kalov", yi:"קאלוב"}, query: "Nagykálló Jewish Cemetery, Hungary", desc: {en:"Cemetery visit.", yi:"מתפלל זיין ביים ציון."} },
                 { id: 23, type: "prayer", time: "8:45 PM", title: {en:"Kerestir", yi:"קערעסטיר"}, loc: {en:"Bodrogkeresztúr", yi:"קערעסטיר"}, query: "Reb Shayala's Guest House, Bodrogkeresztúr", desc: {en:"Maariv, dinner, siyum, historical talk by R' Yaakov Farber.", yi:"מעריב, סעודה, סיום, היסטארישע רעדע דורך ר׳ יעקב פארבער."} },
                 { id: 24, type: "hotel", time: "10:25 PM", title: {en:"Hotel Minnaro", yi:"האטעל מינארא"}, loc: {en:"Tokaj", yi:"טאקאי"}, query: "Hotel & Winery & SPA & Restaurant Minnaro Tokaj Hungary", desc: {en:"Check-in. Coffee/tea/snacks available overnight.", yi:"אריינטשעקן. קאווע/טיי/סנעקס דורכאויס די נאכט."} }
             ]},
@@ -128,8 +128,8 @@
                 { id: 30, type: "prayer", time: "7:30 AM", title: {en:"Morning in Tokaj", yi:"פרימארגן אין טאקאי"}, loc: {en:"Hotel Minnaro", yi:"האטעל מינארא"}, query: "Hotel & Winery & SPA & Restaurant Minnaro Tokaj Hungary", desc: {en:"Hotel checkout, Mikvah & Shachris. Two buses depart.", yi:"ארויסטשעקן, מקוה און שחרית. צוויי באסן פארן אפ."} },
                 { id: 31, type: "prayer", time: "8:45 AM", title: {en:"Kerestir Breakfast", yi:"פרישטאג אין קערעסטיר"}, loc: {en:"Kerestir Shul", yi:"קערעסטירער שול"}, query: "Reb Shayala's Guest House, Bodrogkeresztúr", desc: {en:"Breakfast in shul.", yi:"פרישטאג אין שול."} },
                 { id: 32, type: "prayer", time: "10:00 AM", title: {en:"Kerestir Cemetery", yi:"קערעסטירער בית החיים"}, loc: {en:"Reb Shayala's Tziyun", yi:"רבי ישעי׳לעס ציון"}, query: "Reb Shayala's Guest House, Bodrogkeresztúr", desc: {en:"Very important — leaving on time is critical.", yi:"זייער וויכטיג — מען מוז פארן אויף דער צייט."} },
-                { id: 33, type: "prayer", time: "11:15 AM", title: {en:"Liska", yi:"ליסקא"}, loc: {en:"Reb Hershele Lisker", yi:"הרה״ק ר׳ הערשעלע ליסקער"}, query: "Olaszliszka Cemetery", desc: {en:"Quick cemetery stop.", yi:"א שנעלער באזוך אויפן בית החיים."} },
-                { id: 34, type: "prayer", time: "12:15 PM", title: {en:"Ihel", yi:"אוהעל"}, loc: {en:"Yismach Moshe", yi:"דער הייליגער ישמח משה"}, query: "Sátoraljaújhely Jewish Cemetery", desc: {en:"Cemetery visit. Divrei hisorerus by the Rav.", yi:"באזוך אויפן בית החיים. דברי התעוררות פונעם רב שליט״א."} },
+                { id: 33, type: "prayer", time: "11:15 AM", title: {en:"Liska", yi:"ליסקא"}, loc: {en:"Reb Hershele Lisker", yi:"הרה״ק ר׳ הערשעלע ליסקער"}, query: "Olaszliszka Cemetery", desc: {en:"Quick cemetery stop.", yi:"א שנעלער תפלה ביים ציון."} },
+                { id: 34, type: "prayer", time: "12:15 PM", title: {en:"Ihel", yi:"אוהעל"}, loc: {en:"Yismach Moshe", yi:"דער הייליגער ישמח משה"}, query: "Sátoraljaújhely Jewish Cemetery", desc: {en:"Cemetery visit. Divrei hisorerus by the Rav.", yi:"מתפלל זיין ביים ציון. דברי התעוררות פונעם רב שליט״א."} },
                 { id: 35, type: "prayer", time: "4:30 PM", title: {en:"Tanz", yi:"צאנז"}, loc: {en:"Historic Shul", yi:"היסטארישע שול"}, query: "Nowy Sącz Jewish Cemetery", desc: {en:"Historic shul visit, Mincha, light meal.", yi:"באזוך אין היסטארישע שול, מנחה, לייכטע איבערבייסונג."} },
                 { id: 36, type: "hotel", time: "8:15 PM", title: {en:"Krakow Hotel", yi:"קראקא האטעל"}, loc: {en:"Krakow", yi:"קראקא"}, query: "Kazimierz Krakow", desc: {en:"Check-in (remaining for rest of trip).", yi:"אריינטשעקן (מען בלייבט דא פאר דער רעשט פון טריפ)."} },
                 { id: 37, type: "prayer", time: "9:15 PM", title: {en:"Maariv & Shiur", yi:"מעריב און שיעור"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Maariv followed by weekly shiur by R' Yoel Lefkowitz.", yi:"מעריב, שיעור דורך ר׳ יואל לעפקאוויטש."} },
@@ -205,11 +205,10 @@
                 ]},
                 { id: "other", heading: "Other", items: [
                     {id: "essentials_4", label: "Air plugs"},
-                    {id: "religious_3", label: "Sefer/Gemara/reading material"},
+                    {id: "religious_3", label: "Sefer/Gemara"},
+                    {id: "other_6", label: "Reading material"},
                     {id: "other_1", label: "Tylenol/Motrin/Tums/Bandages"},
                     {id: "other_2", label: "Lenses solution"},
-                    {id: "other_3", label: "Cigarettes", detail: "If you smoke"},
-                    {id: "other_4", label: "Fresh wipes", detail: "If you need"},
                     {id: "other_5", label: "Deodorant", detail: "If you need"}
                 ]}
             ],
@@ -238,11 +237,10 @@
                 ]},
                 { id: "other", heading: "אנדערע", items: [
                     {id: "essentials_4", label: "ער פלאגס"},
-                    {id: "religious_3", label: "ספר/גמרא/לייענונג מאטריאל"},
+                    {id: "religious_3", label: "ספר/גמרא"},
+                    {id: "other_6", label: "לייענונג מאטריאל"},
                     {id: "other_1", label: "טיילענאל/מאטרין/טאמס/באנדאזשעס"},
                     {id: "other_2", label: "לענזעס סאליושאן"},
-                    {id: "other_3", label: "סיגארעטן", detail: "אויב איר רויכערט"},
-                    {id: "other_4", label: "פרישע וויפס", detail: "אויב איר דארפט"},
                     {id: "other_5", label: "דעאדאראנט", detail: "אויב איר דארפט"}
                 ]}
             ]
