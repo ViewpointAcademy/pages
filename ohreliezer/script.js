@@ -706,11 +706,54 @@
                 summaryEl.classList.add('hidden');
             }
 
-            // Reset to main view (not delete confirmation)
+            // Reset to main view (not delete confirmation or edit name)
             document.getElementById('admin-main-view').classList.remove('hidden');
             document.getElementById('admin-delete-confirm').classList.add('hidden');
+            document.getElementById('admin-edit-name-row').classList.add('hidden');
 
             document.getElementById('admin-modal').classList.add('active');
+        };
+
+        window.showAdminEditName = () => {
+            const row = document.getElementById('admin-edit-name-row');
+            const input = document.getElementById('admin-name-input');
+            row.classList.toggle('hidden');
+            if (!row.classList.contains('hidden')) {
+                input.value = currentAdminTarget.name || '';
+                input.focus();
+            }
+        };
+
+        window.adminSaveName = async () => {
+            if (!currentAdminTarget || isOffline) return;
+            const newName = document.getElementById('admin-name-input').value.trim();
+            if (!newName) return;
+            try {
+                const res = await fetch(`${API_BASE}/api/users`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ uid: currentAdminTarget.uid, name: newName })
+                });
+                if (!res.ok) throw new Error('Failed to update name');
+                // Also update RSVP name if they have one
+                const userData = window._adminUserMap ? window._adminUserMap[currentAdminTarget.uid] : null;
+                if (userData && userData.rsvp_status) {
+                    const initials = newName.split(' ').map(n=>n[0]).join('').toUpperCase().substring(0,2);
+                    await fetch(`${API_BASE}/api/rsvps`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ uid: currentAdminTarget.uid, name: newName, initials, status: userData.rsvp_status })
+                    });
+                }
+                currentAdminTarget.name = newName;
+                document.getElementById('admin-target-name').innerText = newName;
+                document.getElementById('admin-edit-name-row').classList.add('hidden');
+                showStatusBar('Name updated');
+                await fetchRsvps();
+            } catch (err) {
+                console.error('Admin save name error:', err);
+                showStatusBar('Error updating name');
+            }
         };
 
         window.adminUpdateStatus = async (status) => {
