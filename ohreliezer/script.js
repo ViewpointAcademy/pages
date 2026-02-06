@@ -849,7 +849,10 @@
             `).join('');
         }
 
-        window.switchTab = function(tab) {
+        const tabRoutes = { itinerary: 'itinerary', info: 'info', packing: 'packing' };
+
+        window.switchTab = function(tab, pushHash = true) {
+            if (!tabRoutes[tab]) tab = 'itinerary';
             currentTab = tab;
             const tabs = ['itinerary', 'info', 'packing'];
             tabs.forEach(t => {
@@ -863,7 +866,19 @@
             });
             if (tab === 'info') renderInfo();
             if (tab === 'packing') renderPackingList();
+            if (pushHash) {
+                history.replaceState(null, '', '#' + tab);
+            }
         };
+
+        function getTabFromHash() {
+            const hash = window.location.hash.replace('#', '');
+            return tabRoutes[hash] || 'itinerary';
+        }
+
+        window.addEventListener('hashchange', () => {
+            switchTab(getTabFromHash(), false);
+        });
 
         // Re-render when crossing the desktop breakpoint
         window.addEventListener('resize', () => {
@@ -916,6 +931,12 @@
                     }
                 }
             } catch (e) {}
+
+            // Route to tab from URL hash
+            const initialTab = getTabFromHash();
+            if (initialTab !== 'itinerary') {
+                switchTab(initialTab, false);
+            }
 
             init();
         };
