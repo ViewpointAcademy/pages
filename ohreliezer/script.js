@@ -149,7 +149,7 @@
                 { id: 50, type: "shabbos", time: "Morning", title: {en:"Shabbos Davening", yi:"שחרית שב״ק"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Shachris, kiddush, Shabbos meal.", yi:"שחרית, קידוש, שבת סעודה."} },
                 { id: 51, type: "shabbos", time: "5:30 PM", title: {en:"Mincha & Havdalah", yi:"מנחה און הבדלה"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Mincha, drasha, Havdalah.", yi:"מנחה, דרשה, הבדלה."} },
                 { id: 52, type: "travel", time: "8:30 PM", title: {en:"Travel to Lizensk", yi:"נסיעה קיין ליזענסק"}, loc: {en:"~90 min drive", yi:"~90 מינוט פארן"}, query: "Leżajsk Beis Hachaim, Poland", desc: {en:"Depart to Lizensk (~90 min after Havdalah).", yi:"פארן קיין ליזענסק (~90 מינוט נאך הבדלה)."} },
-                { id: 53, type: "prayer", time: "10:45 PM", title: {en:"Lizensk", yi:"ליזענסק"}, loc: {en:"Rebbe Reb Elimelech", yi:"רבי ר׳ אלימלך"}, query: "Leżajsk Cemetery, Poland", desc: {en:"Melava Malka & tfilat at Beis Hachaim after chatzos.", yi:"מלוה מלכה און באזוך אויפן בית החיים נאך חצות."} },
+                { id: 53, type: "prayer", time: "10:45 PM", title: {en:"Lizensk", yi:"ליזענסק"}, loc: {en:"Rebbe Reb Elimelech", yi:"רבי ר׳ אלימלך"}, query: "Leżajsk Cemetery, Poland", desc: {en:"Melava Malka & tfilah at Beis Hachaim after chatzos.", yi:"מלוה מלכה און באזוך אויפן בית החיים נאך חצות."} },
                 { id: 54, type: "travel", time: "3:30 AM", title: {en:"Return to Krakow", yi:"צוריק קיין קראקא"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Return to hotel.", yi:"צוריק צום האטעל."} }
             ]},
             { day: "Sun", dateNum: "15", stops: [
@@ -1474,7 +1474,7 @@
             const container = document.getElementById('packing-container');
             if (!container) return;
             const sections = packingList[currentLang] || packingList.en;
-            const customHeading = currentLang === 'yi' ? 'מיינע זאכן' : 'My Items';
+            const customHeading = currentLang === 'yi' ? 'מיינע זאכן (פריווייט)' : 'My Items (private)';
             const builtInHtml = sections.map(section => `
                 <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
                     <h3 class="text-sm font-bold text-slate-800 mb-3">${escapeHtml(section.heading)}</h3>
@@ -1486,7 +1486,7 @@
                 <div class="bg-white rounded-2xl p-5 border border-indigo-100 shadow-sm">
                     <h3 class="text-sm font-bold text-indigo-700 mb-3">${escapeHtml(customHeading)}</h3>
                     <ul class="space-y-2">
-                        ${customItems.length ? customItems.map(ci => renderCheckItem({ id: ci.item_id, label: ci.label }, true)).join('') : `<li class="text-[11px] text-slate-400 py-1">${currentLang === 'yi' ? 'קיין אייגענע זאכן נאך נישט צוגעלייגט' : 'No custom items yet'}</li>`}
+                        ${customItems.length ? customItems.map(ci => renderCheckItem({ id: ci.item_id, label: ci.label }, true)).join('') : `<li class="text-[11px] text-slate-400 py-1">${currentLang === 'yi' ? 'נאך נישט צוגעלייגט' : 'No custom items yet'}</li>`}
                     </ul>
                     <div class="mt-3 flex items-center gap-2">
                         <input id="add-input-custom" type="text" placeholder="${currentLang === 'yi' ? 'צולייגן א זאך...' : 'Add item...'}" class="add-item-input flex-1 text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 focus:border-indigo-400 focus:outline-none" onkeydown="if(event.key==='Enter') addCustomItem()">
