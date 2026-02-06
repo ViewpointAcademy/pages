@@ -57,16 +57,18 @@ body {
             position: absolute;
             inset: 0;
             background:
-                radial-gradient(ellipse 60% 50% at 80% 20%, rgba(99,102,241,0.15) 0%, transparent 70%),
-                radial-gradient(ellipse 40% 60% at 10% 80%, rgba(129,140,248,0.08) 0%, transparent 60%);
+                radial-gradient(ellipse 50% 40% at 75% 15%, rgba(99,102,241,0.18) 0%, transparent 70%),
+                radial-gradient(ellipse 35% 50% at 15% 70%, rgba(129,140,248,0.10) 0%, transparent 60%);
             pointer-events: none;
         }
         .glass-header::after {
             content: '';
             position: absolute;
             inset: 0;
-            background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
-            background-size: 24px 24px;
+            background-image: radial-gradient(circle, rgba(255,255,255,0.09) 1px, transparent 1px);
+            background-size: 20px 20px;
+            -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 55%);
+            mask-image: linear-gradient(to bottom, black 0%, transparent 55%);
             pointer-events: none;
         }
         .day-section { position: relative; display: flex; gap: 16px; }
@@ -361,10 +363,16 @@ body {
                 min-width: 340px;
                 height: 100vh;
                 overflow-y: auto;
+                overflow-x: hidden;
                 padding: 2rem 1.5rem;
                 border-radius: 0;
                 flex-shrink: 0;
+                scrollbar-width: thin;
+                scrollbar-color: rgba(255,255,255,0.1) transparent;
             }
+            .glass-header::-webkit-scrollbar { width: 3px; }
+            .glass-header::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+            .glass-header::-webkit-scrollbar-track { background: transparent; }
 
             .glass-header .lang-switch {
                 position: relative;
