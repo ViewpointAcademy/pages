@@ -135,6 +135,16 @@ body {
         .lang-btn { font-size: 9px; font-weight: 800; padding: 4px 8px; border-radius: 8px; transition: all 0.2s; color: white; opacity: 0.6; }
         .lang-btn.active { background: white; color: #1e1b4b; opacity: 1; }
         
+        .sync-info-tip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 4px solid transparent;
+            border-top-color: white;
+        }
+
         [dir="rtl"] { text-align: right; }
         /* [dir="rtl"] .day-section { flex-direction: row-reverse; } */
         [dir="rtl"] .timeline-line-bg { right: 27px; left: auto; }

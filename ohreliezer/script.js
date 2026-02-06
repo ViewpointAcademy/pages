@@ -275,32 +275,24 @@
             
             const t = i18n[lang];
             document.getElementById('txt-attendance').innerText = t.attendance;
+            try { document.getElementById('txt-attendance-desktop').innerText = t.attendance; } catch(e) {}
 
-            // Only set edit name text if user hasn't entered their name yet
-            if (!userData || !userData.name) {
-                document.getElementById('txt-edit-name').innerText = t.editName;
-                try {
-                    document.getElementById('txt-edit-name-sidebar').innerText = t.editName;
-                } catch (e) {}
-            } else {
-                // User has a name, show icon only
-                document.getElementById('txt-edit-name').innerText = '';
-                try {
-                    document.getElementById('txt-edit-name-sidebar').innerText = '';
-                } catch (e) {}
-            }
+            // Update user info display for language change
+            updateUserInfoDisplay();
 
             document.getElementById('txt-modal-title').innerText = t.modalTitle;
             document.getElementById('txt-modal-sub').innerText = t.modalSub;
             document.getElementById('txt-save-btn').innerText = t.saveBtn;
-            // update RSVP button labels
+            // update RSVP button labels (both mobile and desktop)
             try {
-                const btnYes = document.getElementById('global-going');
-                const btnMaybe = document.getElementById('global-maybe');
-                const btnNo = document.getElementById('global-no');
-                if (btnYes) btnYes.innerText = t.votes?.positive || 'YES';
-                if (btnMaybe) btnMaybe.innerText = t.votes?.neutral || 'MAYBE';
-                if (btnNo) btnNo.innerText = t.votes?.negative || 'NO';
+                ['', '-desktop'].forEach(suffix => {
+                    const btnYes = document.getElementById('global-going' + suffix);
+                    const btnMaybe = document.getElementById('global-maybe' + suffix);
+                    const btnNo = document.getElementById('global-no' + suffix);
+                    if (btnYes) btnYes.innerText = t.votes?.positive || 'YES';
+                    if (btnMaybe) btnMaybe.innerText = t.votes?.neutral || 'MAYBE';
+                    if (btnNo) btnNo.innerText = t.votes?.negative || 'NO';
+                });
             } catch (e) {}
             
             // Update tab labels
@@ -456,7 +448,7 @@
         }
 
         function launchConfetti() {
-            const rsvpBox = document.getElementById('rsvp-box');
+            const rsvpBox = isDesktop() ? document.getElementById('rsvp-box-desktop') : document.getElementById('rsvp-box');
             if (!rsvpBox || typeof confetti !== 'function') return;
             const rect = rsvpBox.getBoundingClientRect();
             const x = (rect.left + rect.width / 2) / window.innerWidth;
@@ -640,26 +632,27 @@
             const container = document.getElementById('user-info');
             const nameDisplay = document.getElementById('user-display-name');
             const adminBadge = document.getElementById('admin-badge');
+            const enterBtn = document.getElementById('enter-name-btn');
             const editBtn = document.getElementById('txt-edit-name');
 
             // Sidebar user info
             const sidebarContainer = document.getElementById('user-info-sidebar');
             const sidebarName = document.getElementById('user-display-name-sidebar');
             const sidebarAdmin = document.getElementById('admin-badge-sidebar');
+            const sidebarEnterBtn = document.getElementById('enter-name-btn-sidebar');
             const sidebarEditBtn = document.getElementById('txt-edit-name-sidebar');
 
             const t = i18n[currentLang];
 
             if (userData && userData.name) {
-                // User has a name - show name, icon only on edit button
+                // User has a name - show name + inline edit icon
                 if (nameDisplay) nameDisplay.innerText = userData.name;
                 if (container) { container.classList.remove('hidden'); container.classList.add('flex'); }
+                if (enterBtn) enterBtn.classList.add('hidden');
+
                 if (sidebarName) sidebarName.innerText = userData.name;
                 if (sidebarContainer) { sidebarContainer.classList.remove('hidden'); sidebarContainer.style.display = 'flex'; }
-
-                // Show icon only (no text)
-                if (editBtn) editBtn.innerText = '';
-                if (sidebarEditBtn) sidebarEditBtn.innerText = '';
+                if (sidebarEnterBtn) sidebarEnterBtn.classList.add('hidden');
 
                 if (isAdmin) {
                     if (adminBadge) adminBadge.classList.remove('hidden');
@@ -669,12 +662,13 @@
                     if (sidebarAdmin) sidebarAdmin.classList.add('hidden');
                 }
             } else {
-                // No name yet - hide user info, show "Enter Name" on button
+                // No name yet - hide user info, show "Enter Name" button
                 if (container) { container.classList.add('hidden'); container.classList.remove('flex'); }
-                if (sidebarContainer) { sidebarContainer.classList.add('hidden'); }
-
-                // Show "Enter Name" text
+                if (enterBtn) enterBtn.classList.remove('hidden');
                 if (editBtn) editBtn.innerText = t.editName;
+
+                if (sidebarContainer) { sidebarContainer.classList.add('hidden'); }
+                if (sidebarEnterBtn) sidebarEnterBtn.classList.remove('hidden');
                 if (sidebarEditBtn) sidebarEditBtn.innerText = t.editName;
             }
         }
@@ -695,22 +689,27 @@
         };
 
         function updateVoteButtons(status) {
+            // Update both mobile/tablet and desktop RSVP buttons
             ['going', 'maybe', 'no'].forEach(s => {
+                const activeClass = "flex-1 py-3 rounded-2xl text-[11px] font-extrabold rsvp-active";
+                const defaultClass = "flex-1 py-3 rounded-2xl text-[11px] font-extrabold border border-white/10 text-indigo-100 transition-all";
                 const btn = document.getElementById(`global-${s}`);
-                if (btn) btn.className = s === status ? "flex-1 py-3 rounded-2xl text-[11px] font-extrabold rsvp-active" : "flex-1 py-3 rounded-2xl text-[11px] font-extrabold border border-white/10 text-indigo-100 transition-all";
+                if (btn) btn.className = s === status ? activeClass : defaultClass;
+                const btnDesktop = document.getElementById(`global-${s}-desktop`);
+                if (btnDesktop) btnDesktop.className = s === status ? activeClass : defaultClass;
             });
 
             // Add or remove glow animation based on vote status
-            const rsvpBox = document.getElementById('rsvp-box');
-            if (rsvpBox) {
-                if (status === null || status === undefined) {
-                    // No vote - add glow
-                    rsvpBox.classList.add('rsvp-glow');
-                } else {
-                    // User voted - remove glow
-                    rsvpBox.classList.remove('rsvp-glow');
+            ['rsvp-box', 'rsvp-box-desktop'].forEach(id => {
+                const box = document.getElementById(id);
+                if (box) {
+                    if (status === null || status === undefined) {
+                        box.classList.add('rsvp-glow');
+                    } else {
+                        box.classList.remove('rsvp-glow');
+                    }
                 }
-            }
+            });
         }
 
         function renderAttendees(list) {
