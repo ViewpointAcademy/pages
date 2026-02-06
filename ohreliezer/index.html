@@ -115,6 +115,9 @@
                 <button id="tab-btn-packing" onclick="switchTab('packing')" class="tab-btn tab-inactive px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all">
                     <span id="tab-label-packing">Packing List</span>
                 </button>
+                <button id="tab-btn-comments" onclick="switchTab('comments')" class="tab-btn tab-inactive px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all">
+                    <span id="tab-label-comments">Comments</span>
+                </button>
             </div>
 
             <!-- Tab: Itinerary -->
@@ -157,6 +160,18 @@
             <!-- Tab: Packing List -->
             <div id="tab-packing" class="hidden">
                 <div class="masonry-grid" id="packing-container"></div>
+            </div>
+
+            <!-- Tab: Comments -->
+            <div id="tab-comments" class="hidden">
+                <div id="comments-container" class="max-w-2xl mx-auto">
+                    <div class="bg-white rounded-2xl p-5 border border-indigo-100 shadow-sm mb-6">
+                        <h3 id="txt-comments-heading" class="text-sm font-bold text-indigo-700 mb-3">Share a Thought</h3>
+                        <textarea id="comment-input" placeholder="Write your comment..." class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-400 focus:outline-none resize-none mb-3" rows="3"></textarea>
+                        <button onclick="submitComment()" id="txt-post-btn" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold text-xs tracking-widest uppercase">POST COMMENT</button>
+                    </div>
+                    <div id="comments-list"></div>
+                </div>
             </div>
         </main>
 

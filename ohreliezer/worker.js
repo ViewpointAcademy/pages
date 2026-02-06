@@ -164,6 +164,50 @@ export default {
         return jsonResponse({ success: true });
       }
 
+      // GET /api/comments - Get all comments
+      if (path === '/api/comments' && request.method === 'GET') {
+        await env.DB.prepare(`
+          CREATE TABLE IF NOT EXISTS comments (
+            id TEXT PRIMARY KEY,
+            uid TEXT NOT NULL,
+            user_name TEXT NOT NULL,
+            comment_text TEXT NOT NULL,
+            created_at TEXT NOT NULL
+          )
+        `).run();
+        const { results } = await env.DB.prepare('SELECT * FROM comments ORDER BY created_at DESC').all();
+        return jsonResponse(results);
+      }
+
+      // POST /api/comments - Create a new comment
+      if (path === '/api/comments' && request.method === 'POST') {
+        const { id, uid, user_name, comment_text } = await request.json();
+        if (!id || !uid || !user_name || !comment_text) {
+          return jsonResponse({ error: 'Missing required fields' }, 400);
+        }
+        await env.DB.prepare(`
+          CREATE TABLE IF NOT EXISTS comments (
+            id TEXT PRIMARY KEY,
+            uid TEXT NOT NULL,
+            user_name TEXT NOT NULL,
+            comment_text TEXT NOT NULL,
+            created_at TEXT NOT NULL
+          )
+        `).run();
+        await env.DB.prepare(
+          'INSERT INTO comments (id, uid, user_name, comment_text, created_at) VALUES (?, ?, ?, ?, datetime("now"))'
+        ).bind(id, uid, user_name, comment_text).run();
+        return jsonResponse({ success: true });
+      }
+
+      // DELETE /api/comments/:id - Delete a comment
+      if (path.match(/^\/api\/comments\/[^/]+$/) && request.method === 'DELETE') {
+        const id = decodeURIComponent(path.split('/')[3]);
+        if (!id) return jsonResponse({ error: 'Missing id' }, 400);
+        await env.DB.prepare('DELETE FROM comments WHERE id = ?').bind(id).run();
+        return jsonResponse({ success: true });
+      }
+
       // Health check endpoint
       if (path === '/' || path === '/api') {
         return jsonResponse({ status: 'ok', message: 'Mekomos Journey API' });

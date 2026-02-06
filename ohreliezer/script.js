@@ -43,6 +43,16 @@
                 showLessNames: "Show Less",
                 info: "Travel Info",
                 packing: "Packing List",
+                comments: "Comments",
+                commentsHeading: "Share a Thought",
+                postBtn: "POST COMMENT",
+                commentPlaceholder: "Write your comment...",
+                deleteComment: "Delete",
+                justNow: "Just now",
+                minutesAgo: "min ago",
+                hoursAgo: "h ago",
+                daysAgo: "d ago",
+                noComments: "No comments yet. Be the first to share!",
                 types: { travel: "Travel", prayer: "Prayer", hotel: "Hotel", shabbos: "Shabbos" },
                 days: { Tue: "Tue", Wed: "Wed", Thu: "Thu", Fri: "Fri", Sat: "Sat", Sun: "Sun" }
             },
@@ -62,6 +72,16 @@
                 showLessNames: "ווייז ווייניגער",
                 info: "איפערמאציע",
                 packing: "ליסטע",
+                comments: "קאמענטן",
+                commentsHeading: "שרייב א געדאנק",
+                postBtn: "פאסטן קאמענט",
+                commentPlaceholder: "...שרייבט אייער קאמענט",
+                deleteComment: "אויסמעקן",
+                justNow: "איצט",
+                minutesAgo: "מינוט צוריק",
+                hoursAgo: "שעה צוריק",
+                daysAgo: "טאג צוריק",
+                noComments: "!נאך קיין קאמענטן. זייט דער ערשטער",
                 types: { travel: "רייזע", prayer: "תפילה", hotel: "אכסניא", shabbos: "שבת" },
                 days: { Tue: "ג׳", Wed: "ד׳", Thu: "ה׳", Fri: "עש״ק", Sat: "שב״ק", Sun: "א׳" }
             }
@@ -218,6 +238,7 @@
         let currentTab = 'itinerary';
         let checkedItems = new Set();
         let customItems = []; // { item_id, label, section_id }
+        let comments = [];
 
         const catStyles = { travel: "bg-blue-50 text-blue-600", prayer: "bg-indigo-50 text-indigo-600", hotel: "bg-emerald-50 text-emerald-600", shabbos: "bg-amber-50 text-amber-700" };
 
@@ -273,11 +294,13 @@
                 document.getElementById('tab-label-itinerary').innerText = t.itinerary;
                 document.getElementById('tab-label-info').innerText = t.info;
                 document.getElementById('tab-label-packing').innerText = t.packing;
+                document.getElementById('tab-label-comments').innerText = t.comments;
             } catch (e) {}
 
             renderTimeline();
             if (currentTab === 'info') renderInfo();
             if (currentTab === 'packing') renderPackingList();
+            if (currentTab === 'comments') renderComments();
             if (typeof closeMapPanel === 'function') closeMapPanel();
         };
 
@@ -320,8 +343,10 @@
                 await fetchRsvps();
                 await fetchChecklist();
                 await fetchCustomItems();
+                await fetchComments();
                 // Re-render packing list now that data is loaded
                 if (currentTab === 'packing') renderPackingList();
+                if (currentTab === 'comments') renderComments();
                 setupRsvpPolling();
 
                 // Hide offline badge and show user info
@@ -867,6 +892,97 @@
             }
         }
 
+        async function fetchComments() {
+            if (isOffline) return;
+            try {
+                const res = await fetch(`${API_BASE}/api/comments`);
+                if (!res.ok) throw new Error('Failed to fetch comments');
+                comments = await res.json();
+                if (currentTab === 'comments') renderComments();
+            } catch (e) {
+                console.warn("Could not load comments:", e);
+            }
+        }
+
+        window.submitComment = async function() {
+            const input = document.getElementById('comment-input');
+            if (!input) return;
+            const text = input.value.trim();
+            if (!text) return;
+            if (!userData || !userData.name) {
+                openNameModal();
+                return;
+            }
+            if (isOffline) {
+                showStatusBar("Cannot post comments offline");
+                return;
+            }
+            const commentId = 'comment_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+            try {
+                const res = await fetch(`${API_BASE}/api/comments`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: commentId, uid: currentUser.uid, user_name: userData.name, comment_text: text })
+                });
+                if (!res.ok) throw new Error('Failed to post comment');
+                input.value = '';
+                await fetchComments();
+            } catch (e) {
+                console.error("Post comment error:", e);
+                showStatusBar("Error posting comment");
+            }
+        };
+
+        window.deleteComment = async function(commentId, commentUid) {
+            if (!isAdmin && commentUid !== currentUser.uid) return;
+            if (isOffline) { showStatusBar("Cannot delete comments offline"); return; }
+            try {
+                const res = await fetch(`${API_BASE}/api/comments/${encodeURIComponent(commentId)}`, { method: 'DELETE' });
+                if (!res.ok) throw new Error('Failed to delete comment');
+                await fetchComments();
+            } catch (e) {
+                console.error("Delete comment error:", e);
+                showStatusBar("Error deleting comment");
+            }
+        };
+
+        function getRelativeTime(timestamp) {
+            const t = i18n[currentLang];
+            const now = new Date();
+            const past = new Date(timestamp + 'Z');
+            const diffMs = now - past;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+            if (diffMins < 1) return t.justNow;
+            if (diffMins < 60) return diffMins + ' ' + t.minutesAgo;
+            if (diffHours < 24) return diffHours + ' ' + t.hoursAgo;
+            return diffDays + ' ' + t.daysAgo;
+        }
+
+        function renderComments() {
+            const container = document.getElementById('comments-list');
+            if (!container) return;
+            const t = i18n[currentLang];
+            const heading = document.getElementById('txt-comments-heading');
+            const input = document.getElementById('comment-input');
+            const btn = document.getElementById('txt-post-btn');
+            if (heading) heading.innerText = t.commentsHeading;
+            if (input) input.placeholder = t.commentPlaceholder;
+            if (btn) btn.innerText = t.postBtn;
+            if (!comments || comments.length === 0) {
+                container.innerHTML = '<div class="text-center py-12"><svg class="mx-auto mb-3 text-slate-300" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><p class="text-xs text-slate-400 font-bold">' + escapeHtml(t.noComments) + '</p></div>';
+                return;
+            }
+            container.innerHTML = comments.map(c => {
+                const isOwner = currentUser && c.uid === currentUser.uid;
+                const canDelete = isAdmin || isOwner;
+                const deleteBtn = canDelete ? '<button onclick="deleteComment(\'' + escapeHtml(c.id) + '\',\'' + escapeHtml(c.uid) + '\')" class="text-slate-300 hover:text-rose-500 transition-colors" title="' + escapeHtml(t.deleteComment) + '"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' : '';
+                const youBadge = isOwner ? ' <span class="text-[8px] font-black text-indigo-500 bg-indigo-50 px-1.5 py-0.5 rounded uppercase">You</span>' : '';
+                return '<div class="comment-card bg-white rounded-2xl p-5 border border-slate-100 shadow-sm mb-4"><div class="flex items-start justify-between mb-2"><div class="flex items-center gap-2"><span class="text-xs font-bold text-slate-700">' + escapeHtml(c.user_name) + '</span>' + youBadge + '</div><div class="flex items-center gap-2"><span class="text-[10px] text-slate-400">' + getRelativeTime(c.created_at) + '</span>' + deleteBtn + '</div></div><p class="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap">' + escapeHtml(c.comment_text) + '</p></div>';
+            }).join('');
+        }
+
         window.addCustomItem = async function() {
             const input = document.getElementById('add-input-custom');
             if (!input) return;
@@ -968,12 +1084,12 @@
             container.innerHTML = builtInHtml + customHtml;
         }
 
-        const tabRoutes = { itinerary: 'itinerary', info: 'info', packing: 'packing' };
+        const tabRoutes = { itinerary: 'itinerary', info: 'info', packing: 'packing', comments: 'comments' };
 
         window.switchTab = function(tab, pushHash = true) {
             if (!tabRoutes[tab]) tab = 'itinerary';
             currentTab = tab;
-            const tabs = ['itinerary', 'info', 'packing'];
+            const tabs = ['itinerary', 'info', 'packing', 'comments'];
             tabs.forEach(t => {
                 const container = document.getElementById(`tab-${t}`);
                 const btn = document.getElementById(`tab-btn-${t}`);
@@ -985,6 +1101,7 @@
             });
             if (tab === 'info') renderInfo();
             if (tab === 'packing') renderPackingList();
+            if (tab === 'comments') renderComments();
             if (pushHash) {
                 history.pushState({ tab }, '', '#' + tab);
             }
