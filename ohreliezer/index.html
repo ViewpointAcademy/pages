@@ -46,7 +46,7 @@
 
                     <!-- Column 1: Logo + Hero (tablet left, mobile top) -->
                     <div class="flex flex-col items-center text-center lg:flex-row lg:items-center lg:text-left lg:gap-4 mb-1 md:mb-0">
-                        <img src="./images/ohr-eliezer-white.svg" alt="Ohr Eliezer" class="header-logo w-14 h-16 md:w-16 md:h-20 lg:w-16 lg:h-20 flex-shrink-0 opacity-90 mb-3 lg:mb-0">
+                        <img src="./images/ohr-eliezer-white.svg" alt="Ohr Eliezer" class="header-logo w-16 h-[4.5rem] md:w-16 md:h-20 lg:w-16 lg:h-20 flex-shrink-0 opacity-90 mb-3 lg:mb-0">
                         <div dir="rtl" style="font-family: 'Heebo', sans-serif;">
                             <h1 class="text-2xl md:text-3xl lg:text-3xl font-extrabold leading-tight">נסיעה למקומות הקדושים</h1>
                             <p class="text-sm md:text-base font-bold text-indigo-300/80 mt-1">ע״י חברי ביהמ״ד אור אליעזר</p>
@@ -69,14 +69,14 @@
                         <!-- User info row -->
                         <div class="flex items-center justify-center md:justify-start gap-2 flex-wrap mt-4 mb-3">
                             <!-- Shown when user has a name -->
-                            <div id="user-info" class="hidden items-center gap-1 text-[10px]">
+                            <div id="user-info" class="hidden items-center gap-1 text-[11px]">
                                 <span id="user-display-name" onclick="openNameModal()" class="font-bold text-white cursor-pointer hover:underline"></span>
-                                <button onclick="openNameModal()" class="text-indigo-300 hover:text-white p-0.5 transition-colors" title="Edit name"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                                <button onclick="openNameModal()" class="text-indigo-300 hover:text-white p-0.5 transition-colors" title="Edit name"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
                                 <span id="admin-badge" class="hidden bg-amber-400/20 text-amber-300 px-1.5 py-0.5 rounded text-[8px] font-black">ADMIN</span>
                             </div>
                             <!-- Shown when no name yet -->
-                            <button id="enter-name-btn" onclick="openNameModal()" class="flex items-center gap-1 text-[10px] font-bold text-indigo-200 hover:text-white transition-colors">
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                            <button id="enter-name-btn" onclick="openNameModal()" class="flex items-center gap-1 text-[11px] font-bold text-indigo-200 hover:text-white transition-colors">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                                 <span id="txt-edit-name">Enter Name</span>
                             </button>
                             <span class="text-indigo-400/40">·</span>
@@ -89,7 +89,7 @@
 
                         <!-- Attendees -->
                         <div class="flex justify-center md:justify-start mb-2">
-                            <div id="attendee-count" class="text-[10px] font-black text-indigo-200 bg-white/10 px-3 py-1 rounded-full">0 Joined</div>
+                            <div id="attendee-count" class="text-[11px] font-black text-indigo-200 bg-white/10 px-3 py-1 rounded-full">0 Joined</div>
                         </div>
                         <div id="attendees-container" class="relative">
                             <div id="attendees-list" class="mb-2 flex flex-wrap gap-1.5 justify-center md:justify-start overflow-hidden transition-all duration-300 relative" style="max-height: 3.5rem;">
