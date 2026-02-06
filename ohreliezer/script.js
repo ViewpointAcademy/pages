@@ -119,17 +119,17 @@
             ] },
             { day: "Wed", dateNum: "11", stops: [
                 { id: 20, type: "travel", time: "2:05 PM", title: {en:"Arrival Budapest", yi:"אנקומען קיין בודאפעסט"}, loc: "Budapest Airport", query: "Budapest Airport", desc: {en:"Arrival. Mincha at baggage claim. Breakfast/lunch on bus.", yi:"אנקומען. מנחה ביים באגאזש. פרישטאג/מיטאג אויפן באס."} },
-                { id: 21, type: "prayer", time: "5:30 PM", title: {en:"Ratzfert Cemetery", yi:"ראצפערט בית החיים"}, loc: {en:"Ratzfert", yi:"ראצפערט"}, query: "Rácalmás Jewish Cemetery, Hungary", desc: {en:"Mikvah, toilets, cemetery visit.", yi:"מקוה, מתפלל זיין ביים ציון."} },
-                { id: 22, type: "prayer", time: "7:00 PM", title: {en:"Kalov Cemetery", yi:"קאלוב בית החיים"}, loc: {en:"Kalov", yi:"קאלוב"}, query: "Nagykálló Jewish Cemetery, Hungary", desc: {en:"Cemetery visit.", yi:"מתפלל זיין ביים ציון."} },
+                { id: 21, type: "prayer", time: "5:30 PM", title: {en:"Ratzfert Beis Hachaim", yi:"ראצפערט בית החיים"}, loc: {en:"Ratzfert", yi:"ראצפערט"}, query: "Rácalmás Jewish Cemetery, Hungary", desc: {en:"Mikvah, toilets, tfilah at Beis Hachaim.", yi:"מקוה, מתפלל זיין ביים ציון."} },
+                { id: 22, type: "prayer", time: "7:00 PM", title: {en:"Kalov Beis Hachaim", yi:"קאלוב בית החיים"}, loc: {en:"Kalov", yi:"קאלוב"}, query: "Nagykálló Jewish Cemetery, Hungary", desc: {en:"tfilah at Beis Hachaim.", yi:"מתפלל זיין ביים ציון."} },
                 { id: 23, type: "prayer", time: "8:45 PM", title: {en:"Kerestir", yi:"קערעסטיר"}, loc: {en:"Bodrogkeresztúr", yi:"קערעסטיר"}, query: "Reb Shayala's Guest House, Bodrogkeresztúr", desc: {en:"Maariv, dinner, siyum, historical talk by R' Yaakov Farber.", yi:"מעריב, סעודה, סיום, היסטארישע רעדע דורך ר׳ יעקב פארבער."} },
                 { id: 24, type: "hotel", time: "10:25 PM", title: {en:"Hotel Minnaro", yi:"האטעל מינארא"}, loc: {en:"Tokaj", yi:"טאקאי"}, query: "Hotel & Winery & SPA & Restaurant Minnaro Tokaj Hungary", desc: {en:"Check-in. Coffee/tea/snacks available overnight.", yi:"אריינטשעקן. קאווע/טיי/סנעקס דורכאויס די נאכט."} }
             ]},
             { day: "Thu", dateNum: "12", stops: [
                 { id: 30, type: "prayer", time: "7:30 AM", title: {en:"Morning in Tokaj", yi:"פרימארגן אין טאקאי"}, loc: {en:"Hotel Minnaro", yi:"האטעל מינארא"}, query: "Hotel & Winery & SPA & Restaurant Minnaro Tokaj Hungary", desc: {en:"Hotel checkout, Mikvah & Shachris. Two buses depart.", yi:"ארויסטשעקן, מקוה און שחרית. צוויי באסן פארן אפ."} },
                 { id: 31, type: "prayer", time: "8:45 AM", title: {en:"Kerestir Breakfast", yi:"פרישטאג אין קערעסטיר"}, loc: {en:"Kerestir Shul", yi:"קערעסטירער שול"}, query: "Reb Shayala's Guest House, Bodrogkeresztúr", desc: {en:"Breakfast in shul.", yi:"פרישטאג אין שול."} },
-                { id: 32, type: "prayer", time: "10:00 AM", title: {en:"Kerestir Cemetery", yi:"קערעסטירער בית החיים"}, loc: {en:"Reb Shayala's Tziyun", yi:"רבי ישעי׳לעס ציון"}, query: "Reb Shayala's Guest House, Bodrogkeresztúr", desc: {en:"Very important — leaving on time is critical.", yi:"זייער וויכטיג — מען מוז פארן אויף דער צייט."} },
+                { id: 32, type: "prayer", time: "10:00 AM", title: {en:"Kerestir Beis Hachaim", yi:"קערעסטירער בית החיים"}, loc: {en:"Reb Shayala's Tziyun", yi:"רבי ישעי׳לעס ציון"}, query: "Reb Shayala's Guest House, Bodrogkeresztúr", desc: {en:"Very important — leaving on time is critical.", yi:"זייער וויכטיג — מען מוז פארן אויף דער צייט."} },
                 { id: 33, type: "prayer", time: "11:15 AM", title: {en:"Liska", yi:"ליסקא"}, loc: {en:"Reb Hershele Lisker", yi:"הרה״ק ר׳ הערשעלע ליסקער"}, query: "Olaszliszka Cemetery", desc: {en:"Quick cemetery stop.", yi:"א שנעלער תפלה ביים ציון."} },
-                { id: 34, type: "prayer", time: "12:15 PM", title: {en:"Ihel", yi:"אוהעל"}, loc: {en:"Yismach Moshe", yi:"דער הייליגער ישמח משה"}, query: "Sátoraljaújhely Jewish Cemetery", desc: {en:"Cemetery visit. Divrei hisorerus by the Rav.", yi:"מתפלל זיין ביים ציון. דברי התעוררות פונעם רב שליט״א."} },
+                { id: 34, type: "prayer", time: "12:15 PM", title: {en:"Ihel", yi:"אוהעל"}, loc: {en:"Yismach Moshe", yi:"דער הייליגער ישמח משה"}, query: "Sátoraljaújhely Jewish Cemetery", desc: {en:"tfilah at Beis Hachaim. Divrei hisorerus by the Rav.", yi:"מתפלל זיין ביים ציון. דברי התעוררות פונעם רב שליט״א."} },
                 { id: 35, type: "prayer", time: "4:30 PM", title: {en:"Tanz", yi:"צאנז"}, loc: {en:"Historic Shul", yi:"היסטארישע שול"}, query: "Nowy Sącz Jewish Cemetery", desc: {en:"Historic shul visit, Mincha, light meal.", yi:"באזוך אין היסטארישע שול, מנחה, לייכטע איבערבייסונג."} },
                 { id: 36, type: "hotel", time: "8:15 PM", title: {en:"Krakow Hotel", yi:"קראקא האטעל"}, loc: {en:"Krakow", yi:"קראקא"}, query: "Kazimierz Krakow", desc: {en:"Check-in (remaining for rest of trip).", yi:"אריינטשעקן (מען בלייבט דא פאר דער רעשט פון טריפ)."} },
                 { id: 37, type: "prayer", time: "9:15 PM", title: {en:"Maariv & Shiur", yi:"מעריב און שיעור"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Maariv followed by weekly shiur by R' Yoel Lefkowitz.", yi:"מעריב, שיעור דורך ר׳ יואל לעפקאוויטש."} },
@@ -137,7 +137,7 @@
             ]},
             { day: "Fri", dateNum: "13", stops: [
                 { id: 40, type: "prayer", time: "8:30 AM", title: {en:"Shachris & Breakfast", yi:"שחרית און פרישטאג"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Shachris & breakfast at hotel.", yi:"שחרית און פרישטאג אין האטעל."} },
-                { id: 41, type: "prayer", time: "11:10 AM", title: {en:"Krakow Cemetery", yi:"קראקא בית החיים"}, loc: {en:"Rema & Others", yi:"דער רמ״א און אנדערע צדיקים"}, query: "Old Jewish Cemetery, Kraków", desc: {en:"Shul & cemetery visit with divrei Torah.", yi:"שול און בית החיים באזוך מיט דברי תורה."} },
+                { id: 41, type: "prayer", time: "11:10 AM", title: {en:"Krakow Beis Hachaim", yi:"קראקא בית החיים"}, loc: {en:"Rema & Others", yi:"דער רמ״א און אנדערע צדיקים"}, query: "Old Jewish Cemetery, Kraków", desc: {en:"Shul & tfilah at Beis Hachaim with divrei Torah.", yi:"שול און בית החיים באזוך מיט דברי תורה."} },
                 { id: 42, type: "travel", time: "12:40 PM", title: {en:"Jewish Quarter Tour", yi:"באזוך אין יידישן קווארטאל"}, loc: {en:"Kazimierz", yi:"קאזימירז"}, query: "Kazimierz, Kraków", desc: {en:"Guided tour of the Jewish Quarter.", yi:"געפירטער באזוך אין יידישן קווארטאל."} },
                 { id: 43, type: "hotel", time: "1:40 PM", title: {en:"Shabbos Prep", yi:"שבת צוגרייטונג"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Return to hotel. Shabbos prep, rest, mikvah, shvitz.", yi:"צוריק צום האטעל. שבת צוגרייטונג, זיך צולייגן, מקוה, שוויץ."} },
                 { id: 44, type: "shabbos", time: "4:39 PM", title: {en:"Candle Lighting", yi:"ליכט צינדן"}, loc: {en:"Krakow", yi:"קראקא"}, query: null, desc: {en:"Candle lighting.", yi:"ליכט צינדן."} },
@@ -148,8 +148,8 @@
             { day: "Sat", dateNum: "14", stops: [
                 { id: 50, type: "shabbos", time: "Morning", title: {en:"Shabbos Davening", yi:"שחרית שב״ק"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Shachris, kiddush, Shabbos meal.", yi:"שחרית, קידוש, שבת סעודה."} },
                 { id: 51, type: "shabbos", time: "5:30 PM", title: {en:"Mincha & Havdalah", yi:"מנחה און הבדלה"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Mincha, drasha, Havdalah.", yi:"מנחה, דרשה, הבדלה."} },
-                { id: 52, type: "travel", time: "8:30 PM", title: {en:"Travel to Lizensk", yi:"נסיעה קיין ליזענסק"}, loc: {en:"~90 min drive", yi:"~90 מינוט פארן"}, query: "Leżajsk Cemetery, Poland", desc: {en:"Depart to Lizensk (~90 min after Havdalah).", yi:"פארן קיין ליזענסק (~90 מינוט נאך הבדלה)."} },
-                { id: 53, type: "prayer", time: "10:45 PM", title: {en:"Lizensk", yi:"ליזענסק"}, loc: {en:"Rebbe Reb Elimelech", yi:"רבי ר׳ אלימלך"}, query: "Leżajsk Cemetery, Poland", desc: {en:"Melava Malka & cemetery visit after chatzos.", yi:"מלוה מלכה און באזוך אויפן בית החיים נאך חצות."} },
+                { id: 52, type: "travel", time: "8:30 PM", title: {en:"Travel to Lizensk", yi:"נסיעה קיין ליזענסק"}, loc: {en:"~90 min drive", yi:"~90 מינוט פארן"}, query: "Leżajsk Beis Hachaim, Poland", desc: {en:"Depart to Lizensk (~90 min after Havdalah).", yi:"פארן קיין ליזענסק (~90 מינוט נאך הבדלה)."} },
+                { id: 53, type: "prayer", time: "10:45 PM", title: {en:"Lizensk", yi:"ליזענסק"}, loc: {en:"Rebbe Reb Elimelech", yi:"רבי ר׳ אלימלך"}, query: "Leżajsk Cemetery, Poland", desc: {en:"Melava Malka & tfilat at Beis Hachaim after chatzos.", yi:"מלוה מלכה און באזוך אויפן בית החיים נאך חצות."} },
                 { id: 54, type: "travel", time: "3:30 AM", title: {en:"Return to Krakow", yi:"צוריק קיין קראקא"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Return to hotel.", yi:"צוריק צום האטעל."} }
             ]},
             { day: "Sun", dateNum: "15", stops: [
@@ -167,7 +167,7 @@
                 { heading: "Weather", items: ["Weather in Europe is similar to the weather here"] },
                 { heading: "Hotel Notes", items: ["Mini bars in the hotel rooms charge a lot — if you take anything remember it's your bill", "There will be a specific room filled with drinks, snacks, cookies that will be for free"] },
                 { heading: "On-Trip Help", items: ["There will be someone traveling with us from Linsoa, he will be able to answer/help with your needs if possible"] },
-                { heading: "Religious Items Note", items: ["Siddur & Chumash donated by R' Shloma Goldstein", "Tehillim is available at every Tzion", "Lecht mostly available, but recommended to take a few"] }
+                { heading: "Miscellaneous Note", items: ["Siddur & Chumash donated by R' Shloma Goldstein", "Tehillim is available at every Tzion", "Lecht mostly available, but recommended to take a few"] }
             ],
             yi: [
                 { heading: "באגאזש", items: ["1 טשעקד בעג ביז 50 פונט איז אומזיסט"] },
