@@ -31,9 +31,7 @@
                 dates: "Feb 10 (23 Shevat) — Feb 15, 2026",
                 hero: "Mekomos<br><span class='text-indigo-400'>Hakdoshim</span>",
                 attendance: "Joining?",
-                roster: "Group Roster",
-                live: "Live Updates",
-                editName: "Edit Name",
+                editName: "Enter Name",
                 itinerary: "Itinerary",
                 modalTitle: "Display Name",
                 modalSub: "Enter your name for the group list.",
@@ -50,9 +48,7 @@
                 dates: "כ״ג שבט — כ״ח שבט, תשפ״ו",
                 hero: "מקומות<br><span class='text-indigo-400'>הקדושים</span>",
                 attendance: "קומט מיט?",
-                roster: "די גרופע",
-                live: "לייוו דערהיינטיגונג",
-                editName: "טויש נאמען",
+                editName: "שרייב נאמען",
                 itinerary: "סדר הנסיעה",
                 modalTitle: "נאמען",
                 modalSub: "לייגט אריין אייער נאמען.",
@@ -240,15 +236,21 @@
             document.getElementById('txt-dates-desktop').innerText = t.dates;
             document.getElementById('txt-hero').innerHTML = t.hero;
             document.getElementById('txt-attendance').innerText = t.attendance;
-            document.getElementById('txt-roster').innerText = t.roster;
-            document.getElementById('txt-live').innerText = t.live;
-            document.getElementById('txt-edit-name').innerText = t.editName;
-            // Sidebar labels
-            try {
-                document.getElementById('txt-roster-sidebar').innerText = t.roster;
-                document.getElementById('txt-live-sidebar').innerText = t.live;
-                document.getElementById('txt-edit-name-sidebar').innerText = t.editName;
-            } catch (e) {}
+
+            // Only set edit name text if user hasn't entered their name yet
+            if (!userData || !userData.name) {
+                document.getElementById('txt-edit-name').innerText = t.editName;
+                try {
+                    document.getElementById('txt-edit-name-sidebar').innerText = t.editName;
+                } catch (e) {}
+            } else {
+                // User has a name, show icon only
+                document.getElementById('txt-edit-name').innerText = '';
+                try {
+                    document.getElementById('txt-edit-name-sidebar').innerText = '';
+                } catch (e) {}
+            }
+
             document.getElementById('txt-modal-title').innerText = t.modalTitle;
             document.getElementById('txt-modal-sub').innerText = t.modalSub;
             document.getElementById('txt-save-btn').innerText = t.saveBtn;
@@ -557,17 +559,26 @@
             const container = document.getElementById('user-info');
             const nameDisplay = document.getElementById('user-display-name');
             const adminBadge = document.getElementById('admin-badge');
+            const editBtn = document.getElementById('txt-edit-name');
 
             // Sidebar user info
             const sidebarContainer = document.getElementById('user-info-sidebar');
             const sidebarName = document.getElementById('user-display-name-sidebar');
             const sidebarAdmin = document.getElementById('admin-badge-sidebar');
+            const sidebarEditBtn = document.getElementById('txt-edit-name-sidebar');
+
+            const t = i18n[currentLang];
 
             if (userData && userData.name) {
+                // User has a name - show name, icon only on edit button
                 if (nameDisplay) nameDisplay.innerText = userData.name;
                 if (container) { container.classList.remove('hidden'); container.classList.add('flex'); }
                 if (sidebarName) sidebarName.innerText = userData.name;
                 if (sidebarContainer) { sidebarContainer.classList.remove('hidden'); sidebarContainer.style.display = 'flex'; }
+
+                // Show icon only (no text)
+                if (editBtn) editBtn.innerText = '';
+                if (sidebarEditBtn) sidebarEditBtn.innerText = '';
 
                 if (isAdmin) {
                     if (adminBadge) adminBadge.classList.remove('hidden');
@@ -577,8 +588,13 @@
                     if (sidebarAdmin) sidebarAdmin.classList.add('hidden');
                 }
             } else {
+                // No name yet - hide user info, show "Enter Name" on button
                 if (container) { container.classList.add('hidden'); container.classList.remove('flex'); }
                 if (sidebarContainer) { sidebarContainer.classList.add('hidden'); }
+
+                // Show "Enter Name" text
+                if (editBtn) editBtn.innerText = t.editName;
+                if (sidebarEditBtn) sidebarEditBtn.innerText = t.editName;
             }
         }
 
@@ -602,6 +618,18 @@
                 const btn = document.getElementById(`global-${s}`);
                 if (btn) btn.className = s === status ? "flex-1 py-3 rounded-2xl text-[11px] font-extrabold rsvp-active" : "flex-1 py-3 rounded-2xl text-[11px] font-extrabold border border-white/10 text-indigo-100 transition-all";
             });
+
+            // Add or remove glow animation based on vote status
+            const rsvpBox = document.getElementById('rsvp-box');
+            if (rsvpBox) {
+                if (status === null || status === undefined) {
+                    // No vote - add glow
+                    rsvpBox.classList.add('rsvp-glow');
+                } else {
+                    // User voted - remove glow
+                    rsvpBox.classList.remove('rsvp-glow');
+                }
+            }
         }
 
         function renderAttendees(list) {
