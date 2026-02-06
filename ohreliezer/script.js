@@ -737,14 +737,34 @@
                 </div>`).join('');
 
             if (container) {
+                // Preserve expand/collapse state across re-renders
+                const wasExpanded = container.getAttribute('data-collapsed') === 'false';
+
+                // Replace only the pill content, not the fade element
+                const fade = document.getElementById('attendees-fade');
                 container.innerHTML = itemsHtml;
-                if (!document.getElementById('attendees-fade')) {
-                    const fade = document.createElement('div');
-                    fade.id = 'attendees-fade';
-                    fade.className = 'absolute left-0 right-0 bottom-0 h-8 pointer-events-none transition-opacity duration-300 z-20';
-                    fade.style.opacity = '1';
-                    fade.style.background = 'linear-gradient(to bottom, transparent, rgba(30,27,75,0.8))';
+
+                // Re-add or create fade element
+                if (fade) {
                     container.appendChild(fade);
+                } else {
+                    const newFade = document.createElement('div');
+                    newFade.id = 'attendees-fade';
+                    newFade.className = 'absolute left-0 right-0 bottom-0 h-8 pointer-events-none transition-opacity duration-300 z-20';
+                    newFade.style.background = 'linear-gradient(to bottom, transparent, #1e1b4b)';
+                    container.appendChild(newFade);
+                }
+
+                // Restore previous state
+                const currentFade = document.getElementById('attendees-fade');
+                if (wasExpanded) {
+                    container.style.maxHeight = 'none';
+                    container.setAttribute('data-collapsed', 'false');
+                    if (currentFade) currentFade.style.opacity = '0';
+                } else {
+                    container.style.maxHeight = '3.5rem';
+                    container.setAttribute('data-collapsed', 'true');
+                    if (currentFade) currentFade.style.opacity = '1';
                 }
             }
 
