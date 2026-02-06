@@ -270,14 +270,31 @@
     <!-- Admin Modal -->
     <div id="admin-modal" onclick="this.classList.remove('active')">
         <div class="bg-white w-full max-w-xs rounded-[2.5rem] p-8 shadow-2xl" onclick="event.stopPropagation()">
-            <h3 class="text-xl font-bold text-slate-900 mb-2">Admin: <span id="admin-target-name"></span></h3>
-            <p class="text-xs text-slate-500 mb-6">UID: <span id="admin-target-uid" class="font-mono"></span></p>
+            <h3 class="text-xl font-bold text-slate-900 mb-1">Admin: <span id="admin-target-name"></span></h3>
+            <p class="text-[10px] text-slate-400 mb-1 font-mono">UID: <span id="admin-target-uid"></span></p>
+            <p id="admin-data-summary" class="hidden text-[11px] text-slate-500 font-semibold mb-4 bg-slate-50 px-3 py-1.5 rounded-lg"></p>
 
-            <div class="grid grid-cols-1 gap-2">
-                <button onclick="adminUpdateStatus('going')" class="bg-emerald-500 text-white py-3 rounded-xl font-bold text-xs uppercase">Set to Going</button>
-                <button onclick="adminUpdateStatus('maybe')" class="bg-slate-500 text-white py-3 rounded-xl font-bold text-xs uppercase">Set to Maybe</button>
-                <button onclick="adminUpdateStatus('no')" class="bg-rose-500 text-white py-3 rounded-xl font-bold text-xs uppercase">Set to No</button>
-                <button onclick="adminUpdateStatus(null)" class="bg-white border border-slate-200 text-slate-400 py-3 rounded-xl font-bold text-xs uppercase mt-4">Remove RSVP</button>
+            <!-- Main view: status buttons + delete -->
+            <div id="admin-main-view">
+                <div class="grid grid-cols-1 gap-2">
+                    <button onclick="adminUpdateStatus('going')" class="bg-emerald-500 text-white py-3 rounded-xl font-bold text-xs uppercase">Set to Going</button>
+                    <button onclick="adminUpdateStatus('maybe')" class="bg-slate-500 text-white py-3 rounded-xl font-bold text-xs uppercase">Set to Maybe</button>
+                    <button onclick="adminUpdateStatus('no')" class="bg-rose-500 text-white py-3 rounded-xl font-bold text-xs uppercase">Set to No</button>
+                    <button onclick="adminUpdateStatus(null)" class="bg-white border border-slate-200 text-slate-400 py-3 rounded-xl font-bold text-xs uppercase mt-2">Remove RSVP</button>
+                </div>
+                <button onclick="showDeleteConfirm()" class="w-full mt-4 py-3 rounded-xl font-bold text-xs uppercase border-2 border-rose-200 text-rose-500 hover:bg-rose-50 transition-colors">Delete User</button>
+            </div>
+
+            <!-- Delete confirmation view -->
+            <div id="admin-delete-confirm" class="hidden">
+                <div class="bg-rose-50 border border-rose-200 rounded-xl p-4 mb-4">
+                    <p class="text-xs font-bold text-rose-700 mb-2">Warning</p>
+                    <p id="admin-delete-warning" class="text-[11px] text-rose-600 leading-relaxed"></p>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="cancelDeleteUser()" class="py-3 rounded-xl font-bold text-xs uppercase bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">Cancel</button>
+                    <button onclick="confirmDeleteUser()" class="py-3 rounded-xl font-bold text-xs uppercase bg-rose-600 text-white hover:bg-rose-700 transition-colors">Confirm Delete</button>
+                </div>
             </div>
         </div>
     </div>

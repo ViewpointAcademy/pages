@@ -421,13 +421,25 @@
                 const res = await fetch(`${API_BASE}/api/rsvps`);
                 if (!res.ok) throw new Error('Failed to fetch RSVPs');
                 const list = await res.json();
+
+                // Admin: fetch all users with data counts
+                if (isAdmin) {
+                    try {
+                        const adminRes = await fetch(`${API_BASE}/api/admin/users`);
+                        if (adminRes.ok) {
+                            const allUsers = await adminRes.json();
+                            window._adminUserMap = {};
+                            (allUsers || []).forEach(u => { window._adminUserMap[u.uid] = u; });
+                        }
+                    } catch (e) { console.error('Admin users fetch error:', e); }
+                }
+
                 renderAttendees(list || []);
                 const my = (list || []).find(r => r.uid === currentUser.uid);
                 currentStatus = my ? my.status : null;
                 updateVoteButtons(currentStatus);
             } catch (err) {
                 console.error("Fetch RSVPs error:", err);
-                // Don't show error on every poll failure, just log it
             }
         }
 
@@ -675,8 +687,29 @@
             if (isOffline) return;
             if (!isAdmin) return;
             currentAdminTarget = { uid, name };
-            document.getElementById('admin-target-name').innerText = name;
+            document.getElementById('admin-target-name').innerText = name || 'No name';
             document.getElementById('admin-target-uid').innerText = uid;
+
+            // Populate data summary from admin user map
+            const userData = window._adminUserMap ? window._adminUserMap[uid] : null;
+            const summaryEl = document.getElementById('admin-data-summary');
+            if (summaryEl && userData) {
+                const parts = [];
+                if (userData.rsvp_status) parts.push(`RSVP: ${userData.rsvp_status}`);
+                else parts.push('No RSVP');
+                if (userData.checklist_count > 0) parts.push(`${userData.checklist_count} checklist`);
+                if (userData.custom_items_count > 0) parts.push(`${userData.custom_items_count} custom items`);
+                if (userData.comments_count > 0) parts.push(`${userData.comments_count} comments`);
+                summaryEl.innerText = parts.join(' · ');
+                summaryEl.classList.remove('hidden');
+            } else if (summaryEl) {
+                summaryEl.classList.add('hidden');
+            }
+
+            // Reset to main view (not delete confirmation)
+            document.getElementById('admin-main-view').classList.remove('hidden');
+            document.getElementById('admin-delete-confirm').classList.add('hidden');
+
             document.getElementById('admin-modal').classList.add('active');
         };
 
@@ -684,6 +717,42 @@
             if (!currentAdminTarget || isOffline) return;
             await saveVote(currentAdminTarget.uid, currentAdminTarget.name, status);
             document.getElementById('admin-modal').classList.remove('active');
+        };
+
+        window.showDeleteConfirm = () => {
+            if (!currentAdminTarget) return;
+            const userData = window._adminUserMap ? window._adminUserMap[currentAdminTarget.uid] : null;
+            const warningEl = document.getElementById('admin-delete-warning');
+            if (warningEl && userData) {
+                const items = [];
+                if (userData.rsvp_status) items.push('RSVP status');
+                if (userData.checklist_count > 0) items.push(`${userData.checklist_count} checklist items`);
+                if (userData.custom_items_count > 0) items.push(`${userData.custom_items_count} custom items`);
+                if (userData.comments_count > 0) items.push(`${userData.comments_count} comments`);
+                const dataStr = items.length > 0 ? items.join(', ') : 'no data';
+                warningEl.innerText = `Permanently delete "${currentAdminTarget.name || 'this user'}"? This will remove: ${dataStr}. This cannot be undone.`;
+            }
+            document.getElementById('admin-main-view').classList.add('hidden');
+            document.getElementById('admin-delete-confirm').classList.remove('hidden');
+        };
+
+        window.cancelDeleteUser = () => {
+            document.getElementById('admin-main-view').classList.remove('hidden');
+            document.getElementById('admin-delete-confirm').classList.add('hidden');
+        };
+
+        window.confirmDeleteUser = async () => {
+            if (!currentAdminTarget || isOffline) return;
+            try {
+                const res = await fetch(`${API_BASE}/api/admin/users/${encodeURIComponent(currentAdminTarget.uid)}`, { method: 'DELETE' });
+                if (!res.ok) throw new Error('Failed to delete user');
+                document.getElementById('admin-modal').classList.remove('active');
+                showStatusBar('User deleted');
+                await fetchRsvps();
+            } catch (err) {
+                console.error('Delete user error:', err);
+                showStatusBar('Error deleting user');
+            }
         };
 
         function updateVoteButtons(status) {
@@ -725,16 +794,38 @@
             const sidebarCount = document.getElementById('attendee-count-sidebar');
             if (sidebarCount) sidebarCount.innerText = countLabel;
 
-            // Filter out users with no status
-            const activeList = list.filter(a => a.status);
+            // Filter out users with no status (for non-admin)
+            let activeList = list.filter(a => a.status);
+
+            // Admin: merge in users without RSVP from the admin user map
+            if (isAdmin && window._adminUserMap) {
+                const rsvpUids = new Set(list.map(a => a.uid));
+                const noRsvpUsers = Object.values(window._adminUserMap)
+                    .filter(u => !rsvpUids.has(u.uid) || !list.find(a => a.uid === u.uid && a.status))
+                    .map(u => ({
+                        uid: u.uid,
+                        name: u.name || u.uid.substring(0, 8),
+                        initials: u.name ? u.name.split(' ').map(n=>n[0]).join('').toUpperCase().substring(0,2) : '??',
+                        status: u.rsvp_status || null,
+                        _noRsvp: !u.rsvp_status
+                    }));
+                // Add those not already in activeList
+                noRsvpUsers.forEach(u => {
+                    if (!activeList.find(a => a.uid === u.uid)) activeList.push(u);
+                });
+            }
 
             // Mobile attendees list (dark header background)
-            const itemsHtml = activeList.map(a => `
-                <div onclick="openAdmin('${escapeHtml(a.uid)}', '${escapeHtml(a.name)}')" class="flex items-center gap-1.5 bg-white/10 ps-0.5 pe-2.5 py-0.5 rounded-full cursor-pointer hover:bg-white/20 active:scale-95 transition-all">
-                    <div class="w-6 h-6 rounded-full bg-indigo-400 text-white flex items-center justify-center text-[8px] font-bold">${escapeHtml(a.initials)}</div>
+            const itemsHtml = activeList.map(a => {
+                const dimmed = a._noRsvp ? 'opacity-40' : '';
+                const statusDot = a.status === 'going' ? 'bg-emerald-400' : (a.status === 'no' ? 'bg-rose-400' : (a.status === 'maybe' ? 'bg-white/40' : 'bg-slate-500'));
+                return `
+                <div onclick="openAdmin('${escapeHtml(a.uid)}', '${escapeHtml(a.name)}')" class="flex items-center gap-1.5 bg-white/10 ps-0.5 pe-2.5 py-0.5 rounded-full cursor-pointer hover:bg-white/20 active:scale-95 transition-all ${dimmed}">
+                    <div class="w-6 h-6 rounded-full ${a._noRsvp ? 'bg-slate-500' : 'bg-indigo-400'} text-white flex items-center justify-center text-[8px] font-bold">${escapeHtml(a.initials)}</div>
                     <span class="text-[10px] font-bold text-indigo-100">${escapeHtml(a.name)}</span>
-                    <div class="w-1.5 h-1.5 rounded-full ${a.status === 'going' ? 'bg-emerald-400' : (a.status === 'no' ? 'bg-rose-400' : 'bg-white/40')}"></div>
-                </div>`).join('');
+                    <div class="w-1.5 h-1.5 rounded-full ${statusDot}"></div>
+                </div>`;
+            }).join('');
 
             if (container) {
                 // Preserve expand/collapse state across re-renders
@@ -771,12 +862,16 @@
             // Sidebar attendees (desktop)
             const sidebarList = document.getElementById('sidebar-attendees-list');
             if (sidebarList) {
-                sidebarList.innerHTML = activeList.map(a => `
-                    <div onclick="openAdmin('${escapeHtml(a.uid)}', '${escapeHtml(a.name)}')" class="flex items-center gap-1 bg-white/10 ps-0.5 pe-2 py-0.5 rounded-full cursor-pointer hover:bg-white/20 transition-colors">
-                        <div class="w-5 h-5 rounded-full bg-indigo-400 text-white flex items-center justify-center text-[7px] font-bold">${escapeHtml(a.initials)}</div>
+                sidebarList.innerHTML = activeList.map(a => {
+                    const dimmed = a._noRsvp ? 'opacity-40' : '';
+                    const statusDot = a.status === 'going' ? 'bg-emerald-400' : (a.status === 'no' ? 'bg-rose-400' : (a.status === 'maybe' ? 'bg-white/40' : 'bg-slate-500'));
+                    return `
+                    <div onclick="openAdmin('${escapeHtml(a.uid)}', '${escapeHtml(a.name)}')" class="flex items-center gap-1 bg-white/10 ps-0.5 pe-2 py-0.5 rounded-full cursor-pointer hover:bg-white/20 transition-colors ${dimmed}">
+                        <div class="w-5 h-5 rounded-full ${a._noRsvp ? 'bg-slate-500' : 'bg-indigo-400'} text-white flex items-center justify-center text-[7px] font-bold">${escapeHtml(a.initials)}</div>
                         <span class="text-[9px] font-bold text-indigo-100">${escapeHtml(a.name)}</span>
-                        <div class="w-1.5 h-1.5 rounded-full ${a.status === 'going' ? 'bg-emerald-400' : (a.status === 'no' ? 'bg-rose-400' : 'bg-white/40')}"></div>
-                    </div>`).join('');
+                        <div class="w-1.5 h-1.5 rounded-full ${statusDot}"></div>
+                    </div>`;
+                }).join('');
             }
         }
 
