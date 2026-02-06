@@ -1458,7 +1458,7 @@
         function renderCheckItem(item, isCustom) {
             const isLocked = item.locked === true;
             const checked = isLocked || checkedItems.has(item.id);
-            const detailMarkup = item.detail ? `<span class="check-info-wrap" onclick="event.stopPropagation()"><svg class="check-info-icon" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg><span class="check-inline-detail">${escapeHtml(item.detail)}</span></span>` : '';
+            const detailMarkup = item.detail ? `<span class="check-info-wrap"><svg class="check-info-icon" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg><span class="check-inline-detail">${escapeHtml(item.detail)}</span></span>` : '';
             const deleteBtn = isCustom ? `<button onclick="event.stopPropagation(); deleteCustomItem('${item.id}')" class="custom-item-delete ml-auto flex-shrink-0 text-slate-300 hover:text-rose-500 transition-colors" title="Remove"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>` : '';
             return `
             <li class="check-item flex items-center gap-3 ${isLocked ? 'opacity-60 cursor-default' : 'cursor-pointer'} select-none" ${isLocked ? '' : `onclick="toggleCheckItem('${item.id}')"`}>
