@@ -96,7 +96,7 @@
                 { id: 31, type: "prayer", time: "8:45 AM", title: {en:"Kerestir Breakfast", yi:"פרישטאג אין קערעסטיר"}, loc: {en:"Kerestir Shul", yi:"קערעסטירער שול"}, query: "Reb Shayala's Guest House, Bodrogkeresztúr", desc: {en:"Breakfast in shul.", yi:"פרישטאג אין שול."} },
                 { id: 32, type: "prayer", time: "10:00 AM", title: {en:"Kerestir Cemetery", yi:"קערעסטירער בית החיים"}, loc: {en:"Reb Shayala's Tziyun", yi:"רבי ישעי׳לעס ציון"}, query: "Reb Shayala's Guest House, Bodrogkeresztúr", desc: {en:"Very important — leaving on time is critical.", yi:"זייער וויכטיג — מען מוז פארן אויף דער צייט."} },
                 { id: 33, type: "prayer", time: "11:15 AM", title: {en:"Liska", yi:"ליסקא"}, loc: {en:"Reb Hershele Lisker", yi:"הרה״ק ר׳ הערשעלע ליסקער"}, query: "Olaszliszka Cemetery", desc: {en:"Quick cemetery stop.", yi:"א שנעלער באזוך אויפן בית החיים."} },
-                { id: 34, type: "prayer", time: "12:15 PM", title: {en:"Ihel", yi:"אוהעל"}, loc: {en:"Yismach Moshe", yi:"דער הייליגער ישמח משה"}, query: "Sátoraljaújhely Jewish Cemetery", desc: {en:"Cemetery visit. Divrei hisorerus by the Rav.", yi:"באזוך אויפן בית החיים. דברי התעוררות פונעם רב שליט\"א."} },
+                { id: 34, type: "prayer", time: "12:15 PM", title: {en:"Ihel", yi:"אוהעל"}, loc: {en:"Yismach Moshe", yi:"דער הייליגער ישמח משה"}, query: "Sátoraljaújhely Jewish Cemetery", desc: {en:"Cemetery visit. Divrei hisorerus by the Rav.", yi:"באזוך אויפן בית החיים. דברי התעוררות פונעם רב שליט״א."} },
                 { id: 35, type: "prayer", time: "4:30 PM", title: {en:"Tanz", yi:"צאנז"}, loc: {en:"Historic Shul", yi:"היסטארישע שול"}, query: "Nowy Sącz Jewish Cemetery", desc: {en:"Historic shul visit, Mincha, light meal.", yi:"באזוך אין היסטארישע שול, מנחה, לייכטע איבערבייסונג."} },
                 { id: 36, type: "hotel", time: "8:15 PM", title: {en:"Krakow Hotel", yi:"קראקא האטעל"}, loc: {en:"Krakow", yi:"קראקא"}, query: "Kazimierz Krakow", desc: {en:"Check-in (remaining for rest of trip).", yi:"אריינטשעקן (מען בלייבט דא פאר דער רעשט פון טריפ)."} },
                 { id: 37, type: "prayer", time: "9:15 PM", title: {en:"Maariv & Shiur", yi:"מעריב און שיעור"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Maariv followed by weekly shiur by R' Yoel Lefkowitz.", yi:"מעריב, שיעור דורך ר׳ יואל לעפקאוויטש."} },
@@ -105,12 +105,12 @@
             { day: "Fri", dateNum: "13", stops: [
                 { id: 40, type: "prayer", time: "8:30 AM", title: {en:"Shachris & Breakfast", yi:"שחרית און פרישטאג"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Shachris & breakfast at hotel.", yi:"שחרית און פרישטאג אין האטעל."} },
                 { id: 41, type: "prayer", time: "11:10 AM", title: {en:"Krakow Cemetery", yi:"קראקא בית החיים"}, loc: {en:"Rema & Others", yi:"דער רמ״א און אנדערע צדיקים"}, query: "Old Jewish Cemetery, Kraków", desc: {en:"Shul & cemetery visit with divrei Torah.", yi:"שול און בית החיים באזוך מיט דברי תורה."} },
-                { id: 42, type: "travel", time: "12:40 PM", title: {en:"Jewish Quarter Tour", yi:"טור אין יידישן קווארטאל"}, loc: {en:"Kazimierz", yi:"קאזימירז"}, query: "Kazimierz, Kraków", desc: {en:"Guided tour of the Jewish Quarter.", yi:"געפירטער טור אין יידישן קווארטאל."} },
+                { id: 42, type: "travel", time: "12:40 PM", title: {en:"Jewish Quarter Tour", yi:"באזוך אין יידישן קווארטאל"}, loc: {en:"Kazimierz", yi:"קאזימירז"}, query: "Kazimierz, Kraków", desc: {en:"Guided tour of the Jewish Quarter.", yi:"געפירטער באזוך אין יידישן קווארטאל."} },
                 { id: 43, type: "hotel", time: "1:40 PM", title: {en:"Shabbos Prep", yi:"שבת צוגרייטונג"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Return to hotel. Shabbos prep, rest, mikvah, shvitz.", yi:"צוריק צום האטעל. שבת צוגרייטונג, זיך צולייגן, מקוה, שוויץ."} },
                 { id: 44, type: "shabbos", time: "4:39 PM", title: {en:"Candle Lighting", yi:"ליכט צינדן"}, loc: {en:"Krakow", yi:"קראקא"}, query: null, desc: {en:"Candle lighting.", yi:"ליכט צינדן."} },
-                { id: 45, type: "shabbos", time: "5:30 PM", title: {en:"Shabbos Mincha", yi:"מנחה שב״ק"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Shabbos Mincha.", yi:"מנחה שבת קודש."} },
+                { id: 45, type: "shabbos", time: "5:30 PM", title: {en:"Shabbos Mincha", yi:"מנחה עש״ק"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Shabbos Mincha.", yi:"מנחה ערב שבת קודש."} },
                 { id: 46, type: "shabbos", time: "7:00 PM", title: {en:"Shiur", yi:"שיעור"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Shiur after Maariv.", yi:"שיעור נאך מעריב."} },
-                { id: 47, type: "shabbos", time: "7:30 PM", title: {en:"Shabbos Meal", yi:"שבת סעודה"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Drashos by R' Yoel Lefkowitz & R' Mallach.", yi:"דרשות פון ר׳ יואל לעפקאוויטש און ר׳ מלאך."} }
+                { id: 47, type: "shabbos", time: "7:30 PM", title: {en:"Shabbos Meal", yi:"שבת סעודה"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Drashos by R' Yoel Lefkowitz & R' Mallach.", yi:"דרשות דורך ר׳ יואל לעפקאוויטש און ר׳ אברהם מרדכי מלאך."} }
             ]},
             { day: "Sat", dateNum: "14", stops: [
                 { id: 50, type: "shabbos", time: "Morning", title: {en:"Shabbos Davening", yi:"שחרית שב״ק"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Shachris, kiddush, Shabbos meal.", yi:"שחרית, קידוש, שבת סעודה."} },
@@ -313,6 +313,8 @@
                 await fetchRsvps();
                 await fetchChecklist();
                 await fetchCustomItems();
+                // Re-render packing list now that data is loaded
+                if (currentTab === 'packing') renderPackingList();
                 setupRsvpPolling();
 
                 // Hide offline badge and show user info
@@ -816,13 +818,13 @@
             }
         }
 
-        window.addCustomItem = async function(sectionId) {
-            const input = document.getElementById(`add-input-${sectionId}`);
+        window.addCustomItem = async function() {
+            const input = document.getElementById('add-input-custom');
             if (!input) return;
             const label = input.value.trim();
             if (!label) return;
             const itemId = 'custom_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
-            customItems.push({ item_id: itemId, label, section_id: sectionId });
+            customItems.push({ item_id: itemId, label, section_id: 'custom' });
             input.value = '';
             renderPackingList();
             if (!isOffline && currentUser) {
@@ -830,7 +832,7 @@
                     await fetch(`${API_BASE}/api/custom-items`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ uid: currentUser.uid, item_id: itemId, label, section_id: sectionId })
+                        body: JSON.stringify({ uid: currentUser.uid, item_id: itemId, label, section_id: 'custom' })
                     });
                 } catch (e) { console.error("Save custom item error:", e); }
             }
@@ -895,21 +897,26 @@
             const container = document.getElementById('packing-container');
             if (!container) return;
             const sections = packingList[currentLang] || packingList.en;
-            container.innerHTML = sections.map(section => {
-                const sectionCustom = customItems.filter(ci => ci.section_id === section.id);
-                return `
+            const customHeading = currentLang === 'yi' ? 'מיינע זאכן' : 'My Items';
+            const builtInHtml = sections.map(section => `
                 <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
                     <h3 class="text-sm font-bold text-slate-800 mb-3">${escapeHtml(section.heading)}</h3>
                     <ul class="space-y-2">
                         ${section.items.map(item => renderCheckItem(item, false)).join('')}
-                        ${sectionCustom.map(ci => renderCheckItem({ id: ci.item_id, label: ci.label }, true)).join('')}
+                    </ul>
+                </div>`).join('');
+            const customHtml = `
+                <div class="bg-white rounded-2xl p-5 border border-indigo-100 shadow-sm">
+                    <h3 class="text-sm font-bold text-indigo-700 mb-3">${escapeHtml(customHeading)}</h3>
+                    <ul class="space-y-2">
+                        ${customItems.length ? customItems.map(ci => renderCheckItem({ id: ci.item_id, label: ci.label }, true)).join('') : `<li class="text-[11px] text-slate-400 py-1">${currentLang === 'yi' ? 'קיין אייגענע זאכן נאך נישט צוגעלייגט' : 'No custom items yet'}</li>`}
                     </ul>
                     <div class="mt-3 flex items-center gap-2">
-                        <input id="add-input-${section.id}" type="text" placeholder="Add item..." class="add-item-input flex-1 text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 focus:border-indigo-400 focus:outline-none" onkeydown="if(event.key==='Enter') addCustomItem('${section.id}')">
-                        <button onclick="addCustomItem('${section.id}')" class="add-item-btn text-[10px] font-bold text-indigo-500 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors">+ Add</button>
+                        <input id="add-input-custom" type="text" placeholder="${currentLang === 'yi' ? 'צולייגן א זאך...' : 'Add item...'}" class="add-item-input flex-1 text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 focus:border-indigo-400 focus:outline-none" onkeydown="if(event.key==='Enter') addCustomItem()">
+                        <button onclick="addCustomItem()" class="add-item-btn text-[10px] font-bold text-indigo-500 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors">+ Add</button>
                     </div>
                 </div>`;
-            }).join('');
+            container.innerHTML = builtInHtml + customHtml;
         }
 
         const tabRoutes = { itinerary: 'itinerary', info: 'info', packing: 'packing' };
