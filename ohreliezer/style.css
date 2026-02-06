@@ -216,14 +216,18 @@ body {
             margin-bottom: 1rem;
         }
 
-        /* Comment card hover */
-        .comment-card {
-            transition: box-shadow 0.2s, border-color 0.2s;
-        }
-        .comment-card:hover {
-            box-shadow: 0 4px 16px rgba(30, 27, 75, 0.08);
-            border-color: #e2e8f0;
-        }
+        /* Chat styles */
+        .chat-scroll::-webkit-scrollbar { width: 4px; }
+        .chat-scroll::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
+        .chat-bubble-own { background: #4f46e5; }
+        .chat-bubble-other { background: #f1f5f9; }
+        .group:hover .chat-delete-btn,
+        .group:hover .chat-reply-btn { opacity: 1; }
+        .group:hover .chat-edit-btn { opacity: 1; }
+        .chat-reply-preview { font-size: 11px; }
+        .chat-edit-input { color: inherit; font-family: inherit; }
+        .chat-bubble-own .chat-edit-input { color: white; background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.3); }
+        .chat-bubble-other .chat-edit-input { color: #334155; background: white; border-color: #e2e8f0; }
 
         /* Sidebar attendees scroll */
         .sidebar-attendees-scroll::-webkit-scrollbar {

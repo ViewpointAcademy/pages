@@ -164,13 +164,44 @@
 
             <!-- Tab: Comments -->
             <div id="tab-comments" class="hidden">
-                <div id="comments-container" class="max-w-2xl mx-auto">
-                    <div class="bg-white rounded-2xl p-5 border border-indigo-100 shadow-sm mb-6">
-                        <h3 id="txt-comments-heading" class="text-sm font-bold text-indigo-700 mb-3">Share a Thought</h3>
-                        <textarea id="comment-input" placeholder="Write your comment..." class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-400 focus:outline-none resize-none mb-3" rows="3"></textarea>
-                        <button onclick="submitComment()" id="txt-post-btn" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold text-xs tracking-widest uppercase">POST COMMENT</button>
+                <div id="comments-container" class="relative max-w-2xl mx-auto flex flex-col" style="height: calc(100vh - 180px); height: calc(100dvh - 180px);">
+                    <!-- Chat messages area (scrollable) -->
+                    <div id="comments-list" class="flex-1 overflow-y-auto px-2 py-4 space-y-1 chat-scroll"></div>
+
+                    <!-- Reply indicator (hidden by default) -->
+                    <div id="reply-indicator" class="hidden px-4 py-2 bg-indigo-50 border-t border-indigo-100 flex items-center justify-between">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <div class="w-0.5 h-8 bg-indigo-400 rounded-full flex-shrink-0"></div>
+                            <div class="min-w-0">
+                                <p id="reply-to-name" class="text-[10px] font-bold text-indigo-600 truncate"></p>
+                                <p id="reply-to-text" class="text-[10px] text-slate-500 truncate"></p>
+                            </div>
+                        </div>
+                        <button onclick="cancelReply()" class="text-slate-400 hover:text-slate-600 flex-shrink-0 p-1">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </button>
                     </div>
-                    <div id="comments-list"></div>
+
+                    <!-- Chat input bar (pinned to bottom) -->
+                    <div class="px-3 py-3 bg-white border-t border-slate-100">
+                        <div class="flex items-end gap-2">
+                            <textarea id="comment-input" placeholder="Write a message..." class="flex-1 text-sm bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2.5 focus:border-indigo-400 focus:outline-none resize-none max-h-24" rows="1" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,96)+'px'"></textarea>
+                            <button onclick="submitComment()" class="w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center flex-shrink-0 hover:bg-indigo-700 transition-colors shadow-sm">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Delete confirmation -->
+                    <div id="chat-confirm-overlay" class="hidden absolute inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center rounded-2xl">
+                        <div class="bg-white rounded-2xl p-6 shadow-xl max-w-xs text-center">
+                            <p id="txt-confirm-delete" class="text-sm font-bold text-slate-800 mb-4">Delete this message?</p>
+                            <div class="flex gap-3">
+                                <button onclick="cancelDeleteComment()" class="flex-1 py-2.5 rounded-xl text-xs font-bold border border-slate-200 text-slate-600 hover:bg-slate-50">Cancel</button>
+                                <button onclick="confirmDeleteComment()" class="flex-1 py-2.5 rounded-xl text-xs font-bold bg-rose-500 text-white hover:bg-rose-600">Delete</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>

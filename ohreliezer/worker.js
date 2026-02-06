@@ -164,39 +164,43 @@ export default {
         return jsonResponse({ success: true });
       }
 
+      // Helper: ensure comments table has all columns
+      async function ensureCommentsTable(db) {
+        await db.prepare(`CREATE TABLE IF NOT EXISTS comments (id TEXT PRIMARY KEY, uid TEXT NOT NULL, user_name TEXT NOT NULL, comment_text TEXT NOT NULL, created_at TEXT NOT NULL)`).run();
+        try { await db.prepare(`ALTER TABLE comments ADD COLUMN reply_to TEXT`).run(); } catch(e) {}
+        try { await db.prepare(`ALTER TABLE comments ADD COLUMN edited_at TEXT`).run(); } catch(e) {}
+      }
+
       // GET /api/comments - Get all comments
       if (path === '/api/comments' && request.method === 'GET') {
-        await env.DB.prepare(`
-          CREATE TABLE IF NOT EXISTS comments (
-            id TEXT PRIMARY KEY,
-            uid TEXT NOT NULL,
-            user_name TEXT NOT NULL,
-            comment_text TEXT NOT NULL,
-            created_at TEXT NOT NULL
-          )
-        `).run();
+        await ensureCommentsTable(env.DB);
         const { results } = await env.DB.prepare('SELECT * FROM comments ORDER BY created_at DESC').all();
         return jsonResponse(results);
       }
 
       // POST /api/comments - Create a new comment
       if (path === '/api/comments' && request.method === 'POST') {
-        const { id, uid, user_name, comment_text } = await request.json();
+        const { id, uid, user_name, comment_text, reply_to } = await request.json();
         if (!id || !uid || !user_name || !comment_text) {
           return jsonResponse({ error: 'Missing required fields' }, 400);
         }
-        await env.DB.prepare(`
-          CREATE TABLE IF NOT EXISTS comments (
-            id TEXT PRIMARY KEY,
-            uid TEXT NOT NULL,
-            user_name TEXT NOT NULL,
-            comment_text TEXT NOT NULL,
-            created_at TEXT NOT NULL
-          )
-        `).run();
+        await ensureCommentsTable(env.DB);
         await env.DB.prepare(
-          'INSERT INTO comments (id, uid, user_name, comment_text, created_at) VALUES (?, ?, ?, ?, datetime("now"))'
-        ).bind(id, uid, user_name, comment_text).run();
+          'INSERT INTO comments (id, uid, user_name, comment_text, reply_to, created_at) VALUES (?, ?, ?, ?, ?, datetime("now"))'
+        ).bind(id, uid, user_name, comment_text, reply_to || null).run();
+        return jsonResponse({ success: true });
+      }
+
+      // PUT /api/comments/:id - Edit a comment
+      if (path.match(/^\/api\/comments\/[^/]+$/) && request.method === 'PUT') {
+        const id = decodeURIComponent(path.split('/')[3]);
+        const { uid, comment_text } = await request.json();
+        if (!id || !uid || !comment_text) return jsonResponse({ error: 'Missing fields' }, 400);
+        await ensureCommentsTable(env.DB);
+        const existing = await env.DB.prepare('SELECT uid FROM comments WHERE id = ?').bind(id).first();
+        if (!existing) return jsonResponse({ error: 'Comment not found' }, 404);
+        if (existing.uid !== uid) return jsonResponse({ error: 'Not authorized' }, 403);
+        await env.DB.prepare('UPDATE comments SET comment_text = ?, edited_at = datetime("now") WHERE id = ?').bind(comment_text, id).run();
         return jsonResponse({ success: true });
       }
 

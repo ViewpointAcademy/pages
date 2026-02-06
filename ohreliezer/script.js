@@ -46,8 +46,15 @@
                 comments: "Comments",
                 commentsHeading: "Share a Thought",
                 postBtn: "POST COMMENT",
-                commentPlaceholder: "Write your comment...",
+                commentPlaceholder: "Write a message...",
                 deleteComment: "Delete",
+                editComment: "Edit",
+                edited: "edited",
+                confirmDelete: "Delete this message?",
+                cancel: "Cancel",
+                replying: "Replying to",
+                you: "You",
+                messagePlaceholder: "Write a message...",
                 justNow: "Just now",
                 minutesAgo: "min ago",
                 hoursAgo: "h ago",
@@ -70,13 +77,20 @@
                 showDetails: "מער פרטים",
                 showMore: "ווייז מער",
                 showLessNames: "ווייז ווייניגער",
-                info: "איפערמאציע",
+                info: "אינפארמאציע",
                 packing: "ליסטע",
                 comments: "קאמענטן",
                 commentsHeading: "שרייב א געדאנק",
                 postBtn: "פאסטן קאמענט",
-                commentPlaceholder: "...שרייבט אייער קאמענט",
+                commentPlaceholder: "...שרייבט א מעסעדזש",
                 deleteComment: "אויסמעקן",
+                editComment: "רעדאקטירן",
+                edited: "באַאַרבעט",
+                confirmDelete: "?אויסמעקן דעם מעסעדזש",
+                cancel: "באַטל",
+                replying: "ענטפערן צו",
+                you: "דו",
+                messagePlaceholder: "...שרייבט א מעסעדזש",
                 justNow: "איצט",
                 minutesAgo: "מינוט צוריק",
                 hoursAgo: "שעה צוריק",
@@ -239,6 +253,7 @@
         let checkedItems = new Set();
         let customItems = []; // { item_id, label, section_id }
         let comments = [];
+        let replyingTo = null; // { id, user_name, text }
 
         const catStyles = { travel: "bg-blue-50 text-blue-600", prayer: "bg-indigo-50 text-indigo-600", hotel: "bg-emerald-50 text-emerald-600", shabbos: "bg-amber-50 text-amber-700" };
 
@@ -919,14 +934,21 @@
             }
             const commentId = 'comment_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
             try {
+                const body = { id: commentId, uid: currentUser.uid, user_name: userData.name, comment_text: text };
+                if (replyingTo) body.reply_to = replyingTo.id;
                 const res = await fetch(`${API_BASE}/api/comments`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: commentId, uid: currentUser.uid, user_name: userData.name, comment_text: text })
+                    body: JSON.stringify(body)
                 });
                 if (!res.ok) throw new Error('Failed to post comment');
                 input.value = '';
+                input.style.height = 'auto';
+                cancelReply();
                 await fetchComments();
+                // Scroll to bottom
+                const list = document.getElementById('comments-list');
+                if (list) list.scrollTop = list.scrollHeight;
             } catch (e) {
                 console.error("Post comment error:", e);
                 showStatusBar("Error posting comment");
@@ -936,6 +958,20 @@
         window.deleteComment = async function(commentId, commentUid) {
             if (!isAdmin && commentUid !== currentUser.uid) return;
             if (isOffline) { showStatusBar("Cannot delete comments offline"); return; }
+            // Show confirm dialog
+            const overlay = document.getElementById('chat-confirm-overlay');
+            if (overlay) {
+                overlay.dataset.commentId = commentId;
+                overlay.classList.remove('hidden');
+                return;
+            }
+        };
+
+        window.confirmDeleteComment = async function() {
+            const overlay = document.getElementById('chat-confirm-overlay');
+            if (!overlay) return;
+            const commentId = overlay.dataset.commentId;
+            overlay.classList.add('hidden');
             try {
                 const res = await fetch(`${API_BASE}/api/comments/${encodeURIComponent(commentId)}`, { method: 'DELETE' });
                 if (!res.ok) throw new Error('Failed to delete comment');
@@ -943,6 +979,63 @@
             } catch (e) {
                 console.error("Delete comment error:", e);
                 showStatusBar("Error deleting comment");
+            }
+        };
+
+        window.cancelDeleteComment = function() {
+            const overlay = document.getElementById('chat-confirm-overlay');
+            if (overlay) overlay.classList.add('hidden');
+        };
+
+        window.setReply = function(commentId, userName, text) {
+            replyingTo = { id: commentId, user_name: userName, text: text };
+            const indicator = document.getElementById('reply-indicator');
+            const nameEl = document.getElementById('reply-to-name');
+            const textEl = document.getElementById('reply-to-text');
+            if (indicator) indicator.classList.remove('hidden');
+            if (nameEl) nameEl.innerText = userName;
+            if (textEl) textEl.innerText = text.length > 60 ? text.substring(0, 60) + '...' : text;
+            document.getElementById('comment-input').focus();
+        };
+
+        window.cancelReply = function() {
+            replyingTo = null;
+            const indicator = document.getElementById('reply-indicator');
+            if (indicator) indicator.classList.add('hidden');
+        };
+
+        window.editComment = function(commentId, currentText) {
+            const el = document.getElementById('comment-' + commentId);
+            if (!el) return;
+            const bubble = el.querySelector('.chat-bubble-own') || el.querySelector('.chat-bubble-other');
+            if (!bubble) return;
+            const textP = bubble.querySelector('.chat-msg-text');
+            if (!textP) return;
+            const original = currentText;
+            textP.outerHTML = '<div class="chat-edit-wrap"><textarea class="chat-edit-input w-full text-sm bg-white/20 border border-white/30 rounded-lg px-2 py-1 focus:outline-none resize-none" rows="2">' + escapeHtml(original) + '</textarea><div class="flex gap-2 mt-1"><button onclick="saveEdit(\'' + escapeHtml(commentId) + '\')" class="text-[9px] font-bold bg-white/20 px-2 py-0.5 rounded hover:bg-white/30">Save</button><button onclick="fetchComments()" class="text-[9px] font-bold opacity-60 hover:opacity-100">Cancel</button></div></div>';
+            const textarea = bubble.querySelector('.chat-edit-input');
+            if (textarea) { textarea.focus(); textarea.selectionStart = textarea.value.length; }
+        };
+
+        window.saveEdit = async function(commentId) {
+            const el = document.getElementById('comment-' + commentId);
+            if (!el) return;
+            const textarea = el.querySelector('.chat-edit-input');
+            if (!textarea) return;
+            const newText = textarea.value.trim();
+            if (!newText) return;
+            if (isOffline) { showStatusBar("Cannot edit comments offline"); return; }
+            try {
+                const res = await fetch(`${API_BASE}/api/comments/${encodeURIComponent(commentId)}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ uid: currentUser.uid, comment_text: newText })
+                });
+                if (!res.ok) throw new Error('Failed to edit comment');
+                await fetchComments();
+            } catch (e) {
+                console.error("Edit comment error:", e);
+                showStatusBar("Error editing comment");
             }
         };
 
@@ -964,24 +1057,105 @@
             const container = document.getElementById('comments-list');
             if (!container) return;
             const t = i18n[currentLang];
-            const heading = document.getElementById('txt-comments-heading');
+
+            // Update input placeholder
             const input = document.getElementById('comment-input');
-            const btn = document.getElementById('txt-post-btn');
-            if (heading) heading.innerText = t.commentsHeading;
             if (input) input.placeholder = t.commentPlaceholder;
-            if (btn) btn.innerText = t.postBtn;
+
             if (!comments || comments.length === 0) {
-                container.innerHTML = '<div class="text-center py-12"><svg class="mx-auto mb-3 text-slate-300" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><p class="text-xs text-slate-400 font-bold">' + escapeHtml(t.noComments) + '</p></div>';
+                container.innerHTML = '<div class="flex flex-col items-center justify-center h-full opacity-50"><svg class="mb-3 text-slate-300" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><p class="text-xs text-slate-400 font-bold">' + escapeHtml(t.noComments) + '</p></div>';
                 return;
             }
-            container.innerHTML = comments.map(c => {
+
+            // Build a map for reply lookups
+            const commentMap = {};
+            comments.forEach(c => { commentMap[c.id] = c; });
+
+            // Reverse to show oldest first (chat style)
+            const sorted = [...comments].reverse();
+
+            let html = '';
+            let lastDate = '';
+
+            sorted.forEach(c => {
                 const isOwner = currentUser && c.uid === currentUser.uid;
                 const canDelete = isAdmin || isOwner;
-                const deleteBtn = canDelete ? '<button onclick="deleteComment(\'' + escapeHtml(c.id) + '\',\'' + escapeHtml(c.uid) + '\')" class="text-slate-300 hover:text-rose-500 transition-colors" title="' + escapeHtml(t.deleteComment) + '"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' : '';
-                const youBadge = isOwner ? ' <span class="text-[8px] font-black text-indigo-500 bg-indigo-50 px-1.5 py-0.5 rounded uppercase">You</span>' : '';
-                return '<div class="comment-card bg-white rounded-2xl p-5 border border-slate-100 shadow-sm mb-4"><div class="flex items-start justify-between mb-2"><div class="flex items-center gap-2"><span class="text-xs font-bold text-slate-700">' + escapeHtml(c.user_name) + '</span>' + youBadge + '</div><div class="flex items-center gap-2"><span class="text-[10px] text-slate-400">' + getRelativeTime(c.created_at) + '</span>' + deleteBtn + '</div></div><p class="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap">' + escapeHtml(c.comment_text) + '</p></div>';
-            }).join('');
+
+                // Date separator
+                const msgDate = c.created_at ? c.created_at.split(' ')[0] : '';
+                if (msgDate && msgDate !== lastDate) {
+                    lastDate = msgDate;
+                    const dateObj = new Date(msgDate + 'T00:00:00Z');
+                    const today = new Date();
+                    today.setHours(0,0,0,0);
+                    const yesterday = new Date(today);
+                    yesterday.setDate(yesterday.getDate() - 1);
+                    let dateLabel = msgDate;
+                    if (dateObj.toDateString() === today.toDateString()) dateLabel = 'Today';
+                    else if (dateObj.toDateString() === yesterday.toDateString()) dateLabel = 'Yesterday';
+                    html += '<div class="flex justify-center my-3"><span class="text-[9px] font-bold text-slate-400 bg-slate-100 px-3 py-1 rounded-full">' + dateLabel + '</span></div>';
+                }
+
+                // Reply preview
+                let replyHtml = '';
+                if (c.reply_to && commentMap[c.reply_to]) {
+                    const parent = commentMap[c.reply_to];
+                    replyHtml = '<div class="chat-reply-preview mb-1.5 px-3 py-1.5 rounded-lg bg-black/5 border-l-2 border-indigo-400 cursor-pointer" onclick="scrollToComment(\'' + escapeHtml(parent.id) + '\')">'
+                        + '<p class="text-[9px] font-bold text-indigo-600">' + escapeHtml(parent.user_name) + '</p>'
+                        + '<p class="text-[10px] text-slate-500 truncate">' + escapeHtml(parent.comment_text.length > 50 ? parent.comment_text.substring(0, 50) + '...' : parent.comment_text) + '</p>'
+                        + '</div>';
+                }
+
+                // Delete button
+                const deleteBtn = canDelete ? ' <button onclick="event.stopPropagation();deleteComment(\'' + escapeHtml(c.id) + '\',\'' + escapeHtml(c.uid) + '\')" class="chat-delete-btn text-slate-300 hover:text-rose-500 transition-colors opacity-0" title="' + escapeHtml(t.deleteComment) + '"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' : '';
+                const editBtn = isOwner ? ' <button onclick="event.stopPropagation();editComment(\'' + escapeHtml(c.id) + '\',\'' + escapeHtml(c.comment_text.replace(/'/g, "\\'").replace(/\n/g, "\\n")) + '\')" class="chat-edit-btn text-slate-300 hover:text-indigo-500 transition-colors opacity-0" title="' + escapeHtml(t.editComment) + '"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>' : '';
+
+                // Time
+                const timeStr = c.created_at ? c.created_at.split(' ')[1]?.substring(0, 5) || '' : '';
+
+                // Reply button
+                const replyBtn = '<button onclick="setReply(\'' + escapeHtml(c.id) + '\',\'' + escapeHtml(c.user_name) + '\',\'' + escapeHtml(c.comment_text.replace(/'/g, "\\'")) + '\')" class="chat-reply-btn text-slate-300 hover:text-indigo-500 transition-colors opacity-0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 00-4-4H4"/></svg></button>';
+
+                if (isOwner) {
+                    // Own messages - right aligned, indigo bubble
+                    html += '<div class="flex justify-end group mb-1" id="comment-' + escapeHtml(c.id) + '">'
+                        + '<div class="flex items-end gap-1.5">'
+                        + deleteBtn + editBtn + replyBtn
+                        + '<div class="chat-bubble-own max-w-[75%] rounded-2xl rounded-br-md px-3.5 py-2">'
+                        + replyHtml
+                        + '<p class="chat-msg-text text-sm text-white leading-relaxed whitespace-pre-wrap">' + escapeHtml(c.comment_text) + '</p>'
+                        + '<p class="text-[9px] text-indigo-200 mt-1 text-right">' + (c.edited_at ? '<span class="italic opacity-70">' + escapeHtml(t.edited) + ' </span>' : '') + timeStr + '</p>'
+                        + '</div></div></div>';
+                } else {
+                    // Others' messages - left aligned, white/gray bubble
+                    html += '<div class="flex justify-start group mb-1" id="comment-' + escapeHtml(c.id) + '">'
+                        + '<div class="flex items-end gap-1.5">'
+                        + '<div class="chat-bubble-other max-w-[75%] rounded-2xl rounded-bl-md px-3.5 py-2">'
+                        + '<p class="text-[10px] font-bold text-indigo-600 mb-0.5">' + escapeHtml(c.user_name) + '</p>'
+                        + replyHtml
+                        + '<p class="chat-msg-text text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">' + escapeHtml(c.comment_text) + '</p>'
+                        + '<p class="text-[9px] text-slate-400 mt-1">' + (c.edited_at ? '<span class="italic opacity-70">' + escapeHtml(t.edited) + ' </span>' : '') + timeStr + '</p>'
+                        + '</div>'
+                        + replyBtn + deleteBtn
+                        + '</div></div>';
+                }
+            });
+
+            container.innerHTML = html;
+
+            // Auto-scroll to bottom on first render
+            container.scrollTop = container.scrollHeight;
         }
+
+        window.scrollToComment = function(commentId) {
+            const el = document.getElementById('comment-' + commentId);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                el.style.transition = 'background 0.3s';
+                el.style.background = 'rgba(99,102,241,0.08)';
+                setTimeout(() => { el.style.background = 'transparent'; }, 1500);
+            }
+        };
 
         window.addCustomItem = async function() {
             const input = document.getElementById('add-input-custom');
@@ -1167,6 +1341,14 @@
                     }
                 }
             } catch (e) {}
+
+            // Add Enter key to submit comments (Shift+Enter for new line)
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey && document.activeElement && document.activeElement.id === 'comment-input') {
+                    e.preventDefault();
+                    submitComment();
+                }
+            });
 
             // Route to tab from URL hash
             const initialTab = getTabFromHash();
