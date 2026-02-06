@@ -115,6 +115,9 @@
                 <button id="tab-btn-info" onclick="switchTab('info')" class="tab-btn tab-inactive px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all">
                     <span id="tab-label-info">Travel Info</span>
                 </button>
+                <button id="tab-btn-packing" onclick="switchTab('packing')" class="tab-btn tab-inactive px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all">
+                    <span id="tab-label-packing">Packing List</span>
+                </button>
             </div>
 
             <!-- Tab: Itinerary -->
@@ -152,6 +155,11 @@
             <!-- Tab: Travel Info -->
             <div id="tab-info" class="hidden">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="info-container"></div>
+            </div>
+
+            <!-- Tab: Packing List -->
+            <div id="tab-packing" class="hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="packing-container"></div>
             </div>
         </main>
 

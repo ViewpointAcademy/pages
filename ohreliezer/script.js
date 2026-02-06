@@ -42,6 +42,7 @@
                 showLess: "Show Less",
                 showDetails: "Show Details",
                 info: "Travel Info",
+                packing: "Packing List",
                 types: { travel: "Travel", prayer: "Prayer", hotel: "Hotel", shabbos: "Shabbos" },
                 days: { Tue: "Tue", Wed: "Wed", Thu: "Thu", Fri: "Fri", Sat: "Sat", Sun: "Sun" }
             },
@@ -60,6 +61,7 @@
                 showLess: "ווייניגער",
                 showDetails: "מער פרטים",
                 info: "מידע לנסיעה",
+                packing: "רשימת חפצים",
                 types: { travel: "רייזע", prayer: "תפילה", hotel: "אכסניא", shabbos: "שבת" },
                 days: { Tue: "ג׳", Wed: "ד׳", Thu: "ה׳", Fri: "עש״ק", Sat: "שב״ק", Sun: "א׳" }
             }
@@ -131,28 +133,88 @@
                 { heading: "Phone & Connectivity", items: ["Make sure your phone works internationally at a reasonable price per day", "If not, rent a phone or SIM card"] },
                 { heading: "Weather", items: ["Weather in Europe is similar to the weather here"] },
                 { heading: "Hotel Notes", items: ["Mini bars in hotel rooms charge a lot", "There will be a specific room with free drinks, snacks, cookies"] },
-                { heading: "On-Trip Help", items: ["Someone traveling with the group from Linsoa will be available to help"] },
-                { heading: "Religious Items", items: ["Siddur & Chumash donated by R' Shloma Goldstein", "Tehillim available at every Tzion", "Lecht mostly available but recommended to bring a few"] },
-                { heading: "Clothing", items: ["Boots/Kalachin", "Coat & Sweater", "4-5 sets of clothes & extra pairs of socks", "Pajamas", "Bathing suit (for shvitz)", "Shabbos clothes: Shtreimel, Bakitcha"] },
-                { heading: "Essentials", items: ["Tefillin", "Passport", "Charger & Adapter", "Air plugs"] },
-                { heading: "Food", items: ["Tuesday night dinner (kosher food ordered but not always enough)", "Food/cookies/chips/sweets for the flight"] },
-                { heading: "Other", items: ["Sefer/Gemara/reading material", "Tylenol/Motrin/Tums/Bandages", "Lenses solution", "Cigarettes (if applicable)", "Fresh wipes & Deodorant"] }
+                { heading: "On-Trip Help", items: ["Someone traveling with the group from Linsoa will be available to help"] }
             ],
             yi: [
                 { heading: "באגאזש", items: ["1 טשעקד בעג ביז 50 פונט איז פריי"] },
                 { heading: "טעלעפאן", items: ["זייט זיכער אז אייער טעלעפאן ארבעט אינטערנאציאנאל", "אויב נישט, רענט א טעלעפאן אדער SIM קארטל"] },
                 { heading: "וועטער", items: ["דער וועטער אין אייראפע איז ענליך צום וועטער דא"] },
                 { heading: "האטעל", items: ["מיני בארס אין צימערן קאסטן טייער", "עס וועט זיין א ספעציעלער צימער מיט פריי געטראנקן און סנעקס"] },
-                { heading: "הילף אויפן טריפ", items: ["עמיצער פון לינסא רייזט מיט דער גרופע און קען העלפן"] },
-                { heading: "רעליגיעזע זאכן", items: ["סידור און חומש געשאנקען פון ר׳ שלמה גאלדשטיין", "תהלים פאראן ביי יעדן ציון", "לעכט מערסטנס פאראן, אבער רעקאמענדירט צו ברענגען עטליכע"] },
-                { heading: "בגדים", items: ["שטיוול/קאלאטשן", "מאנטל און סוועטער", "4-5 זעטס בגדים און עקסטרא זאקן", "פיזשאמעס", "באדינג סוט (פאר שוויץ)", "שבת בגדים: שטריימל, באקיטשע"] },
-                { heading: "עסענציעלס", items: ["תפילין", "פאספארט", "טשארזשער און אדאפטער", "ער פלאגס"] },
-                { heading: "עסן", items: ["דינסטאג נאכט סעודה (כשר עסן באשטעלט אבער נישט אלעמאל גענוג)", "עסן/קוקיס/טשיפס/זיסע זאכן פארן פלי"] },
-                { heading: "אנדערע", items: ["ספר/גמרא/לייענונג מאטריאל", "טיילענאל/מאטרין/טאמס/באנדאזשעס", "לענזעס סאליושאן", "סיגארעטן (אויב נוגע)", "פרישע וויפס און דעאדאראנט"] }
+                { heading: "הילף אויפן טריפ", items: ["עמיצער פון לינסא רייזט מיט דער גרופע און קען העלפן"] }
+            ]
+        };
+
+        const packingList = {
+            en: [
+                { id: "religious", heading: "Religious Items", items: [
+                    {id: "religious_0", label: "Siddur & Chumash"},
+                    {id: "religious_1", label: "Tehillim"},
+                    {id: "religious_2", label: "Lecht (candles)"}
+                ]},
+                { id: "clothing", heading: "Clothing", items: [
+                    {id: "clothing_0", label: "Boots/Kalachin"},
+                    {id: "clothing_1", label: "Coat & Sweater"},
+                    {id: "clothing_2", label: "4-5 sets of clothes"},
+                    {id: "clothing_3", label: "Extra pairs of socks"},
+                    {id: "clothing_4", label: "Pajamas"},
+                    {id: "clothing_5", label: "Bathing suit (for shvitz)"},
+                    {id: "clothing_6", label: "Shtreimel"},
+                    {id: "clothing_7", label: "Bakitcha"}
+                ]},
+                { id: "essentials", heading: "Essentials", items: [
+                    {id: "essentials_0", label: "Tefillin"},
+                    {id: "essentials_1", label: "Passport"},
+                    {id: "essentials_2", label: "Charger & Adapter"},
+                    {id: "essentials_3", label: "Air plugs"}
+                ]},
+                { id: "food", heading: "Food", items: [
+                    {id: "food_0", label: "Tuesday night dinner"},
+                    {id: "food_1", label: "Snacks/cookies/chips for flight"}
+                ]},
+                { id: "other", heading: "Other", items: [
+                    {id: "other_0", label: "Sefer/Gemara/reading material"},
+                    {id: "other_1", label: "Tylenol/Motrin/Tums/Bandages"},
+                    {id: "other_2", label: "Lenses solution"},
+                    {id: "other_3", label: "Fresh wipes & Deodorant"}
+                ]}
+            ],
+            yi: [
+                { id: "religious", heading: "רעליגיעזע זאכן", items: [
+                    {id: "religious_0", label: "סידור און חומש"},
+                    {id: "religious_1", label: "תהלים"},
+                    {id: "religious_2", label: "לעכט"}
+                ]},
+                { id: "clothing", heading: "בגדים", items: [
+                    {id: "clothing_0", label: "שטיוול/קאלאטשן"},
+                    {id: "clothing_1", label: "מאנטל און סוועטער"},
+                    {id: "clothing_2", label: "4-5 זעטס בגדים"},
+                    {id: "clothing_3", label: "עקסטרא זאקן"},
+                    {id: "clothing_4", label: "פיזשאמעס"},
+                    {id: "clothing_5", label: "באדינג סוט (פאר שוויץ)"},
+                    {id: "clothing_6", label: "שטריימל"},
+                    {id: "clothing_7", label: "באקיטשע"}
+                ]},
+                { id: "essentials", heading: "עסענציעלס", items: [
+                    {id: "essentials_0", label: "תפילין"},
+                    {id: "essentials_1", label: "פאספארט"},
+                    {id: "essentials_2", label: "טשארזשער און אדאפטער"},
+                    {id: "essentials_3", label: "ער פלאגס"}
+                ]},
+                { id: "food", heading: "עסן", items: [
+                    {id: "food_0", label: "דינסטאג נאכט סעודה"},
+                    {id: "food_1", label: "סנעקס/קוקיס/טשיפס פארן פלי"}
+                ]},
+                { id: "other", heading: "אנדערע", items: [
+                    {id: "other_0", label: "ספר/גמרא/לייענונג מאטריאל"},
+                    {id: "other_1", label: "טיילענאל/מאטרין/טאמס/באנדאזשעס"},
+                    {id: "other_2", label: "לענזעס סאליושאן"},
+                    {id: "other_3", label: "פרישע וויפס און דעאדאראנט"}
+                ]}
             ]
         };
 
         let currentTab = 'itinerary';
+        let checkedItems = new Set();
 
         const catStyles = { travel: "bg-blue-50 text-blue-600", prayer: "bg-indigo-50 text-indigo-600", hotel: "bg-emerald-50 text-emerald-600", shabbos: "bg-amber-50 text-amber-700" };
 
@@ -200,10 +262,12 @@
             try {
                 document.getElementById('tab-label-itinerary').innerText = t.itinerary;
                 document.getElementById('tab-label-info').innerText = t.info;
+                document.getElementById('tab-label-packing').innerText = t.packing;
             } catch (e) {}
 
             renderTimeline();
             if (currentTab === 'info') renderInfo();
+            if (currentTab === 'packing') renderPackingList();
             if (typeof closeMapPanel === 'function') closeMapPanel();
         };
 
@@ -242,8 +306,9 @@
                     console.warn("Could not load profile:", e);
                 }
 
-                // Load RSVPs and start polling
+                // Load RSVPs, checklist, and start polling
                 await fetchRsvps();
+                await fetchChecklist();
                 setupRsvpPolling();
 
                 // Hide offline badge and show user info
@@ -723,29 +788,81 @@
             `).join('');
         }
 
+        async function fetchChecklist() {
+            if (isOffline || !currentUser) return;
+            try {
+                const res = await fetch(`${API_BASE}/api/checklist/${currentUser.uid}`);
+                if (!res.ok) return;
+                const items = await res.json();
+                checkedItems.clear();
+                (items || []).forEach(i => { if (i.checked) checkedItems.add(i.item_id); });
+            } catch (e) {
+                console.warn("Could not load checklist:", e);
+            }
+        }
+
+        window.toggleCheckItem = async function(itemId) {
+            const isChecked = checkedItems.has(itemId);
+            if (isChecked) {
+                checkedItems.delete(itemId);
+            } else {
+                checkedItems.add(itemId);
+            }
+            renderPackingList();
+
+            if (isOffline || !currentUser) {
+                // Save locally as fallback
+                localStorage.setItem('local_checklist', JSON.stringify([...checkedItems]));
+                return;
+            }
+            try {
+                await fetch(`${API_BASE}/api/checklist`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ uid: currentUser.uid, item_id: itemId, checked: !isChecked })
+                });
+            } catch (e) {
+                console.error("Save checklist error:", e);
+            }
+        };
+
+        function renderPackingList() {
+            const container = document.getElementById('packing-container');
+            if (!container) return;
+            const sections = packingList[currentLang] || packingList.en;
+            container.innerHTML = sections.map(section => `
+                <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+                    <h3 class="text-sm font-bold text-slate-800 mb-3">${escapeHtml(section.heading)}</h3>
+                    <ul class="space-y-2">
+                        ${section.items.map(item => {
+                            const checked = checkedItems.has(item.id);
+                            return `
+                            <li class="check-item flex items-center gap-3 cursor-pointer select-none" onclick="toggleCheckItem('${item.id}')">
+                                <div class="check-box ${checked ? 'checked' : ''}">
+                                    ${checked ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>' : ''}
+                                </div>
+                                <span class="text-xs ${checked ? 'line-through text-slate-400' : 'text-slate-700'}">${escapeHtml(item.label)}</span>
+                            </li>`;
+                        }).join('')}
+                    </ul>
+                </div>
+            `).join('');
+        }
+
         window.switchTab = function(tab) {
             currentTab = tab;
-            const itinContainer = document.getElementById('tab-itinerary');
-            const infoContainer = document.getElementById('tab-info');
-            const itinBtn = document.getElementById('tab-btn-itinerary');
-            const infoBtn = document.getElementById('tab-btn-info');
-
-            if (tab === 'itinerary') {
-                itinContainer.classList.remove('hidden');
-                infoContainer.classList.add('hidden');
-                itinBtn.classList.add('tab-active');
-                itinBtn.classList.remove('tab-inactive');
-                infoBtn.classList.remove('tab-active');
-                infoBtn.classList.add('tab-inactive');
-            } else {
-                itinContainer.classList.add('hidden');
-                infoContainer.classList.remove('hidden');
-                infoBtn.classList.add('tab-active');
-                infoBtn.classList.remove('tab-inactive');
-                itinBtn.classList.remove('tab-active');
-                itinBtn.classList.add('tab-inactive');
-                renderInfo();
-            }
+            const tabs = ['itinerary', 'info', 'packing'];
+            tabs.forEach(t => {
+                const container = document.getElementById(`tab-${t}`);
+                const btn = document.getElementById(`tab-btn-${t}`);
+                if (container) container.classList.toggle('hidden', t !== tab);
+                if (btn) {
+                    btn.classList.toggle('tab-active', t === tab);
+                    btn.classList.toggle('tab-inactive', t !== tab);
+                }
+            });
+            if (tab === 'info') renderInfo();
+            if (tab === 'packing') renderPackingList();
         };
 
         // Re-render when crossing the desktop breakpoint
