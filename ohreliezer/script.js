@@ -148,10 +148,17 @@
 
         const packingList = {
             en: [
+                { id: "essentials", heading: "Essentials", items: [
+                    {id: "essentials_0", label: "Tefillin"},
+                    {id: "essentials_1", label: "Passport"},
+                    {id: "essentials_2", label: "Charger"},
+                    {id: "essentials_4", label: "Air plugs"}
+                ]},
                 { id: "religious", heading: "Religious Items", items: [
-                    {id: "religious_0", label: "Siddur & Chumash", detail: "Donated by R' Shloma Goldstein"},
+                    {id: "religious_0", label: "Siddur & Chumash", detail: "Donated by R' Shloma Goldstein", locked: true},
                     {id: "religious_1", label: "Tehillim", detail: "Available at every Tzion"},
-                    {id: "religious_2", label: "Lecht", detail: "Mostly available, but recommended to take a few"}
+                    {id: "religious_2", label: "Lecht", detail: "Mostly available, but recommended to take a few"},
+                    {id: "religious_3", label: "Sefer/Gemara/reading material"}
                 ]},
                 { id: "clothing", heading: "Clothing", items: [
                     {id: "clothing_0", label: "Boots/Kalachin"},
@@ -162,19 +169,12 @@
                     {id: "clothing_5", label: "Bathing suit", detail: "For shvitz"},
                     {id: "clothing_6", label: "Shabbos clothes", detail: "Shtramel, Bakitcha"}
                 ]},
-                { id: "essentials", heading: "Essentials", items: [
-                    {id: "essentials_0", label: "Tefillin"},
-                    {id: "essentials_1", label: "Passport"},
-                    {id: "essentials_2", label: "Charger"},
-                    {id: "essentials_3", label: "Adapter"},
-                    {id: "essentials_4", label: "Air plugs"}
-                ]},
                 { id: "food", heading: "Food", items: [
                     {id: "food_0", label: "Tuesday night dinner", detail: "Kosher food is ordered but isn't always good/enough"},
                     {id: "food_1", label: "Snacks/cookies/chips/sweets for the flight"}
                 ]},
                 { id: "other", heading: "Other", items: [
-                    {id: "other_0", label: "Sefer/Gemara/reading material"},
+                    {id: "essentials_3", label: "Adapter"},
                     {id: "other_1", label: "Tylenol/Motrin/Tums/Bandages"},
                     {id: "other_2", label: "Lenses solution"},
                     {id: "other_3", label: "Cigarettes", detail: "If you smoke"},
@@ -183,10 +183,17 @@
                 ]}
             ],
             yi: [
+                { id: "essentials", heading: "עסענציעלס", items: [
+                    {id: "essentials_0", label: "תפילין"},
+                    {id: "essentials_1", label: "פאספארט"},
+                    {id: "essentials_2", label: "טשארזשער"},
+                    {id: "essentials_4", label: "ער פלאגס"}
+                ]},
                 { id: "religious", heading: "רעליגיעזע זאכן", items: [
-                    {id: "religious_0", label: "סידור און חומש", detail: "געשאנקען פון ר' שלמה גאלדשטיין"},
+                    {id: "religious_0", label: "סידור און חומש", detail: "געשאנקען פון ר' שלמה גאלדשטיין", locked: true},
                     {id: "religious_1", label: "תהלים", detail: "דא ביי יעדן ציון"},
-                    {id: "religious_2", label: "לעכט", detail: "מערסטנס דא, אבער רעקאמענדירט צו נעמען א פאר"}
+                    {id: "religious_2", label: "לעכט", detail: "מערסטנס דא, אבער רעקאמענדירט צו נעמען א פאר"},
+                    {id: "religious_3", label: "ספר/גמרא/לייענונג מאטריאל"}
                 ]},
                 { id: "clothing", heading: "בגדים", items: [
                     {id: "clothing_0", label: "שטיוול/קאלאטשן"},
@@ -197,19 +204,12 @@
                     {id: "clothing_5", label: "באדינג סוט", detail: "פאר שוויץ"},
                     {id: "clothing_6", label: "שבת בגדים", detail: "שטריימל, באקיטשע"}
                 ]},
-                { id: "essentials", heading: "עסענציעלס", items: [
-                    {id: "essentials_0", label: "תפילין"},
-                    {id: "essentials_1", label: "פאספארט"},
-                    {id: "essentials_2", label: "טשארזשער"},
-                    {id: "essentials_3", label: "אדאפטער"},
-                    {id: "essentials_4", label: "ער פלאגס"}
-                ]},
                 { id: "food", heading: "עסן", items: [
                     {id: "food_0", label: "דינסטאג נאכט סעודה", detail: "כשר עסן איז באשטעלט אבער איז נישט אלעמאל גוט/גענוג"},
                     {id: "food_1", label: "סנעקס/קוקיס/טשיפס/זיסן פארן פלי"}
                 ]},
                 { id: "other", heading: "אנדערע", items: [
-                    {id: "other_0", label: "ספר/גמרא/לייענונג מאטריאל"},
+                    {id: "essentials_3", label: "אדאפטער"},
                     {id: "other_1", label: "טיילענאל/מאטרין/טאמס/באנדאזשעס"},
                     {id: "other_2", label: "לענזעס סאליושאן"},
                     {id: "other_3", label: "סיגארעטן", detail: "אויב איר רויכערט"},
@@ -841,10 +841,11 @@
                     <h3 class="text-sm font-bold text-slate-800 mb-3">${escapeHtml(section.heading)}</h3>
                     <ul class="space-y-2">
                         ${section.items.map(item => {
-                            const checked = checkedItems.has(item.id);
+                            const isLocked = item.locked === true;
+                            const checked = isLocked || checkedItems.has(item.id);
                             const detailHtml = item.detail ? `<span class="check-detail text-[10px] text-slate-400 block">${escapeHtml(item.detail)}</span>` : '';
                             return `
-                            <li class="check-item flex items-start gap-3 cursor-pointer select-none ${item.detail ? 'has-detail' : ''}" onclick="toggleCheckItem('${item.id}')">
+                            <li class="check-item flex items-start gap-3 ${isLocked ? 'opacity-60 cursor-default' : 'cursor-pointer'} select-none ${item.detail ? 'has-detail' : ''}" ${isLocked ? '' : `onclick="toggleCheckItem('${item.id}')"`}>
                                 <div class="check-box mt-0.5 ${checked ? 'checked' : ''}">
                                     ${checked ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>' : ''}
                                 </div>
