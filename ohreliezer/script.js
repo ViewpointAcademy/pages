@@ -88,25 +88,25 @@
                 { id: 20, type: "travel", time: "2:05 PM", title: {en:"Arrival Budapest", yi:"אנקומען קיין בודאפעסט"}, loc: "Budapest Airport", query: "Budapest Airport", desc: {en:"Arrival. Mincha at baggage claim. Breakfast/lunch on bus.", yi:"אנקומען. מנחה ביים באגאזש. פרישטאג/מיטאג אויפן באס."} },
                 { id: 21, type: "prayer", time: "5:30 PM", title: {en:"Ratzfert Cemetery", yi:"ראצפערט בית החיים"}, loc: {en:"Ratzfert", yi:"ראצפערט"}, query: "Rácalmás Jewish Cemetery, Hungary", desc: {en:"Mikvah, toilets, cemetery visit.", yi:"מקוה, באזוך אויפן בית החיים."} },
                 { id: 22, type: "prayer", time: "7:00 PM", title: {en:"Kalov Cemetery", yi:"קאלוב בית החיים"}, loc: {en:"Kalov", yi:"קאלוב"}, query: "Nagykálló Jewish Cemetery, Hungary", desc: {en:"Cemetery visit.", yi:"באזוך אויפן בית החיים."} },
-                { id: 23, type: "prayer", time: "8:45 PM", title: {en:"Kerestir", yi:"קערעסטיר"}, loc: {en:"Bodrogkeresztúr", yi:"קערעסטיר"}, query: "Reb Shayala's Guest House, Bodrogkeresztúr", desc: {en:"Maariv, dinner, siyum, historical talk by R' Yaakov Farber.", yi:"מעריב, סעודה, סיום, היסטארישע רעדע פון ר׳ יעקב פארבער."} },
+                { id: 23, type: "prayer", time: "8:45 PM", title: {en:"Kerestir", yi:"קערעסטיר"}, loc: {en:"Bodrogkeresztúr", yi:"קערעסטיר"}, query: "Reb Shayala's Guest House, Bodrogkeresztúr", desc: {en:"Maariv, dinner, siyum, historical talk by R' Yaakov Farber.", yi:"מעריב, סעודה, סיום, היסטארישע רעדע דורך ר׳ יעקב פארבער."} },
                 { id: 24, type: "hotel", time: "10:25 PM", title: {en:"Hotel Minnaro", yi:"האטעל מינארא"}, loc: {en:"Tokaj", yi:"טאקאי"}, query: "Hotel & Winery & SPA & Restaurant Minnaro Tokaj Hungary", desc: {en:"Check-in. Coffee/tea/snacks available overnight.", yi:"אריינטשעקן. קאווע/טיי/סנעקס דורכאויס די נאכט."} }
             ]},
             { day: "Thu", dateNum: "12", stops: [
                 { id: 30, type: "prayer", time: "7:30 AM", title: {en:"Morning in Tokaj", yi:"פרימארגן אין טאקאי"}, loc: {en:"Hotel Minnaro", yi:"האטעל מינארא"}, query: null, desc: {en:"Hotel checkout, Mikvah & Shachris. Two buses depart.", yi:"אויסטשעקן, מקוה און שחרית. צוויי באסן פארן אפ."} },
                 { id: 31, type: "prayer", time: "8:45 AM", title: {en:"Kerestir Breakfast", yi:"פרישטאג אין קערעסטיר"}, loc: {en:"Kerestir Shul", yi:"קערעסטירער שול"}, query: "Reb Shayala's Guest House, Bodrogkeresztúr", desc: {en:"Breakfast in shul.", yi:"פרישטאג אין שול."} },
-                { id: 32, type: "prayer", time: "10:00 AM", title: {en:"Kerestir Cemetery", yi:"קערעסטירער בית החיים"}, loc: {en:"Reb Shayala's Tziyun", yi:"רבי ישעי׳לעס ציון"}, query: "Reb Shayala's Guest House, Bodrogkeresztúr", desc: {en:"Very important — leaving on time is critical.", yi:"זייער וויכטיג — מען מוז אפגיין אויף דער צייט."} },
+                { id: 32, type: "prayer", time: "10:00 AM", title: {en:"Kerestir Cemetery", yi:"קערעסטירער בית החיים"}, loc: {en:"Reb Shayala's Tziyun", yi:"רבי ישעי׳לעס ציון"}, query: "Reb Shayala's Guest House, Bodrogkeresztúr", desc: {en:"Very important — leaving on time is critical.", yi:"זייער וויכטיג — מען מוז פארן אויף דער צייט."} },
                 { id: 33, type: "prayer", time: "11:15 AM", title: {en:"Liska", yi:"ליסקא"}, loc: {en:"Reb Hershele Lisker", yi:"הרה״ק ר׳ הערשעלע ליסקער"}, query: "Olaszliszka Cemetery", desc: {en:"Quick cemetery stop.", yi:"א שנעלער באזוך אויפן בית החיים."} },
-                { id: 34, type: "prayer", time: "12:15 PM", title: {en:"Ihel", yi:"אוהעל"}, loc: {en:"Yismach Moshe", yi:"דער הייליגער ישמח משה"}, query: "Sátoraljaújhely Jewish Cemetery", desc: {en:"Cemetery visit. Divrei hisorerus by the Rav.", yi:"באזוך אויפן בית החיים. דברי התעוררות פונעם רב."} },
-                { id: 35, type: "prayer", time: "4:30 PM", title: {en:"Tanz", yi:"צאנז"}, loc: {en:"Historic Shul", yi:"היסטארישע שול"}, query: "Nowy Sącz Jewish Cemetery", desc: {en:"Historic shul visit, Mincha, light meal.", yi:"באזוך אין היסטארישע שול, מנחה, לייכטע סעודה."} },
-                { id: 36, type: "hotel", time: "8:15 PM", title: {en:"Krakow Hotel", yi:"קראקא האטעל"}, loc: {en:"Krakow", yi:"קראקא"}, query: "Kazimierz Krakow", desc: {en:"Check-in (remaining for rest of trip).", yi:"אריינטשעקן (בלייבן דא פאר דער רעשט פון טריפ)."} },
-                { id: 37, type: "prayer", time: "9:15 PM", title: {en:"Maariv & Shiur", yi:"מעריב און שיעור"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Maariv followed by weekly shiur by R' Yoel Lefkowitz.", yi:"מעריב, שיעור פון ר׳ יואל לעפקאוויטש."} },
+                { id: 34, type: "prayer", time: "12:15 PM", title: {en:"Ihel", yi:"אוהעל"}, loc: {en:"Yismach Moshe", yi:"דער הייליגער ישמח משה"}, query: "Sátoraljaújhely Jewish Cemetery", desc: {en:"Cemetery visit. Divrei hisorerus by the Rav.", yi:"באזוך אויפן בית החיים. דברי התעוררות פונעם רב שליט\"א."} },
+                { id: 35, type: "prayer", time: "4:30 PM", title: {en:"Tanz", yi:"צאנז"}, loc: {en:"Historic Shul", yi:"היסטארישע שול"}, query: "Nowy Sącz Jewish Cemetery", desc: {en:"Historic shul visit, Mincha, light meal.", yi:"באזוך אין היסטארישע שול, מנחה, לייכטע איבערבייסונג."} },
+                { id: 36, type: "hotel", time: "8:15 PM", title: {en:"Krakow Hotel", yi:"קראקא האטעל"}, loc: {en:"Krakow", yi:"קראקא"}, query: "Kazimierz Krakow", desc: {en:"Check-in (remaining for rest of trip).", yi:"אריינטשעקן (מען בלייבט דא פאר דער רעשט פון טריפ)."} },
+                { id: 37, type: "prayer", time: "9:15 PM", title: {en:"Maariv & Shiur", yi:"מעריב און שיעור"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Maariv followed by weekly shiur by R' Yoel Lefkowitz.", yi:"מעריב, שיעור דורך ר׳ יואל לעפקאוויטש."} },
                 { id: 38, type: "hotel", time: "10:00 PM", title: {en:"Dinner & Kumzitz", yi:"סעודה און קומזיץ"}, loc: {en:"Krakow", yi:"קראקא"}, query: null, desc: {en:"Main dinner, siyum & kumzitz.", yi:"הויפט סעודה, סיום און קומזיץ."} }
             ]},
             { day: "Fri", dateNum: "13", stops: [
                 { id: 40, type: "prayer", time: "8:30 AM", title: {en:"Shachris & Breakfast", yi:"שחרית און פרישטאג"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Shachris & breakfast at hotel.", yi:"שחרית און פרישטאג אין האטעל."} },
                 { id: 41, type: "prayer", time: "11:10 AM", title: {en:"Krakow Cemetery", yi:"קראקא בית החיים"}, loc: {en:"Rema & Others", yi:"דער רמ״א און אנדערע צדיקים"}, query: "Old Jewish Cemetery, Kraków", desc: {en:"Shul & cemetery visit with divrei Torah.", yi:"שול און בית החיים באזוך מיט דברי תורה."} },
                 { id: 42, type: "travel", time: "12:40 PM", title: {en:"Jewish Quarter Tour", yi:"טור אין יידישן קווארטאל"}, loc: {en:"Kazimierz", yi:"קאזימירז"}, query: "Kazimierz, Kraków", desc: {en:"Guided tour of the Jewish Quarter.", yi:"געפירטער טור אין יידישן קווארטאל."} },
-                { id: 43, type: "hotel", time: "1:40 PM", title: {en:"Shabbos Prep", yi:"שבת צוגרייטונג"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Return to hotel. Shabbos prep, rest, mikvah, shvitz.", yi:"צוריק צום האטעל. שבת צוגרייטונג, רו, מקוה, שוויץ."} },
+                { id: 43, type: "hotel", time: "1:40 PM", title: {en:"Shabbos Prep", yi:"שבת צוגרייטונג"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Return to hotel. Shabbos prep, rest, mikvah, shvitz.", yi:"צוריק צום האטעל. שבת צוגרייטונג, זיך צולייגן, מקוה, שוויץ."} },
                 { id: 44, type: "shabbos", time: "4:39 PM", title: {en:"Candle Lighting", yi:"ליכט צינדן"}, loc: {en:"Krakow", yi:"קראקא"}, query: null, desc: {en:"Candle lighting.", yi:"ליכט צינדן."} },
                 { id: 45, type: "shabbos", time: "5:30 PM", title: {en:"Shabbos Mincha", yi:"מנחה שב״ק"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Shabbos Mincha.", yi:"מנחה שבת קודש."} },
                 { id: 46, type: "shabbos", time: "7:00 PM", title: {en:"Shiur", yi:"שיעור"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Shiur after Maariv.", yi:"שיעור נאך מעריב."} },
@@ -217,6 +217,7 @@
 
         let currentTab = 'itinerary';
         let checkedItems = new Set();
+        let customItems = []; // { item_id, label, section_id }
 
         const catStyles = { travel: "bg-blue-50 text-blue-600", prayer: "bg-indigo-50 text-indigo-600", hotel: "bg-emerald-50 text-emerald-600", shabbos: "bg-amber-50 text-amber-700" };
 
@@ -311,6 +312,7 @@
                 // Load RSVPs, checklist, and start polling
                 await fetchRsvps();
                 await fetchChecklist();
+                await fetchCustomItems();
                 setupRsvpPolling();
 
                 // Hide offline badge and show user info
@@ -803,6 +805,50 @@
             }
         }
 
+        async function fetchCustomItems() {
+            if (isOffline || !currentUser) return;
+            try {
+                const res = await fetch(`${API_BASE}/api/custom-items/${currentUser.uid}`);
+                if (!res.ok) return;
+                customItems = (await res.json()) || [];
+            } catch (e) {
+                console.warn("Could not load custom items:", e);
+            }
+        }
+
+        window.addCustomItem = async function(sectionId) {
+            const input = document.getElementById(`add-input-${sectionId}`);
+            if (!input) return;
+            const label = input.value.trim();
+            if (!label) return;
+            const itemId = 'custom_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+            customItems.push({ item_id: itemId, label, section_id: sectionId });
+            input.value = '';
+            renderPackingList();
+            if (!isOffline && currentUser) {
+                try {
+                    await fetch(`${API_BASE}/api/custom-items`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ uid: currentUser.uid, item_id: itemId, label, section_id: sectionId })
+                    });
+                } catch (e) { console.error("Save custom item error:", e); }
+            }
+        };
+
+        window.deleteCustomItem = async function(itemId) {
+            customItems = customItems.filter(i => i.item_id !== itemId);
+            checkedItems.delete(itemId);
+            renderPackingList();
+            if (!isOffline && currentUser) {
+                try {
+                    await fetch(`${API_BASE}/api/custom-items/${currentUser.uid}/${encodeURIComponent(itemId)}`, {
+                        method: 'DELETE'
+                    });
+                } catch (e) { console.error("Delete custom item error:", e); }
+            }
+        };
+
         window.toggleCheckItem = async function(itemId) {
             const isChecked = checkedItems.has(itemId);
             if (isChecked) {
@@ -828,31 +874,42 @@
             }
         };
 
+        function renderCheckItem(item, isCustom) {
+            const isLocked = item.locked === true;
+            const checked = isLocked || checkedItems.has(item.id);
+            const detailMarkup = item.detail ? `<span class="check-info-wrap" onclick="event.stopPropagation()"><svg class="check-info-icon" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg><span class="check-inline-detail">${escapeHtml(item.detail)}</span></span>` : '';
+            const deleteBtn = isCustom ? `<button onclick="event.stopPropagation(); deleteCustomItem('${item.id}')" class="custom-item-delete ml-auto flex-shrink-0 text-slate-300 hover:text-rose-500 transition-colors" title="Remove"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>` : '';
+            return `
+            <li class="check-item flex items-center gap-3 ${isLocked ? 'opacity-60 cursor-default' : 'cursor-pointer'} select-none" ${isLocked ? '' : `onclick="toggleCheckItem('${item.id}')"`}>
+                <div class="check-box ${checked ? 'checked' : ''}">
+                    ${checked ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>' : ''}
+                </div>
+                <div class="flex-1 min-w-0">
+                    <span class="text-xs ${checked ? 'line-through text-slate-400' : 'text-slate-700'}">${escapeHtml(item.label)}</span>${detailMarkup}
+                </div>
+                ${deleteBtn}
+            </li>`;
+        }
+
         function renderPackingList() {
             const container = document.getElementById('packing-container');
             if (!container) return;
             const sections = packingList[currentLang] || packingList.en;
-            container.innerHTML = sections.map(section => `
+            container.innerHTML = sections.map(section => {
+                const sectionCustom = customItems.filter(ci => ci.section_id === section.id);
+                return `
                 <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
                     <h3 class="text-sm font-bold text-slate-800 mb-3">${escapeHtml(section.heading)}</h3>
                     <ul class="space-y-2">
-                        ${section.items.map(item => {
-                            const isLocked = item.locked === true;
-                            const checked = isLocked || checkedItems.has(item.id);
-                            const detailMarkup = item.detail ? `<span class="check-info-wrap" onclick="event.stopPropagation()"><svg class="check-info-icon" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg><span class="check-inline-detail">${escapeHtml(item.detail)}</span></span>` : '';
-                            return `
-                            <li class="check-item flex items-start gap-3 ${isLocked ? 'opacity-60 cursor-default' : 'cursor-pointer'} select-none" ${isLocked ? '' : `onclick="toggleCheckItem('${item.id}')"`}>
-                                <div class="check-box mt-0.5 ${checked ? 'checked' : ''}">
-                                    ${checked ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>' : ''}
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <span class="text-xs ${checked ? 'line-through text-slate-400' : 'text-slate-700'}">${escapeHtml(item.label)}</span>${detailMarkup}
-                                </div>
-                            </li>`;
-                        }).join('')}
+                        ${section.items.map(item => renderCheckItem(item, false)).join('')}
+                        ${sectionCustom.map(ci => renderCheckItem({ id: ci.item_id, label: ci.label }, true)).join('')}
                     </ul>
-                </div>
-            `).join('');
+                    <div class="mt-3 flex items-center gap-2">
+                        <input id="add-input-${section.id}" type="text" placeholder="Add item..." class="add-item-input flex-1 text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 focus:border-indigo-400 focus:outline-none" onkeydown="if(event.key==='Enter') addCustomItem('${section.id}')">
+                        <button onclick="addCustomItem('${section.id}')" class="add-item-btn text-[10px] font-bold text-indigo-500 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors">+ Add</button>
+                    </div>
+                </div>`;
+            }).join('');
         }
 
         const tabRoutes = { itinerary: 'itinerary', info: 'info', packing: 'packing' };
