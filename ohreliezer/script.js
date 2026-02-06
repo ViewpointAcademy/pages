@@ -19,6 +19,7 @@
         let currentUser = null, userData = null, currentStatus = null, pendingVote = null;
         let currentLang = 'en';
         let pollInterval = null;
+        let commentPollInterval = null;
         let wasDesktop = false;
         let activeMapCardId = null;
 
@@ -254,6 +255,7 @@
         let customItems = []; // { item_id, label, section_id }
         let comments = [];
         let replyingTo = null; // { id, user_name, text }
+        let lastReadCommentTime = localStorage.getItem('lastReadCommentTime') || '';
 
         const catStyles = { travel: "bg-blue-50 text-blue-600", prayer: "bg-indigo-50 text-indigo-600", hotel: "bg-emerald-50 text-emerald-600", shabbos: "bg-amber-50 text-amber-700" };
 
@@ -363,6 +365,11 @@
                 if (currentTab === 'packing') renderPackingList();
                 if (currentTab === 'comments') renderComments();
                 setupRsvpPolling();
+                setupCommentPolling();
+
+                // Mark comments as read if on comments tab, and update badge
+                if (currentTab === 'comments') markCommentsRead();
+                updateUnreadBadge();
 
                 // Hide offline badge and show user info
                 document.getElementById('offline-badge').classList.add('hidden');
@@ -432,6 +439,13 @@
             // Poll every 10 seconds for updates
             if (pollInterval) clearInterval(pollInterval);
             pollInterval = setInterval(fetchRsvps, 10000);
+        }
+
+        function setupCommentPolling() {
+            if (isOffline) return;
+            // Poll every 8 seconds for comment updates
+            if (commentPollInterval) clearInterval(commentPollInterval);
+            commentPollInterval = setInterval(fetchComments, 8000);
         }
 
         function launchConfetti() {
@@ -913,10 +927,76 @@
             try {
                 const res = await fetch(`${API_BASE}/api/comments`);
                 if (!res.ok) throw new Error('Failed to fetch comments');
-                comments = await res.json();
-                if (currentTab === 'comments') renderComments();
+                const newComments = await res.json();
+                const prevCount = comments.length;
+                comments = newComments;
+                if (currentTab === 'comments') {
+                    renderComments(prevCount === 0);
+                    markCommentsRead();
+                } else {
+                    updateUnreadBadge();
+                }
+                checkNewNotifications(prevCount);
             } catch (e) {
                 console.warn("Could not load comments:", e);
+            }
+        }
+
+        function markCommentsRead() {
+            if (comments.length > 0) {
+                lastReadCommentTime = comments[0].created_at; // comments are sorted DESC, [0] is newest
+                localStorage.setItem('lastReadCommentTime', lastReadCommentTime);
+            }
+            updateUnreadBadge();
+        }
+
+        function getUnreadCount() {
+            if (!lastReadCommentTime) return comments.length;
+            return comments.filter(c => c.created_at > lastReadCommentTime).length;
+        }
+
+        function updateUnreadBadge() {
+            const count = getUnreadCount();
+            const btn = document.getElementById('tab-btn-comments');
+            if (!btn) return;
+            let badge = document.getElementById('comments-badge');
+            if (count > 0) {
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.id = 'comments-badge';
+                    badge.className = 'comments-unread-badge';
+                    btn.style.position = 'relative';
+                    btn.appendChild(badge);
+                }
+                badge.innerText = count > 99 ? '99+' : count;
+                badge.classList.remove('hidden');
+            } else {
+                if (badge) badge.classList.add('hidden');
+            }
+        }
+
+        function checkNewNotifications(prevCount) {
+            if (!currentUser || !userData || !userData.name) return;
+            if (prevCount === 0) return; // Don't notify on first load
+            const newOnes = comments.filter(c => c.created_at > lastReadCommentTime && c.uid !== currentUser.uid);
+            if (newOnes.length === 0) return;
+
+            const myName = userData.name;
+            for (const c of newOnes) {
+                const isMention = c.comment_text && c.comment_text.includes('@' + myName);
+                const isReplyToMe = c.reply_to && comments.find(p => p.id === c.reply_to && p.uid === currentUser.uid);
+                if (isMention || isReplyToMe) {
+                    // Show a toast notification
+                    const label = isMention ? (c.user_name + ' mentioned you') : (c.user_name + ' replied to you');
+                    showStatusBar(label);
+                    // Also try browser notification
+                    if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+                        new Notification('Mekomos Chat', { body: label, icon: './images/ohr-eliezer-white.svg' });
+                    } else if (typeof Notification !== 'undefined' && Notification.permission !== 'denied') {
+                        Notification.requestPermission();
+                    }
+                    break; // Only one notification per poll cycle
+                }
             }
         }
 
@@ -947,9 +1027,10 @@
                 input.style.height = 'auto';
                 cancelReply();
                 await fetchComments();
-                // Scroll to bottom
+                // Force scroll to bottom after own post
                 const list = document.getElementById('comments-list');
                 if (list) list.scrollTop = list.scrollHeight;
+                markCommentsRead();
             } catch (e) {
                 console.error("Post comment error:", e);
                 showStatusBar("Error posting comment");
@@ -1056,10 +1137,24 @@
 
         function renderMentions(text) {
             const escaped = escapeHtml(text);
-            return escaped.replace(/@(\S+)/g, '<span class="chat-mention">@$1</span>');
+            const names = (window._attendeesList || []).map(a => a.name).filter(Boolean);
+            // Sort by length descending so longer names match first
+            names.sort((a, b) => b.length - a.length);
+            let result = escaped;
+            names.forEach(name => {
+                const escapedName = escapeHtml(name);
+                const regex = new RegExp('@' + escapedName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+                result = result.replace(regex, '<span class="chat-mention">@' + escapedName + '</span>');
+            });
+            // Fallback: highlight any remaining @word patterns
+            result = result.replace(/@(\S+)/g, function(match) {
+                if (match.includes('chat-mention')) return match;
+                return '<span class="chat-mention">' + match + '</span>';
+            });
+            return result;
         }
 
-        function renderComments() {
+        function renderComments(scrollToBottom) {
             const container = document.getElementById('comments-list');
             if (!container) return;
             const t = i18n[currentLang];
@@ -1161,8 +1256,14 @@
 
             container.innerHTML = html;
 
-            // Auto-scroll to bottom on first render
-            container.scrollTop = container.scrollHeight;
+            // Smart scroll: only scroll to bottom if explicitly requested or user is near bottom
+            if (scrollToBottom) {
+                container.scrollTop = container.scrollHeight;
+            } else {
+                // Auto-scroll only if user is near the bottom (within 100px)
+                const nearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+                if (nearBottom) container.scrollTop = container.scrollHeight;
+            }
         }
 
         window.scrollToComment = function(commentId) {
@@ -1346,7 +1447,7 @@
             });
             if (tab === 'info') renderInfo();
             if (tab === 'packing') renderPackingList();
-            if (tab === 'comments') renderComments();
+            if (tab === 'comments') { renderComments(); markCommentsRead(); }
             if (pushHash) {
                 history.pushState({ tab }, '', '#' + tab);
             }
