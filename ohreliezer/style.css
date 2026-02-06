@@ -134,6 +134,36 @@ body {
             color: white;
         }
 
+        /* Info icon + inline detail */
+        .check-info-wrap {
+            display: inline;
+            margin-left: 4px;
+            vertical-align: middle;
+        }
+        .check-info-icon {
+            display: inline-block;
+            vertical-align: middle;
+            color: #cbd5e1;
+            transition: color 0.15s;
+        }
+        .check-info-wrap:hover .check-info-icon {
+            color: #6366f1;
+        }
+        .check-inline-detail {
+            font-size: 10px;
+            color: #94a3b8;
+            margin-left: 4px;
+        }
+        /* Desktop: hide detail text until icon is hovered */
+        @media (min-width: 768px) {
+            .check-inline-detail {
+                opacity: 0;
+                transition: opacity 0.15s;
+            }
+            .check-info-wrap:hover .check-inline-detail {
+                opacity: 1;
+            }
+        }
 
         /* Masonry grid layout */
         .masonry-grid {
