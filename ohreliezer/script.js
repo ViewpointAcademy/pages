@@ -390,26 +390,58 @@
             pollInterval = setInterval(fetchRsvps, 10000);
         }
 
+        function launchConfetti() {
+            const rsvpBox = document.getElementById('rsvp-box');
+            if (!rsvpBox) return;
+            const rect = rsvpBox.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+            const colors = ['#6366f1','#a78bfa','#f59e0b','#34d399','#f472b6','#60a5fa','#fbbf24','#fb7185'];
+            for (let i = 0; i < 40; i++) {
+                const el = document.createElement('div');
+                el.style.cssText = 'position:fixed;z-index:9999;pointer-events:none;border-radius:2px;';
+                el.style.width = (Math.random() * 8 + 4) + 'px';
+                el.style.height = (Math.random() * 8 + 4) + 'px';
+                el.style.background = colors[Math.floor(Math.random() * colors.length)];
+                el.style.left = cx + 'px';
+                el.style.top = cy + 'px';
+                document.body.appendChild(el);
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 200 + 100;
+                const dx = Math.cos(angle) * speed;
+                const dy = Math.sin(angle) * speed - 150;
+                const rot = Math.random() * 720 - 360;
+                el.animate([
+                    { transform: 'translate(0,0) rotate(0deg)', opacity: 1 },
+                    { transform: `translate(${dx}px,${dy + 300}px) rotate(${rot}deg)`, opacity: 0 }
+                ], { duration: 1000 + Math.random() * 500, easing: 'cubic-bezier(.25,.46,.45,.94)' });
+                setTimeout(() => el.remove(), 1600);
+            }
+        }
+
         window.handleVote = async (status) => {
-            if (currentStatus === status) { 
+            const wasGoing = currentStatus === 'going';
+            if (currentStatus === status) {
                 currentStatus = null;
             } else {
                 currentStatus = status;
             }
 
-            if (!userData) { 
-                pendingVote = currentStatus; 
-                openNameModal(); 
-                return; 
+            if (!userData) {
+                pendingVote = currentStatus;
+                openNameModal();
+                return;
             }
+
+            if (currentStatus === 'going' && !wasGoing) launchConfetti();
 
             if (isOffline) {
                 localStorage.setItem('local_rsvp_status', currentStatus);
-                renderAttendees([{ 
-                    uid: 'local-user', 
-                    name: userData.name, 
-                    initials: userData.name.split(' ').map(n=>n[0]).join('').toUpperCase().substring(0,2), 
-                    status: currentStatus 
+                renderAttendees([{
+                    uid: 'local-user',
+                    name: userData.name,
+                    initials: userData.name.split(' ').map(n=>n[0]).join('').toUpperCase().substring(0,2),
+                    status: currentStatus
                 }]);
                 updateVoteButtons(currentStatus);
                 showStatusBar("Saved Locally");
@@ -430,6 +462,7 @@
                 localStorage.setItem('local_user_name', name);
                 closeNameModal();
                 if (pendingVote !== null) {
+                    if (pendingVote === 'going') launchConfetti();
                     localStorage.setItem('local_rsvp_status', pendingVote);
                     currentStatus = pendingVote;
                     pendingVote = null;
@@ -454,6 +487,7 @@
                     closeNameModal();
                     updateUserInfoDisplay();
                     if (pendingVote !== null) {
+                        if (pendingVote === 'going') launchConfetti();
                         saveVote(currentUser.uid, userData.name, pendingVote);
                         pendingVote = null;
                     } else if (currentStatus) {
