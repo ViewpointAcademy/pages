@@ -229,6 +229,41 @@ body {
         .chat-bubble-own .chat-edit-input { color: white; background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.3); }
         .chat-bubble-other .chat-edit-input { color: #334155; background: white; border-color: #e2e8f0; }
 
+        /* Mention dropdown */
+        .mention-dropdown {
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            margin-bottom: 4px;
+            overflow: hidden;
+            z-index: 60;
+        }
+        .mention-option {
+            padding: 8px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+        .mention-option:hover, .mention-option.mention-active {
+            background: #f1f5f9;
+            color: #4f46e5;
+        }
+        .chat-mention {
+            color: #818cf8;
+            font-weight: 700;
+        }
+        .chat-bubble-own .chat-mention {
+            color: #c7d2fe;
+            font-weight: 700;
+        }
+
         /* Sidebar attendees scroll */
         .sidebar-attendees-scroll::-webkit-scrollbar {
             width: 3px;

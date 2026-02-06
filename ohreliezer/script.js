@@ -693,6 +693,7 @@
         }
 
         function renderAttendees(list) {
+            window._attendeesList = list || [];
             const container = document.getElementById('attendees-list');
             const goingCount = list.filter(a => a.status === 'going').length;
             const countLabel = `${goingCount} Joined`;
@@ -1053,6 +1054,11 @@
             return diffDays + ' ' + t.daysAgo;
         }
 
+        function renderMentions(text) {
+            const escaped = escapeHtml(text);
+            return escaped.replace(/@(\S+)/g, '<span class="chat-mention">@$1</span>');
+        }
+
         function renderComments() {
             const container = document.getElementById('comments-list');
             if (!container) return;
@@ -1081,11 +1087,20 @@
                 const isOwner = currentUser && c.uid === currentUser.uid;
                 const canDelete = isAdmin || isOwner;
 
+                // Convert UTC to local time
+                let timeStr = '';
+                let localDate = '';
+                if (c.created_at) {
+                    const utc = new Date(c.created_at + 'Z');
+                    timeStr = utc.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+                    localDate = utc.toLocaleDateString('en-CA'); // YYYY-MM-DD format
+                }
+
                 // Date separator
-                const msgDate = c.created_at ? c.created_at.split(' ')[0] : '';
+                const msgDate = localDate;
                 if (msgDate && msgDate !== lastDate) {
                     lastDate = msgDate;
-                    const dateObj = new Date(msgDate + 'T00:00:00Z');
+                    const dateObj = new Date(msgDate + 'T00:00:00');
                     const today = new Date();
                     today.setHours(0,0,0,0);
                     const yesterday = new Date(today);
@@ -1096,22 +1111,25 @@
                     html += '<div class="flex justify-center my-3"><span class="text-[9px] font-bold text-slate-400 bg-slate-100 px-3 py-1 rounded-full">' + dateLabel + '</span></div>';
                 }
 
-                // Reply preview
-                let replyHtml = '';
+                // Reply preview - build two versions for own and other messages
+                let replyHtmlOwn = '';
+                let replyHtmlOther = '';
                 if (c.reply_to && commentMap[c.reply_to]) {
                     const parent = commentMap[c.reply_to];
-                    replyHtml = '<div class="chat-reply-preview mb-1.5 px-3 py-1.5 rounded-lg bg-black/5 border-l-2 border-indigo-400 cursor-pointer" onclick="scrollToComment(\'' + escapeHtml(parent.id) + '\')">'
-                        + '<p class="text-[9px] font-bold text-indigo-600">' + escapeHtml(parent.user_name) + '</p>'
-                        + '<p class="text-[10px] text-slate-500 truncate">' + escapeHtml(parent.comment_text.length > 50 ? parent.comment_text.substring(0, 50) + '...' : parent.comment_text) + '</p>'
-                        + '</div>';
+                    const parentText = escapeHtml(parent.comment_text.length > 50 ? parent.comment_text.substring(0, 50) + '...' : parent.comment_text);
+                    const parentName = escapeHtml(parent.user_name);
+                    const onclick = 'onclick="scrollToComment(\'' + escapeHtml(parent.id) + '\')"';
+                    replyHtmlOwn = '<div class="mb-1.5 px-3 py-1.5 rounded-lg bg-white/15 border-l-2 border-indigo-200 cursor-pointer" ' + onclick + '>'
+                        + '<p class="text-[9px] font-bold text-indigo-200">' + parentName + '</p>'
+                        + '<p class="text-[10px] text-indigo-100/70 truncate">' + parentText + '</p></div>';
+                    replyHtmlOther = '<div class="mb-1.5 px-3 py-1.5 rounded-lg bg-black/5 border-l-2 border-indigo-400 cursor-pointer" ' + onclick + '>'
+                        + '<p class="text-[9px] font-bold text-indigo-600">' + parentName + '</p>'
+                        + '<p class="text-[10px] text-slate-500 truncate">' + parentText + '</p></div>';
                 }
 
                 // Delete button
                 const deleteBtn = canDelete ? ' <button onclick="event.stopPropagation();deleteComment(\'' + escapeHtml(c.id) + '\',\'' + escapeHtml(c.uid) + '\')" class="chat-delete-btn text-slate-300 hover:text-rose-500 transition-colors opacity-0" title="' + escapeHtml(t.deleteComment) + '"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' : '';
                 const editBtn = isOwner ? ' <button onclick="event.stopPropagation();editComment(\'' + escapeHtml(c.id) + '\',\'' + escapeHtml(c.comment_text.replace(/'/g, "\\'").replace(/\n/g, "\\n")) + '\')" class="chat-edit-btn text-slate-300 hover:text-indigo-500 transition-colors opacity-0" title="' + escapeHtml(t.editComment) + '"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>' : '';
-
-                // Time
-                const timeStr = c.created_at ? c.created_at.split(' ')[1]?.substring(0, 5) || '' : '';
 
                 // Reply button
                 const replyBtn = '<button onclick="setReply(\'' + escapeHtml(c.id) + '\',\'' + escapeHtml(c.user_name) + '\',\'' + escapeHtml(c.comment_text.replace(/'/g, "\\'")) + '\')" class="chat-reply-btn text-slate-300 hover:text-indigo-500 transition-colors opacity-0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 00-4-4H4"/></svg></button>';
@@ -1122,8 +1140,8 @@
                         + '<div class="flex items-end gap-1.5">'
                         + deleteBtn + editBtn + replyBtn
                         + '<div class="chat-bubble-own max-w-[75%] rounded-2xl rounded-br-md px-3.5 py-2">'
-                        + replyHtml
-                        + '<p class="chat-msg-text text-sm text-white leading-relaxed whitespace-pre-wrap">' + escapeHtml(c.comment_text) + '</p>'
+                        + replyHtmlOwn
+                        + '<p class="chat-msg-text text-sm text-white leading-relaxed whitespace-pre-wrap">' + renderMentions(c.comment_text) + '</p>'
                         + '<p class="text-[9px] text-indigo-200 mt-1 text-right">' + (c.edited_at ? '<span class="italic opacity-70">' + escapeHtml(t.edited) + ' </span>' : '') + timeStr + '</p>'
                         + '</div></div></div>';
                 } else {
@@ -1132,8 +1150,8 @@
                         + '<div class="flex items-end gap-1.5">'
                         + '<div class="chat-bubble-other max-w-[75%] rounded-2xl rounded-bl-md px-3.5 py-2">'
                         + '<p class="text-[10px] font-bold text-indigo-600 mb-0.5">' + escapeHtml(c.user_name) + '</p>'
-                        + replyHtml
-                        + '<p class="chat-msg-text text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">' + escapeHtml(c.comment_text) + '</p>'
+                        + replyHtmlOther
+                        + '<p class="chat-msg-text text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">' + renderMentions(c.comment_text) + '</p>'
                         + '<p class="text-[9px] text-slate-400 mt-1">' + (c.edited_at ? '<span class="italic opacity-70">' + escapeHtml(t.edited) + ' </span>' : '') + timeStr + '</p>'
                         + '</div>'
                         + replyBtn + deleteBtn
@@ -1155,6 +1173,60 @@
                 el.style.background = 'rgba(99,102,241,0.08)';
                 setTimeout(() => { el.style.background = 'transparent'; }, 1500);
             }
+        };
+
+        // Mention/tag system
+        let mentionActive = false;
+        let mentionQuery = '';
+        let mentionStart = -1;
+        let mentionIndex = 0;
+
+        function getMentionCandidates(query) {
+            const list = window._attendeesList || [];
+            if (!query) return list.slice(0, 5);
+            const q = query.toLowerCase();
+            return list.filter(a => a.name && a.name.toLowerCase().includes(q)).slice(0, 5);
+        }
+
+        function showMentionDropdown(candidates) {
+            let dropdown = document.getElementById('mention-dropdown');
+            if (!dropdown) {
+                dropdown = document.createElement('div');
+                dropdown.id = 'mention-dropdown';
+                dropdown.className = 'mention-dropdown';
+                const inputBar = document.getElementById('comment-input').parentElement;
+                inputBar.style.position = 'relative';
+                inputBar.appendChild(dropdown);
+            }
+            if (candidates.length === 0) {
+                dropdown.classList.add('hidden');
+                return;
+            }
+            mentionIndex = 0;
+            dropdown.innerHTML = candidates.map((c, i) =>
+                '<div class="mention-option' + (i === 0 ? ' mention-active' : '') + '" data-name="' + escapeHtml(c.name) + '" onmousedown="selectMention(\'' + escapeHtml(c.name.replace(/'/g, "\\'")) + '\')">' + escapeHtml(c.name) + '</div>'
+            ).join('');
+            dropdown.classList.remove('hidden');
+        }
+
+        function hideMentionDropdown() {
+            const dropdown = document.getElementById('mention-dropdown');
+            if (dropdown) dropdown.classList.add('hidden');
+            mentionActive = false;
+        }
+
+        window.selectMention = function(name) {
+            const input = document.getElementById('comment-input');
+            if (!input) return;
+            const val = input.value;
+            const before = val.substring(0, mentionStart);
+            const after = val.substring(input.selectionStart);
+            input.value = before + '@' + name + ' ' + after;
+            input.focus();
+            const pos = before.length + name.length + 2;
+            input.selectionStart = pos;
+            input.selectionEnd = pos;
+            hideMentionDropdown();
         };
 
         window.addCustomItem = async function() {
@@ -1342,12 +1414,58 @@
                 }
             } catch (e) {}
 
-            // Add Enter key to submit comments (Shift+Enter for new line)
+            // Add Enter key to submit comments (Shift+Enter for new line) and handle mention navigation
             document.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey && document.activeElement && document.activeElement.id === 'comment-input') {
-                    e.preventDefault();
-                    submitComment();
+                if (document.activeElement && document.activeElement.id === 'comment-input') {
+                    if (mentionActive) {
+                        const dropdown = document.getElementById('mention-dropdown');
+                        const options = dropdown ? dropdown.querySelectorAll('.mention-option') : [];
+                        if (e.key === 'ArrowDown') {
+                            e.preventDefault();
+                            mentionIndex = Math.min(mentionIndex + 1, options.length - 1);
+                            options.forEach((o, i) => o.classList.toggle('mention-active', i === mentionIndex));
+                        } else if (e.key === 'ArrowUp') {
+                            e.preventDefault();
+                            mentionIndex = Math.max(mentionIndex - 1, 0);
+                            options.forEach((o, i) => o.classList.toggle('mention-active', i === mentionIndex));
+                        } else if (e.key === 'Enter' || e.key === 'Tab') {
+                            e.preventDefault();
+                            if (options[mentionIndex]) {
+                                selectMention(options[mentionIndex].dataset.name);
+                            }
+                        } else if (e.key === 'Escape') {
+                            hideMentionDropdown();
+                        }
+                        return;
+                    }
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        submitComment();
+                    }
                 }
+            });
+
+            // Handle @ detection for mentions
+            document.addEventListener('input', function(e) {
+                if (e.target.id !== 'comment-input') return;
+                const input = e.target;
+                const val = input.value;
+                const pos = input.selectionStart;
+                // Look backward from cursor for @
+                const textBefore = val.substring(0, pos);
+                const atIndex = textBefore.lastIndexOf('@');
+                if (atIndex >= 0 && (atIndex === 0 || textBefore[atIndex - 1] === ' ' || textBefore[atIndex - 1] === '\n')) {
+                    const query = textBefore.substring(atIndex + 1);
+                    if (!query.includes(' ') && !query.includes('\n')) {
+                        mentionActive = true;
+                        mentionStart = atIndex;
+                        mentionQuery = query;
+                        const candidates = getMentionCandidates(query);
+                        showMentionDropdown(candidates);
+                        return;
+                    }
+                }
+                hideMentionDropdown();
             });
 
             // Route to tab from URL hash
