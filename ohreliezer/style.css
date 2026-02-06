@@ -134,6 +134,25 @@ body {
             color: white;
         }
 
+        /* Detail reveal on hover (desktop) / always visible (mobile) */
+        .check-detail {
+            max-height: 60px;
+            opacity: 1;
+            transition: max-height 0.2s ease, opacity 0.2s ease;
+        }
+        @media (min-width: 768px) {
+            .check-detail {
+                max-height: 0;
+                overflow: hidden;
+                opacity: 0;
+            }
+            .check-item.has-detail:hover .check-detail,
+            .check-item.has-detail.detail-open .check-detail {
+                max-height: 60px;
+                opacity: 1;
+            }
+        }
+
         /* Masonry grid layout */
         .masonry-grid {
             columns: 1;

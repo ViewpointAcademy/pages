@@ -129,27 +129,29 @@
 
         const travelInfo = {
             en: [
-                { heading: "Luggage", items: ["1 checked bag up to 50LB is free"] },
-                { heading: "Phone & Connectivity", items: ["Make sure your phone works internationally at a reasonable price per day", "If not, rent a phone or SIM card"] },
+                { heading: "Luggage", items: ["1 checked bag up to 50LB is for free"] },
+                { heading: "Phone & Connectivity", items: ["Make sure your phone works internationally and has a reasonable price per day", "If not, rent a phone or SIM card for the trip"] },
                 { heading: "Weather", items: ["Weather in Europe is similar to the weather here"] },
-                { heading: "Hotel Notes", items: ["Mini bars in hotel rooms charge a lot", "There will be a specific room with free drinks, snacks, cookies"] },
-                { heading: "On-Trip Help", items: ["Someone traveling with the group from Linsoa will be available to help"] }
+                { heading: "Hotel Notes", items: ["Mini bars in the hotel rooms charge a lot — if you take anything remember it's your bill", "There will be a specific room filled with drinks, snacks, cookies that will be for free"] },
+                { heading: "On-Trip Help", items: ["There will be someone traveling with us from Linsoa, he will be able to answer/help with your needs if possible"] },
+                { heading: "Religious Items Note", items: ["Siddur & Chumash donated by R' Shloma Goldstein", "Tehillim is available at every Tzion", "Lecht mostly available, but recommended to take a few"] }
             ],
             yi: [
                 { heading: "באגאזש", items: ["1 טשעקד בעג ביז 50 פונט איז פריי"] },
-                { heading: "טעלעפאן", items: ["זייט זיכער אז אייער טעלעפאן ארבעט אינטערנאציאנאל", "אויב נישט, רענט א טעלעפאן אדער SIM קארטל"] },
+                { heading: "טעלעפאן", items: ["זייט זיכער אז אייער טעלעפאן ארבעט אינטערנאציאנאל מיט א רעזאנאבלע פרייז פער טאג", "אויב נישט, רענט א טעלעפאן אדער SIM קארטל פארן טריפ"] },
                 { heading: "וועטער", items: ["דער וועטער אין אייראפע איז ענליך צום וועטער דא"] },
-                { heading: "האטעל", items: ["מיני בארס אין צימערן קאסטן טייער", "עס וועט זיין א ספעציעלער צימער מיט פריי געטראנקן און סנעקס"] },
-                { heading: "הילף אויפן טריפ", items: ["עמיצער פון לינסא רייזט מיט דער גרופע און קען העלפן"] }
+                { heading: "האטעל", items: ["מיני בארס אין צימערן קאסטן טייער — אויב איר נעמט עפעס, געדענקט אז עס איז אייער חשבון", "עס וועט זיין א ספעציעלער צימער מיט פריי געטראנקן, סנעקס, קוקיס"] },
+                { heading: "הילף אויפן טריפ", items: ["עמיצער פון לינסא רייזט מיט אונז, ער וועט קענען העלפן מיט אייערע באדערפענישן"] },
+                { heading: "רעליגיעזע זאכן נאטיץ", items: ["סידור און חומש געשאנקען פון ר' שלמה גאלדשטיין", "תהלים איז דא ביי יעדן ציון", "לעכט איז מערסטנס דא, אבער רעקאמענדירט צו נעמען א פאר"] }
             ]
         };
 
         const packingList = {
             en: [
                 { id: "religious", heading: "Religious Items", items: [
-                    {id: "religious_0", label: "Siddur & Chumash"},
-                    {id: "religious_1", label: "Tehillim"},
-                    {id: "religious_2", label: "Lecht (candles)"}
+                    {id: "religious_0", label: "Siddur & Chumash", detail: "Donated by R' Shloma Goldstein"},
+                    {id: "religious_1", label: "Tehillim", detail: "Available at every Tzion"},
+                    {id: "religious_2", label: "Lecht", detail: "Mostly available, but recommended to take a few"}
                 ]},
                 { id: "clothing", heading: "Clothing", items: [
                     {id: "clothing_0", label: "Boots/Kalachin"},
@@ -157,32 +159,34 @@
                     {id: "clothing_2", label: "4-5 sets of clothes"},
                     {id: "clothing_3", label: "Extra pairs of socks"},
                     {id: "clothing_4", label: "Pajamas"},
-                    {id: "clothing_5", label: "Bathing suit (for shvitz)"},
-                    {id: "clothing_6", label: "Shtreimel"},
-                    {id: "clothing_7", label: "Bakitcha"}
+                    {id: "clothing_5", label: "Bathing suit", detail: "For shvitz"},
+                    {id: "clothing_6", label: "Shabbos clothes", detail: "Shtramel, Bakitcha"}
                 ]},
                 { id: "essentials", heading: "Essentials", items: [
                     {id: "essentials_0", label: "Tefillin"},
                     {id: "essentials_1", label: "Passport"},
-                    {id: "essentials_2", label: "Charger & Adapter"},
-                    {id: "essentials_3", label: "Air plugs"}
+                    {id: "essentials_2", label: "Charger"},
+                    {id: "essentials_3", label: "Adapter"},
+                    {id: "essentials_4", label: "Air plugs"}
                 ]},
                 { id: "food", heading: "Food", items: [
-                    {id: "food_0", label: "Tuesday night dinner"},
-                    {id: "food_1", label: "Snacks/cookies/chips for flight"}
+                    {id: "food_0", label: "Tuesday night dinner", detail: "Kosher food is ordered but isn't always good/enough"},
+                    {id: "food_1", label: "Snacks/cookies/chips/sweets for the flight"}
                 ]},
                 { id: "other", heading: "Other", items: [
                     {id: "other_0", label: "Sefer/Gemara/reading material"},
                     {id: "other_1", label: "Tylenol/Motrin/Tums/Bandages"},
                     {id: "other_2", label: "Lenses solution"},
-                    {id: "other_3", label: "Fresh wipes & Deodorant"}
+                    {id: "other_3", label: "Cigarettes", detail: "If you smoke"},
+                    {id: "other_4", label: "Fresh wipes", detail: "If you need"},
+                    {id: "other_5", label: "Deodorant", detail: "If you need"}
                 ]}
             ],
             yi: [
                 { id: "religious", heading: "רעליגיעזע זאכן", items: [
-                    {id: "religious_0", label: "סידור און חומש"},
-                    {id: "religious_1", label: "תהלים"},
-                    {id: "religious_2", label: "לעכט"}
+                    {id: "religious_0", label: "סידור און חומש", detail: "געשאנקען פון ר' שלמה גאלדשטיין"},
+                    {id: "religious_1", label: "תהלים", detail: "דא ביי יעדן ציון"},
+                    {id: "religious_2", label: "לעכט", detail: "מערסטנס דא, אבער רעקאמענדירט צו נעמען א פאר"}
                 ]},
                 { id: "clothing", heading: "בגדים", items: [
                     {id: "clothing_0", label: "שטיוול/קאלאטשן"},
@@ -190,25 +194,27 @@
                     {id: "clothing_2", label: "4-5 זעטס בגדים"},
                     {id: "clothing_3", label: "עקסטרא זאקן"},
                     {id: "clothing_4", label: "פיזשאמעס"},
-                    {id: "clothing_5", label: "באדינג סוט (פאר שוויץ)"},
-                    {id: "clothing_6", label: "שטריימל"},
-                    {id: "clothing_7", label: "באקיטשע"}
+                    {id: "clothing_5", label: "באדינג סוט", detail: "פאר שוויץ"},
+                    {id: "clothing_6", label: "שבת בגדים", detail: "שטריימל, באקיטשע"}
                 ]},
                 { id: "essentials", heading: "עסענציעלס", items: [
                     {id: "essentials_0", label: "תפילין"},
                     {id: "essentials_1", label: "פאספארט"},
-                    {id: "essentials_2", label: "טשארזשער און אדאפטער"},
-                    {id: "essentials_3", label: "ער פלאגס"}
+                    {id: "essentials_2", label: "טשארזשער"},
+                    {id: "essentials_3", label: "אדאפטער"},
+                    {id: "essentials_4", label: "ער פלאגס"}
                 ]},
                 { id: "food", heading: "עסן", items: [
-                    {id: "food_0", label: "דינסטאג נאכט סעודה"},
-                    {id: "food_1", label: "סנעקס/קוקיס/טשיפס פארן פלי"}
+                    {id: "food_0", label: "דינסטאג נאכט סעודה", detail: "כשר עסן איז באשטעלט אבער איז נישט אלעמאל גוט/גענוג"},
+                    {id: "food_1", label: "סנעקס/קוקיס/טשיפס/זיסן פארן פלי"}
                 ]},
                 { id: "other", heading: "אנדערע", items: [
                     {id: "other_0", label: "ספר/גמרא/לייענונג מאטריאל"},
                     {id: "other_1", label: "טיילענאל/מאטרין/טאמס/באנדאזשעס"},
                     {id: "other_2", label: "לענזעס סאליושאן"},
-                    {id: "other_3", label: "פרישע וויפס און דעאדאראנט"}
+                    {id: "other_3", label: "סיגארעטן", detail: "אויב איר רויכערט"},
+                    {id: "other_4", label: "פרישע וויפס", detail: "אויב איר דארפט"},
+                    {id: "other_5", label: "דעאדאראנט", detail: "אויב איר דארפט"}
                 ]}
             ]
         };
@@ -836,12 +842,16 @@
                     <ul class="space-y-2">
                         ${section.items.map(item => {
                             const checked = checkedItems.has(item.id);
+                            const detailHtml = item.detail ? `<span class="check-detail text-[10px] text-slate-400 block">${escapeHtml(item.detail)}</span>` : '';
                             return `
-                            <li class="check-item flex items-center gap-3 cursor-pointer select-none" onclick="toggleCheckItem('${item.id}')">
-                                <div class="check-box ${checked ? 'checked' : ''}">
+                            <li class="check-item flex items-start gap-3 cursor-pointer select-none ${item.detail ? 'has-detail' : ''}" onclick="toggleCheckItem('${item.id}')">
+                                <div class="check-box mt-0.5 ${checked ? 'checked' : ''}">
                                     ${checked ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>' : ''}
                                 </div>
-                                <span class="text-xs ${checked ? 'line-through text-slate-400' : 'text-slate-700'}">${escapeHtml(item.label)}</span>
+                                <div class="flex-1 min-w-0">
+                                    <span class="text-xs ${checked ? 'line-through text-slate-400' : 'text-slate-700'}">${escapeHtml(item.label)}${item.detail ? ' <svg class="inline-block ml-0.5 text-slate-300" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>' : ''}</span>
+                                    ${detailHtml}
+                                </div>
                             </li>`;
                         }).join('')}
                     </ul>
