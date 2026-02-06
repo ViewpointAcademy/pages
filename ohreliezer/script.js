@@ -66,7 +66,7 @@
             yi: {
                 attendance: "קומט מיט?",
                 editName: "שרייב נאמען",
-                joined: "מיטגעקומען",
+                joined: "קומען",
                 itinerary: "סדר הנסיעה",
                 modalTitle: "נאמען",
                 modalSub: "לייגט אריין אייער נאמען.",
@@ -730,7 +730,7 @@
 
             // Mobile attendees list (dark header background)
             const itemsHtml = activeList.map(a => `
-                <div onclick="openAdmin('${escapeHtml(a.uid)}', '${escapeHtml(a.name)}')" class="flex items-center gap-1.5 bg-white/10 pl-0.5 pr-2.5 py-0.5 rounded-full cursor-pointer hover:bg-white/20 active:scale-95 transition-all">
+                <div onclick="openAdmin('${escapeHtml(a.uid)}', '${escapeHtml(a.name)}')" class="flex items-center gap-1.5 bg-white/10 ps-0.5 pe-2.5 py-0.5 rounded-full cursor-pointer hover:bg-white/20 active:scale-95 transition-all">
                     <div class="w-6 h-6 rounded-full bg-indigo-400 text-white flex items-center justify-center text-[8px] font-bold">${escapeHtml(a.initials)}</div>
                     <span class="text-[10px] font-bold text-indigo-100">${escapeHtml(a.name)}</span>
                     <div class="w-1.5 h-1.5 rounded-full ${a.status === 'going' ? 'bg-emerald-400' : (a.status === 'no' ? 'bg-rose-400' : 'bg-white/40')}"></div>
@@ -772,7 +772,7 @@
             const sidebarList = document.getElementById('sidebar-attendees-list');
             if (sidebarList) {
                 sidebarList.innerHTML = activeList.map(a => `
-                    <div onclick="openAdmin('${escapeHtml(a.uid)}', '${escapeHtml(a.name)}')" class="flex items-center gap-1 bg-white/10 pl-0.5 pr-2 py-0.5 rounded-full cursor-pointer hover:bg-white/20 transition-colors">
+                    <div onclick="openAdmin('${escapeHtml(a.uid)}', '${escapeHtml(a.name)}')" class="flex items-center gap-1 bg-white/10 ps-0.5 pe-2 py-0.5 rounded-full cursor-pointer hover:bg-white/20 transition-colors">
                         <div class="w-5 h-5 rounded-full bg-indigo-400 text-white flex items-center justify-center text-[7px] font-bold">${escapeHtml(a.initials)}</div>
                         <span class="text-[9px] font-bold text-indigo-100">${escapeHtml(a.name)}</span>
                         <div class="w-1.5 h-1.5 rounded-full ${a.status === 'going' ? 'bg-emerald-400' : (a.status === 'no' ? 'bg-rose-400' : 'bg-white/40')}"></div>
