@@ -183,9 +183,9 @@
                     </div>
 
                     <!-- Chat input bar (pinned to bottom) -->
-                    <div class="px-3 py-3 bg-white border-t border-slate-100">
+                    <div id="chat-input-bar" class="px-3 py-3 bg-white border-t border-slate-100 relative">
                         <div class="flex items-end gap-2">
-                            <textarea id="comment-input" placeholder="Write a message..." class="flex-1 text-sm bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2.5 focus:border-indigo-400 focus:outline-none resize-none max-h-24" rows="1" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,96)+'px'"></textarea>
+                            <textarea id="comment-input" placeholder="Write a message... (@ to mention)" class="flex-1 text-sm bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2.5 focus:border-indigo-400 focus:outline-none resize-none max-h-24" rows="1" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,96)+'px'"></textarea>
                             <button onclick="submitComment()" class="w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center flex-shrink-0 hover:bg-indigo-700 transition-colors shadow-sm">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
                             </button>

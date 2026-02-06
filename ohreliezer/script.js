@@ -46,7 +46,7 @@
                 comments: "Comments",
                 commentsHeading: "Share a Thought",
                 postBtn: "POST COMMENT",
-                commentPlaceholder: "Write a message...",
+                commentPlaceholder: "Write a message... (@ to mention)",
                 deleteComment: "Delete",
                 editComment: "Edit",
                 edited: "edited",
@@ -82,7 +82,7 @@
                 comments: "קאמענטן",
                 commentsHeading: "שרייב א געדאנק",
                 postBtn: "פאסטן קאמענט",
-                commentPlaceholder: "...שרייבט א מעסעדזש",
+                commentPlaceholder: "...שרייבט א מעסעדזש (@ צו טאַגן)",
                 deleteComment: "אויסמעקן",
                 editComment: "רעדאקטירן",
                 edited: "באַאַרבעט",
@@ -1194,9 +1194,8 @@
                 dropdown = document.createElement('div');
                 dropdown.id = 'mention-dropdown';
                 dropdown.className = 'mention-dropdown';
-                const inputBar = document.getElementById('comment-input').parentElement;
-                inputBar.style.position = 'relative';
-                inputBar.appendChild(dropdown);
+                const inputBar = document.getElementById('chat-input-bar');
+                if (inputBar) inputBar.appendChild(dropdown);
             }
             if (candidates.length === 0) {
                 dropdown.classList.add('hidden');

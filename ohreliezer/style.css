@@ -230,6 +230,7 @@ body {
         .chat-bubble-other .chat-edit-input { color: #334155; background: white; border-color: #e2e8f0; }
 
         /* Mention dropdown */
+        #chat-input-bar { overflow: visible; }
         .mention-dropdown {
             position: absolute;
             bottom: 100%;
