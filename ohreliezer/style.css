@@ -176,9 +176,9 @@ body {
             right: 50%;
             transform: translateX(50%);
         }
-        /* Mobile: detail shown inline below label */
+        /* Mobile: detail shown inline next to label; hidden on desktop where tooltip handles it */
         @media (min-width: 768px) {
-            .check-detail-mobile {
+            .check-detail-inline {
                 display: none !important;
             }
         }
