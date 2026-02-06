@@ -42,11 +42,11 @@
 
             <div class="relative z-10">
                 <div class="flex flex-col items-center text-center lg:flex-row lg:items-center lg:text-left lg:gap-4 mb-1">
-                    <span id="txt-dates" class="text-[9px] md:text-[10px] font-extrabold tracking-[0.3em] uppercase text-indigo-300/80 mb-2 lg:hidden">Feb 10 — Feb 15, 2026</span>
                     <img src="./images/ohr-eliezer-white.svg" alt="Ohr Eliezer" class="header-logo w-14 h-16 md:w-16 md:h-20 lg:w-16 lg:h-20 flex-shrink-0 opacity-90 mb-3 lg:mb-0">
-                    <div>
-                        <span id="txt-dates-desktop" class="hidden lg:block text-[10px] font-extrabold tracking-[0.3em] uppercase text-indigo-300/80">Feb 10 — Feb 15, 2026</span>
-                        <h1 id="txt-hero" class="text-2xl md:text-3xl lg:text-4xl font-extrabold leading-tight tracking-tight">Mekomos<br><span class="text-indigo-400">Hakdoshim</span></h1>
+                    <div dir="rtl" style="font-family: 'Heebo', sans-serif;">
+                        <h1 class="text-2xl md:text-3xl lg:text-3xl font-extrabold leading-tight">נסיעה למקומות הקדושים</h1>
+                        <p class="text-sm md:text-base font-bold text-indigo-300/80 mt-1">ע״י חברי ביהמ״ד אור אליעזר</p>
+                        <p class="text-xs font-extrabold text-indigo-400 mt-1">אייראפא - תשפ״ו</p>
                     </div>
                 </div>
 
@@ -59,7 +59,37 @@
                     </div>
                 </div>
 
-                <!-- Roster (inside sidebar on desktop) -->
+                <!-- Mobile/Tablet Roster (inside banner) -->
+                <div id="mobile-roster" class="lg:hidden mt-4">
+                    <div class="flex items-center justify-center gap-2 flex-wrap mb-3">
+                        <div id="user-info" class="hidden items-center gap-2 text-[10px] text-indigo-200">
+                            <span id="user-display-name" onclick="openNameModal()" class="font-bold text-white cursor-pointer hover:underline"></span>
+                            <span id="admin-badge" class="hidden bg-amber-400/20 text-amber-300 px-1.5 py-0.5 rounded text-[8px] font-black">ADMIN</span>
+                        </div>
+                        <button onclick="openNameModal()" class="flex items-center gap-1 text-[10px] font-bold text-indigo-200 hover:text-white transition-colors">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                            <span id="txt-edit-name">Enter Name</span>
+                        </button>
+                        <span class="text-indigo-400/40">·</span>
+                        <button onclick="copyAuthLink()" class="text-[9px] font-bold text-indigo-300 opacity-60 hover:opacity-100 transition-opacity">Copy Sync Link</button>
+                    </div>
+                    <div class="flex justify-center mb-2">
+                        <div id="attendee-count" class="text-[10px] font-black text-indigo-200 bg-white/10 px-3 py-1 rounded-full">0 Joined</div>
+                    </div>
+                    <div id="attendees-container" class="relative">
+                        <div id="attendees-list" class="mb-2 flex flex-wrap gap-1.5 justify-center overflow-hidden transition-all duration-300 relative" style="max-height: 3.5rem;">
+                            <div id="attendees-fade" class="absolute left-0 right-0 bottom-0 h-8 pointer-events-none transition-opacity duration-300 z-20" style="opacity:1; background: linear-gradient(to bottom, transparent, rgba(30,27,75,0.8))"></div>
+                        </div>
+                        <div id="attendees-reveal-hint" class="mt-2 text-center">
+                            <button onclick="toggleAttendeesList()" class="text-indigo-300 hover:text-white font-bold flex items-center gap-1 justify-center w-full text-xs transition-colors">
+                                <span id="reveal-text">Show More</span>
+                                <svg id="reveal-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Desktop Sidebar Roster -->
                 <div id="sidebar-roster" class="hidden">
                     <div class="mt-6 border-t border-white/10 pt-4">
                         <div class="flex justify-between items-center mb-3">
@@ -67,55 +97,25 @@
                         </div>
                         <div id="sidebar-attendees-list" class="flex flex-wrap gap-1.5 max-h-40 overflow-y-auto pr-1 sidebar-attendees-scroll"></div>
                         <div class="mt-3 flex items-center justify-between">
-                            <div id="user-info-sidebar" class="hidden items-center gap-2 text-[10px] text-indigo-200">
-                                <span id="user-display-name-sidebar" onclick="openNameModal()" class="font-bold text-white cursor-pointer hover:underline"></span>
-                                <span id="admin-badge-sidebar" class="hidden bg-amber-400/20 text-amber-300 px-1.5 py-0.5 rounded text-[8px] font-black">ADMIN</span>
+                            <div class="flex items-center gap-2">
+                                <div id="user-info-sidebar" class="hidden items-center gap-2 text-[10px] text-indigo-200">
+                                    <span id="user-display-name-sidebar" onclick="openNameModal()" class="font-bold text-white cursor-pointer hover:underline"></span>
+                                    <span id="admin-badge-sidebar" class="hidden bg-amber-400/20 text-amber-300 px-1.5 py-0.5 rounded text-[8px] font-black">ADMIN</span>
+                                </div>
+                                <button onclick="openNameModal()" class="flex items-center gap-1 text-[10px] font-bold text-indigo-200 hover:text-white transition-colors">
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                    <span id="txt-edit-name-sidebar">Enter Name</span>
+                                </button>
                             </div>
-                            <button onclick="openNameModal()" class="flex items-center gap-1 text-[10px] font-bold text-indigo-200 hover:text-white transition-colors">
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                                <span id="txt-edit-name-sidebar">Enter Name</span>
-                            </button>
+                            <button onclick="copyAuthLink()" class="text-[9px] font-bold text-indigo-300 opacity-60 hover:opacity-100 transition-opacity">Sync Link</button>
                         </div>
                     </div>
-                </div>
-
-                <div id="sync-link-container" class="mt-4 flex justify-center lg:justify-start">
-                    <button onclick="copyAuthLink()" class="text-[9px] font-bold text-indigo-200 underline opacity-60 hover:opacity-100">Copy Sync Link for Other Devices</button>
                 </div>
             </div>
         </header>
 
         <!-- Main Content -->
         <main id="main" class="flex-1 px-4 md:px-6 lg:px-8 pb-24 md:pb-32 relative bg-white lg:overflow-y-auto">
-
-            <!-- Mobile-only Roster -->
-            <div id="mobile-roster" class="lg:hidden">
-                <div class="pt-8 mb-6 flex justify-between items-end border-b border-slate-100 pb-4">
-                    <div id="attendee-count" class="text-[10px] font-black text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">0 Joined</div>
-                    <div class="flex flex-col items-end gap-2">
-                        <div id="user-info" class="hidden flex items-center gap-2 text-[10px] text-slate-500">
-                            <span id="user-display-name" onclick="openNameModal()" class="font-bold text-slate-700 cursor-pointer hover:underline"></span>
-                            <span id="admin-badge" class="hidden bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-[8px] font-black">ADMIN</span>
-                        </div>
-                        <button onclick="openNameModal()" class="flex items-center gap-1 text-[10px] font-bold text-indigo-500 bg-white border border-indigo-100 px-2 py-1 rounded-lg shadow-sm hover:bg-indigo-50 transition-colors">
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                            <span id="txt-edit-name">Enter Name</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div id="attendees-container" class="mb-8 relative group">
-                    <div id="attendees-list" class="mb-2 flex flex-wrap gap-2 overflow-hidden transition-all duration-300 relative" style="max-height: 3.5rem;">
-                        <div id="attendees-fade" class="absolute left-0 right-0 bottom-0 h-8 bg-gradient-to-b from-transparent to-white/60 pointer-events-none transition-opacity duration-300 z-20" style="opacity:1"></div>
-                    </div>
-                    <div id="attendees-reveal-hint" class="mt-2 text-center text-xs text-slate-400/50 font-semibold">
-                        <button onclick="toggleAttendeesList()" class="text-indigo-600 hover:text-indigo-700 font-bold flex items-center gap-1 justify-center w-full">
-                            <span id="reveal-text">Show More</span>
-                            <svg id="reveal-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
 
             <!-- Tabs -->
             <div class="flex gap-1 pt-4 lg:pt-8 mb-6 border-b border-slate-100">

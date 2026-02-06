@@ -29,10 +29,9 @@
 
         const i18n = {
             en: {
-                dates: "Feb 10 (23 Shevat) — Feb 15, 2026",
-                hero: "Mekomos<br><span class='text-indigo-400'>Hakdoshim</span>",
                 attendance: "Joining?",
                 editName: "Enter Name",
+                joined: "Joined",
                 itinerary: "Itinerary",
                 modalTitle: "Display Name",
                 modalSub: "Enter your name for the group list.",
@@ -65,10 +64,9 @@
                 days: { Tue: "Tue", Wed: "Wed", Thu: "Thu", Fri: "Fri", Sat: "Sat", Sun: "Sun" }
             },
             yi: {
-                dates: "כ״ג שבט — כ״ח שבט, תשפ״ו",
-                hero: "מקומות<br><span class='text-indigo-400'>הקדושים</span>",
                 attendance: "קומט מיט?",
                 editName: "שרייב נאמען",
+                joined: "מיטגעקומען",
                 itinerary: "סדר הנסיעה",
                 modalTitle: "נאמען",
                 modalSub: "לייגט אריין אייער נאמען.",
@@ -276,9 +274,6 @@
             document.getElementById(`btn-${lang}`).classList.add('active');
             
             const t = i18n[lang];
-            document.getElementById('txt-dates').innerText = t.dates;
-            document.getElementById('txt-dates-desktop').innerText = t.dates;
-            document.getElementById('txt-hero').innerHTML = t.hero;
             document.getElementById('txt-attendance').innerText = t.attendance;
 
             // Only set edit name text if user hasn't entered their name yet
@@ -317,6 +312,7 @@
             } catch (e) {}
 
             renderTimeline();
+            if (window._attendeesList) renderAttendees(window._attendeesList);
             if (currentTab === 'info') renderInfo();
             if (currentTab === 'packing') renderPackingList();
             if (currentTab === 'comments') renderComments();
@@ -388,7 +384,8 @@
                 console.warn("Switching to Offline Mode:", e.message);
                 isOffline = true;
                 document.getElementById('offline-badge').classList.remove('hidden');
-                document.getElementById('sync-link-container').classList.add('hidden');
+                // Hide sync link buttons when offline
+                document.querySelectorAll('[onclick="copyAuthLink()"]').forEach(el => el.classList.add('hidden'));
 
                 // Load local profile if exists
                 const localName = localStorage.getItem('local_user_name');
@@ -720,7 +717,8 @@
             window._attendeesList = list || [];
             const container = document.getElementById('attendees-list');
             const goingCount = list.filter(a => a.status === 'going').length;
-            const countLabel = `${goingCount} Joined`;
+            const t = i18n[currentLang];
+            const countLabel = `${goingCount} ${t.joined}`;
 
             // Update mobile count
             const mobileCount = document.getElementById('attendee-count');
@@ -733,12 +731,12 @@
             // Filter out users with no status
             const activeList = list.filter(a => a.status);
 
-            // Mobile attendees list
+            // Mobile attendees list (dark header background)
             const itemsHtml = activeList.map(a => `
-                <div onclick="openAdmin('${escapeHtml(a.uid)}', '${escapeHtml(a.name)}')" class="flex items-center gap-1.5 bg-slate-50 border border-slate-100 pl-1 pr-2.5 py-1 rounded-full cursor-pointer active:scale-95 transition-transform">
-                    <div class="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[8px] font-bold">${escapeHtml(a.initials)}</div>
-                    <span class="text-[10px] font-bold text-slate-700">${escapeHtml(a.name)}</span>
-                    <div class="w-1.5 h-1.5 rounded-full ${a.status === 'going' ? 'bg-emerald-400' : (a.status === 'no' ? 'bg-rose-500' : 'bg-slate-300')}"></div>
+                <div onclick="openAdmin('${escapeHtml(a.uid)}', '${escapeHtml(a.name)}')" class="flex items-center gap-1 bg-white/10 pl-0.5 pr-2 py-0.5 rounded-full cursor-pointer hover:bg-white/20 active:scale-95 transition-all">
+                    <div class="w-5 h-5 rounded-full bg-indigo-400 text-white flex items-center justify-center text-[7px] font-bold">${escapeHtml(a.initials)}</div>
+                    <span class="text-[9px] font-bold text-indigo-100">${escapeHtml(a.name)}</span>
+                    <div class="w-1.5 h-1.5 rounded-full ${a.status === 'going' ? 'bg-emerald-400' : (a.status === 'no' ? 'bg-rose-400' : 'bg-white/40')}"></div>
                 </div>`).join('');
 
             if (container) {
@@ -746,8 +744,9 @@
                 if (!document.getElementById('attendees-fade')) {
                     const fade = document.createElement('div');
                     fade.id = 'attendees-fade';
-                    fade.className = 'absolute left-0 right-0 bottom-0 h-8 bg-gradient-to-b from-transparent to-white/60 pointer-events-none transition-opacity duration-300 z-20';
+                    fade.className = 'absolute left-0 right-0 bottom-0 h-8 pointer-events-none transition-opacity duration-300 z-20';
                     fade.style.opacity = '1';
+                    fade.style.background = 'linear-gradient(to bottom, transparent, rgba(30,27,75,0.8))';
                     container.appendChild(fade);
                 }
             }
