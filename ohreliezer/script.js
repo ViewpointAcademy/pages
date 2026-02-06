@@ -39,6 +39,8 @@
                 directions: "Directions",
                 showLess: "Show Less",
                 showDetails: "Show Details",
+                showMore: "Show More",
+                showLessNames: "Show Less",
                 info: "Travel Info",
                 packing: "Packing List",
                 types: { travel: "Travel", prayer: "Prayer", hotel: "Hotel", shabbos: "Shabbos" },
@@ -56,6 +58,8 @@
                 directions: "דיירעקציע",
                 showLess: "ווייניגער",
                 showDetails: "מער פרטים",
+                showMore: "ווייז מער",
+                showLessNames: "ווייז ווייניגער",
                 info: "איפערמאציע",
                 packing: "ליסטע",
                 types: { travel: "רייזע", prayer: "תפילה", hotel: "אכסניא", shabbos: "שבת" },
@@ -722,13 +726,13 @@
                 container.setAttribute('data-collapsed','true');
                 container.style.maxHeight = '3.5rem';
                 const fade = document.getElementById('attendees-fade'); if (fade) fade.style.opacity = '1';
-                const text = document.getElementById('reveal-text'); if (text) text.innerText = i18n[currentLang].showDetails;
+                const text = document.getElementById('reveal-text'); if (text) text.innerText = i18n[currentLang].showMore;
                 const icon = document.getElementById('reveal-icon'); if (icon) icon.style.transform = 'rotate(0deg)';
             } else {
                 container.setAttribute('data-collapsed','false');
                 container.style.maxHeight = 'none';
                 const fade = document.getElementById('attendees-fade'); if (fade) fade.style.opacity = '0';
-                const text = document.getElementById('reveal-text'); if (text) text.innerText = i18n[currentLang].showLess;
+                const text = document.getElementById('reveal-text'); if (text) text.innerText = i18n[currentLang].showLessNames;
                 const icon = document.getElementById('reveal-icon'); if (icon) icon.style.transform = 'rotate(180deg)';
             }
         };
@@ -747,14 +751,14 @@
             container.style.maxHeight = 'none';
             container.setAttribute('data-collapsed', 'false');
             if (fade) fade.style.opacity = '0';
-            if (text) text.innerText = i18n[currentLang].showLess;
+            if (text) text.innerText = i18n[currentLang].showLessNames;
             if (icon) icon.style.transform = 'rotate(180deg)';
         } else {
             // Collapse
             container.style.maxHeight = '3.5rem';
             container.setAttribute('data-collapsed', 'true');
             if (fade) fade.style.opacity = '1';
-            if (text) text.innerText = i18n[currentLang].showDetails;
+            if (text) text.innerText = i18n[currentLang].showMore;
             if (icon) icon.style.transform = 'rotate(0deg)';
         }
     }
@@ -1031,16 +1035,16 @@
                     container.setAttribute('data-collapsed', 'true');
                     container.style.maxHeight = '3.5rem';
                     if (fade) fade.style.opacity = '1';
-                    if (text) text.innerText = i18n[currentLang].showDetails;
+                    if (text) text.innerText = i18n[currentLang].showMore;
                     if (icon) icon.style.transform = 'rotate(0deg)';
                 } else {
                     const isCollapsed = container && container.getAttribute('data-collapsed') === 'true';
                     if (isCollapsed) {
-                        if (text) text.innerText = i18n[currentLang].showDetails;
+                        if (text) text.innerText = i18n[currentLang].showMore;
                         if (icon) icon.style.transform = 'rotate(0deg)';
                         if (fade) fade.style.opacity = '1';
                     } else {
-                        if (text) text.innerText = i18n[currentLang].showLess;
+                        if (text) text.innerText = i18n[currentLang].showLessNames;
                         if (icon) icon.style.transform = 'rotate(180deg)';
                         if (fade) fade.style.opacity = '0';
                     }
