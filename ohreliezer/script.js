@@ -839,14 +839,13 @@
                         ${section.items.map(item => {
                             const isLocked = item.locked === true;
                             const checked = isLocked || checkedItems.has(item.id);
-                            const infoIcon = item.detail ? `<span class="check-info-trigger relative inline-block ml-1 align-middle" onclick="event.stopPropagation()"><svg class="text-slate-300 hover:text-indigo-400 transition-colors" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg><span class="check-tooltip">${escapeHtml(item.detail)}</span></span>` : '';
-                            const inlineDetail = item.detail ? `<span class="check-detail-inline text-[10px] text-slate-400 ml-1">${escapeHtml(item.detail)}</span>` : '';
+                            const inlineDetail = item.detail ? `<span class="text-[10px] text-slate-400 ml-1">— ${escapeHtml(item.detail)}</span>` : '';
                             return `
                             <li class="check-item flex items-center gap-3 ${isLocked ? 'opacity-60 cursor-default' : 'cursor-pointer'} select-none" ${isLocked ? '' : `onclick="toggleCheckItem('${item.id}')"`}>
                                 <div class="check-box ${checked ? 'checked' : ''}">
                                     ${checked ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>' : ''}
                                 </div>
-                                <span class="text-xs ${checked ? 'line-through text-slate-400' : 'text-slate-700'}">${escapeHtml(item.label)}${infoIcon}${inlineDetail}</span>
+                                <span class="text-xs ${checked ? 'line-through text-slate-400' : 'text-slate-700'}">${escapeHtml(item.label)}${inlineDetail}</span>
                             </li>`;
                         }).join('')}
                     </ul>
