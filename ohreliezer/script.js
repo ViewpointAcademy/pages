@@ -152,13 +152,10 @@
                     {id: "essentials_0", label: "Tefillin"},
                     {id: "essentials_1", label: "Passport"},
                     {id: "essentials_2", label: "Charger"},
-                    {id: "essentials_4", label: "Air plugs"}
-                ]},
-                { id: "religious", heading: "Religious Items", items: [
+                    {id: "essentials_3", label: "Adapter"},
                     {id: "religious_0", label: "Siddur & Chumash", detail: "Donated by R' Shloma Goldstein", locked: true},
-                    {id: "religious_1", label: "Tehillim", detail: "Available at every Tzion"},
-                    {id: "religious_2", label: "Lecht", detail: "Mostly available, but recommended to take a few"},
-                    {id: "religious_3", label: "Sefer/Gemara/reading material"}
+                    {id: "religious_1", label: "Tehillim", detail: "Available at every Tzion", locked: true},
+                    {id: "religious_2", label: "Lecht", detail: "Mostly available, but recommended to take a few"}
                 ]},
                 { id: "clothing", heading: "Clothing", items: [
                     {id: "clothing_0", label: "Boots/Kalachin"},
@@ -174,7 +171,8 @@
                     {id: "food_1", label: "Snacks/cookies/chips/sweets for the flight"}
                 ]},
                 { id: "other", heading: "Other", items: [
-                    {id: "essentials_3", label: "Adapter"},
+                    {id: "essentials_4", label: "Air plugs"},
+                    {id: "religious_3", label: "Sefer/Gemara/reading material"},
                     {id: "other_1", label: "Tylenol/Motrin/Tums/Bandages"},
                     {id: "other_2", label: "Lenses solution"},
                     {id: "other_3", label: "Cigarettes", detail: "If you smoke"},
@@ -187,13 +185,10 @@
                     {id: "essentials_0", label: "תפילין"},
                     {id: "essentials_1", label: "פאספארט"},
                     {id: "essentials_2", label: "טשארזשער"},
-                    {id: "essentials_4", label: "ער פלאגס"}
-                ]},
-                { id: "religious", heading: "רעליגיעזע זאכן", items: [
+                    {id: "essentials_3", label: "אדאפטער"},
                     {id: "religious_0", label: "סידור און חומש", detail: "געשאנקען פון ר' שלמה גאלדשטיין", locked: true},
-                    {id: "religious_1", label: "תהלים", detail: "דא ביי יעדן ציון"},
-                    {id: "religious_2", label: "לעכט", detail: "מערסטנס דא, אבער רעקאמענדירט צו נעמען א פאר"},
-                    {id: "religious_3", label: "ספר/גמרא/לייענונג מאטריאל"}
+                    {id: "religious_1", label: "תהלים", detail: "דא ביי יעדן ציון", locked: true},
+                    {id: "religious_2", label: "לעכט", detail: "מערסטנס דא, אבער רעקאמענדירט צו נעמען א פאר"}
                 ]},
                 { id: "clothing", heading: "בגדים", items: [
                     {id: "clothing_0", label: "שטיוול/קאלאטשן"},
@@ -209,7 +204,8 @@
                     {id: "food_1", label: "סנעקס/קוקיס/טשיפס/זיסן פארן פלי"}
                 ]},
                 { id: "other", heading: "אנדערע", items: [
-                    {id: "essentials_3", label: "אדאפטער"},
+                    {id: "essentials_4", label: "ער פלאגס"},
+                    {id: "religious_3", label: "ספר/גמרא/לייענונג מאטריאל"},
                     {id: "other_1", label: "טיילענאל/מאטרין/טאמס/באנדאזשעס"},
                     {id: "other_2", label: "לענזעס סאליושאן"},
                     {id: "other_3", label: "סיגארעטן", detail: "אויב איר רויכערט"},
@@ -843,15 +839,16 @@
                         ${section.items.map(item => {
                             const isLocked = item.locked === true;
                             const checked = isLocked || checkedItems.has(item.id);
-                            const detailHtml = item.detail ? `<span class="check-detail text-[10px] text-slate-400 block">${escapeHtml(item.detail)}</span>` : '';
+                            const infoIcon = item.detail ? `<span class="check-info-trigger relative inline-block ml-1 align-middle" onclick="event.stopPropagation()"><svg class="text-slate-300 hover:text-indigo-400 transition-colors" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg><span class="check-tooltip">${escapeHtml(item.detail)}</span></span>` : '';
+                            const mobileDetail = item.detail ? `<span class="check-detail-mobile text-[10px] text-slate-400 block md:hidden">${escapeHtml(item.detail)}</span>` : '';
                             return `
-                            <li class="check-item flex items-start gap-3 ${isLocked ? 'opacity-60 cursor-default' : 'cursor-pointer'} select-none ${item.detail ? 'has-detail' : ''}" ${isLocked ? '' : `onclick="toggleCheckItem('${item.id}')"`}>
+                            <li class="check-item flex items-start gap-3 ${isLocked ? 'opacity-60 cursor-default' : 'cursor-pointer'} select-none" ${isLocked ? '' : `onclick="toggleCheckItem('${item.id}')"`}>
                                 <div class="check-box mt-0.5 ${checked ? 'checked' : ''}">
                                     ${checked ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>' : ''}
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <span class="text-xs ${checked ? 'line-through text-slate-400' : 'text-slate-700'}">${escapeHtml(item.label)}${item.detail ? ' <svg class="inline-block ml-0.5 text-slate-300" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>' : ''}</span>
-                                    ${detailHtml}
+                                    <span class="text-xs ${checked ? 'line-through text-slate-400' : 'text-slate-700'}">${escapeHtml(item.label)}${infoIcon}</span>
+                                    ${mobileDetail}
                                 </div>
                             </li>`;
                         }).join('')}
