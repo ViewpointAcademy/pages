@@ -392,31 +392,13 @@
 
         function launchConfetti() {
             const rsvpBox = document.getElementById('rsvp-box');
-            if (!rsvpBox) return;
+            if (!rsvpBox || typeof confetti !== 'function') return;
             const rect = rsvpBox.getBoundingClientRect();
-            const cx = rect.left + rect.width / 2;
-            const cy = rect.top + rect.height / 2;
-            const colors = ['#6366f1','#a78bfa','#f59e0b','#34d399','#f472b6','#60a5fa','#fbbf24','#fb7185'];
-            for (let i = 0; i < 40; i++) {
-                const el = document.createElement('div');
-                el.style.cssText = 'position:fixed;z-index:9999;pointer-events:none;border-radius:2px;';
-                el.style.width = (Math.random() * 8 + 4) + 'px';
-                el.style.height = (Math.random() * 8 + 4) + 'px';
-                el.style.background = colors[Math.floor(Math.random() * colors.length)];
-                el.style.left = cx + 'px';
-                el.style.top = cy + 'px';
-                document.body.appendChild(el);
-                const angle = Math.random() * Math.PI * 2;
-                const speed = Math.random() * 200 + 100;
-                const dx = Math.cos(angle) * speed;
-                const dy = Math.sin(angle) * speed - 150;
-                const rot = Math.random() * 720 - 360;
-                el.animate([
-                    { transform: 'translate(0,0) rotate(0deg)', opacity: 1 },
-                    { transform: `translate(${dx}px,${dy + 300}px) rotate(${rot}deg)`, opacity: 0 }
-                ], { duration: 1000 + Math.random() * 500, easing: 'cubic-bezier(.25,.46,.45,.94)' });
-                setTimeout(() => el.remove(), 1600);
-            }
+            const x = (rect.left + rect.width / 2) / window.innerWidth;
+            const y = (rect.top + rect.height / 2) / window.innerHeight;
+            confetti({ particleCount: 80, spread: 70, origin: { x, y }, colors: ['#6366f1','#a78bfa','#f59e0b','#34d399','#f472b6','#60a5fa'] });
+            setTimeout(() => confetti({ particleCount: 40, spread: 100, origin: { x: x - 0.1, y }, colors: ['#fbbf24','#fb7185','#6366f1','#34d399'] }), 150);
+            setTimeout(() => confetti({ particleCount: 40, spread: 100, origin: { x: x + 0.1, y }, colors: ['#a78bfa','#60a5fa','#f59e0b','#f472b6'] }), 300);
         }
 
         window.handleVote = async (status) => {
