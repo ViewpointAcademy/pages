@@ -147,6 +147,12 @@
         let customItems = []; // { item_id, label, section_id }
         let comments = [];
         let replyingTo = null; // { id, user_name, text }
+
+        // Gallery photos - edit this array to add/remove photos
+        let galleryPhotos = [
+            // { name: "photo-name.jpg", url: "./gallery/photo-name.jpg" }
+            // Add photos above, one per line
+        ];
         let lastReadCommentTime = localStorage.getItem('lastReadCommentTime') || '';
 
         // Google Photos state
@@ -280,10 +286,8 @@
                 try { await fetchChecklist(); } catch (e) { console.warn("Could not load checklist:", e); }
                 try { await fetchCustomItems(); } catch (e) { console.warn("Could not load custom items:", e); }
                 try { await fetchComments(); } catch (e) { console.warn("Could not load comments:", e); }
-                // Load photo config and data
-                try { await fetchPhotoConfig(); } catch (e) { console.warn("Could not load photo config:", e); }
+                // Load gallery photos
                 try { await fetchPhotos(); } catch (e) { console.warn("Could not load photos:", e); }
-                try { await fetchPhotoTags(); } catch (e) { console.warn("Could not load photo tags:", e); }
 
                 // Re-render current tab now that data is loaded
                 if (currentTab === 'itinerary') renderTimeline();
@@ -2702,17 +2706,8 @@
         }
 
         async function fetchPhotos() {
-            try {
-                // Load photos from gallery-manifest.json
-                const res = await fetch('./gallery-manifest.json');
-                if (res.ok) {
-                    const data = await res.json();
-                    if (Array.isArray(data)) allPhotos = data;
-                    else allPhotos = [];
-                } else {
-                    allPhotos = [];
-                }
-            } catch (e) { console.warn('Fetch photos error:', e); allPhotos = []; }
+            // Load photos from galleryPhotos array (defined above)
+            allPhotos = galleryPhotos || [];
         }
 
         async function fetchPhotoTags() {
