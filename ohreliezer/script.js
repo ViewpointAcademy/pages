@@ -2702,12 +2702,16 @@
         }
 
         async function fetchPhotos() {
-            if (!photoConfig.connected) { allPhotos = []; return; }
             try {
-                const res = await fetch(`${API_BASE}/api/photos`);
-                const data = await res.json();
-                if (Array.isArray(data)) allPhotos = data;
-                else allPhotos = [];
+                // Load photos from gallery-manifest.json
+                const res = await fetch('./gallery-manifest.json');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (Array.isArray(data)) allPhotos = data;
+                    else allPhotos = [];
+                } else {
+                    allPhotos = [];
+                }
             } catch (e) { console.warn('Fetch photos error:', e); allPhotos = []; }
         }
 
@@ -2813,93 +2817,24 @@
         }
 
         function renderGallery() {
-            const t = i18n[currentLang];
-            const setupEl = document.getElementById('gallery-setup');
-            const albumSelectEl = document.getElementById('gallery-album-select');
-            const contentEl = document.getElementById('gallery-content');
-            const notConnectedEl = document.getElementById('gallery-not-connected');
-            const emptyEl = document.getElementById('gallery-empty');
             const gridEl = document.getElementById('gallery-grid');
-            const adminBar = document.getElementById('gallery-admin-bar');
-            const filtersEl = document.getElementById('gallery-day-filters');
+            const emptyEl = document.getElementById('gallery-empty');
 
-            if (!setupEl || !contentEl || !gridEl) return;
+            if (!gridEl) return;
 
-            // Hide all states first
-            setupEl.classList.add('hidden');
-            if (albumSelectEl) albumSelectEl.classList.add('hidden');
-            contentEl.classList.add('hidden');
-            if (notConnectedEl) notConnectedEl.classList.add('hidden');
-            if (emptyEl) emptyEl.classList.add('hidden');
-
-            if (!photoConfig.connected) {
-                if (isAdmin) {
-                    setupEl.classList.remove('hidden');
-                } else {
-                    contentEl.classList.remove('hidden');
-                    if (notConnectedEl) notConnectedEl.classList.remove('hidden');
-                }
-                return;
-            }
-
-            contentEl.classList.remove('hidden');
-
-            // Admin bar (show refresh button, but no album selection)
-            if (adminBar) {
-                if (isAdmin) {
-                    adminBar.classList.remove('hidden');
-                } else {
-                    adminBar.classList.add('hidden');
-                }
-            }
-
-            // Build day/stop filter pills
-            let filterHtml = `<button onclick="filterGallery('all')" class="gallery-filter-btn ${galleryFilter === 'all' ? 'gallery-filter-active' : ''} text-[10px] font-bold px-3 py-1.5 rounded-full transition-all" data-filter="all">${t.galleryAll}</button>`;
-            if (isAdmin) {
-                filterHtml += `<button onclick="filterGallery('untagged')" class="gallery-filter-btn ${galleryFilter === 'untagged' ? 'gallery-filter-active' : ''} text-[10px] font-bold px-3 py-1.5 rounded-full transition-all" data-filter="untagged">${t.galleryUntagged}</button>`;
-            }
-            // Add stop-based filters (grouped by day)
-            itineraryDays.forEach(day => {
-                day.stops.forEach(stop => {
-                    const count = (photoTagsReverse[stop.stop_id] || []).length;
-                    if (count > 0 || isAdmin) {
-                        const label = (stop.title[currentLang] || stop.title.en);
-                        const shortLabel = label.length > 20 ? label.substring(0, 18) + '...' : label;
-                        filterHtml += `<button onclick="filterGallery('${stop.stop_id}')" class="gallery-filter-btn ${galleryFilter === stop.stop_id ? 'gallery-filter-active' : ''} text-[10px] font-bold px-3 py-1.5 rounded-full transition-all" data-filter="${stop.stop_id}">${escapeHtml(shortLabel)}${count ? ' (' + count + ')' : ''}</button>`;
-                    }
-                });
-            });
-            if (filtersEl) filtersEl.innerHTML = filterHtml;
-
-            // Get filtered photos
-            const filtered = getFilteredPhotos();
-
-            if (filtered.length === 0) {
+            if (allPhotos.length === 0) {
                 gridEl.innerHTML = '';
                 if (emptyEl) emptyEl.classList.remove('hidden');
                 return;
             }
 
-            // Render photo grid
-            lightboxPhotos = filtered;
-            gridEl.innerHTML = filtered.map((photo, idx) => {
-                const thumbUrl = photo.baseUrl + '=w400-h300-c';
-                const stopId = photoTags[photo.id];
-                let stopLabel = '';
-                if (stopId) {
-                    for (const day of itineraryDays) {
-                        const stop = day.stops.find(s => s.stop_id === stopId);
-                        if (stop) { stopLabel = stop.title[currentLang] || stop.title.en; break; }
-                    }
-                }
-                const dateStr = photo.creationTime ? new Date(photo.creationTime).toLocaleDateString() : '';
-                const isVideo = photo.mimeType && photo.mimeType.startsWith('video/');
+            if (emptyEl) emptyEl.classList.add('hidden');
 
+            // Render photo grid from local gallery folder
+            lightboxPhotos = allPhotos;
+            gridEl.innerHTML = allPhotos.map((photo, idx) => {
                 return `<div class="gallery-item" onclick="openLightbox(${idx})">
-                    <img src="${thumbUrl}" alt="${escapeHtml(photo.filename || '')}" loading="lazy" class="gallery-thumb">
-                    ${isVideo ? '<div class="gallery-video-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>' : ''}
-                    ${stopLabel ? '<div class="gallery-stop-badge">' + escapeHtml(stopLabel.length > 15 ? stopLabel.substring(0,13) + '...' : stopLabel) + '</div>' : ''}
-                    ${isAdmin && !stopId ? '<div class="gallery-untag-badge">?</div>' : ''}
+                    <img src="${photo.url}" alt="${escapeHtml(photo.name || '')}" loading="lazy" class="gallery-thumb">
                 </div>`;
             }).join('');
         }
