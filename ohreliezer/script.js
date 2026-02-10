@@ -142,7 +142,7 @@
         // Packing list loaded from DB (replaces old hardcoded packingList)
         let packingSections = []; // [{section_id, heading_en, heading_yi, items: [{item_id, label_en, label_yi, detail_en, detail_yi, is_locked}]}]
 
-        let currentTab = 'itinerary';
+        let currentTab = 'gallery';
         let checkedItems = new Set();
         let customItems = []; // { item_id, label, section_id }
         let comments = [];
@@ -3104,7 +3104,7 @@
 
         function getTabFromHash() {
             const hash = window.location.hash.replace('#', '');
-            return tabRoutes[hash] || 'itinerary';
+            return tabRoutes[hash] || 'gallery';
         }
 
         window.addEventListener('popstate', () => {
@@ -3219,7 +3219,7 @@
 
             // Route to tab from URL hash
             const initialTab = getTabFromHash();
-            if (initialTab !== 'itinerary') {
+            if (initialTab !== 'gallery') {
                 switchTab(initialTab, false);
             }
 
