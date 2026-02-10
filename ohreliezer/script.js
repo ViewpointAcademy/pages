@@ -60,6 +60,16 @@
                 hoursAgo: "h ago",
                 daysAgo: "d ago",
                 noComments: "No comments yet. Be the first to share!",
+                gallery: "Gallery",
+                galleryAll: "All Photos",
+                galleryUntagged: "Untagged",
+                galleryPhotos: "photos",
+                galleryMore: "more",
+                gallerySetup: "Connect Google Photos to share trip photos with the group.",
+                galleryComingSoon: "Photos coming soon!",
+                galleryComingSoonSub: "Trip photos will be shared here after the journey.",
+                galleryNoPhotos: "No photos yet",
+                galleryNoPhotosSub: "Photos added to the shared album will appear here.",
                 types: { travel: "Travel", prayer: "Prayer", hotel: "Hotel", shabbos: "Shabbos" },
                 days: { Tue: "Tue", Wed: "Wed", Thu: "Thu", Fri: "Fri", Sat: "Sat", Sun: "Sun" }
             },
@@ -95,6 +105,16 @@
                 hoursAgo: "שעה צוריק",
                 daysAgo: "טאג צוריק",
                 noComments: "!נאך קיין קאמענטן. זייט דער ערשטער",
+                gallery: "גאלעריע",
+                galleryAll: "אלע בילדער",
+                galleryUntagged: "אנגעצייכנט",
+                galleryPhotos: "בילדער",
+                galleryMore: "מער",
+                gallerySetup: "פארבינד Google Photos צו טיילן רייזע בילדער מיט דער גרופע.",
+                galleryComingSoon: "!בילדער קומען באלד",
+                galleryComingSoonSub: "רייזע בילדער וועלן ווערן געטיילט דא נאך דער נסיעה.",
+                galleryNoPhotos: "נאך קיין בילדער",
+                galleryNoPhotosSub: "בילדער צוגעלייגט צום שערד אלבום וועלן אויפטרעטן דא.",
                 types: { travel: "רייזע", prayer: "תפילה", hotel: "אכסניא", shabbos: "שבת" },
                 days: { Tue: "ג׳", Wed: "ד׳", Thu: "ה׳", Fri: "עש״ק", Sat: "שב״ק", Sun: "א׳" }
             }
@@ -128,6 +148,15 @@
         let comments = [];
         let replyingTo = null; // { id, user_name, text }
         let lastReadCommentTime = localStorage.getItem('lastReadCommentTime') || '';
+
+        // Google Photos state
+        let photoConfig = { connected: false, albumId: null, albumTitle: null };
+        let allPhotos = []; // [{id, baseUrl, filename, mimeType, width, height, creationTime, description}]
+        let photoTags = {}; // { media_item_id: stop_id }
+        let photoTagsReverse = {}; // { stop_id: [media_item_id, ...] }
+        let galleryFilter = 'all'; // 'all', 'untagged', or a stop_id
+        let lightboxIndex = -1;
+        let lightboxPhotos = []; // filtered photo list for lightbox navigation
         let lastNotifiedCommentTime = localStorage.getItem('lastNotifiedCommentTime') || '';
         let notificationPermissionAsked = false;
 
@@ -175,6 +204,7 @@
                 document.getElementById('tab-label-info').innerText = t.info;
                 document.getElementById('tab-label-packing').innerText = t.packing;
                 document.getElementById('tab-label-comments').innerText = t.comments;
+                document.getElementById('tab-label-gallery').innerText = t.gallery;
             } catch (e) {}
 
             renderTimeline();
@@ -182,6 +212,7 @@
             if (currentTab === 'info') renderInfo();
             if (currentTab === 'packing') renderPackingList();
             if (currentTab === 'comments') renderComments();
+            if (currentTab === 'gallery') renderGallery();
             if (typeof closeMapPanel === 'function') closeMapPanel();
         };
 
@@ -197,6 +228,26 @@
                     uid = 'user_' + Math.random().toString(36).substring(2, 15);
                 }
                 localStorage.setItem('mekomos_user_id', uid);
+
+                // Handle Google OAuth callback code
+                const googleCode = urlParams.get('code');
+                if (googleCode) {
+                    try {
+                        await fetch(`${API_BASE}/api/photos/auth-callback`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ code: googleCode })
+                        });
+                        showStatusBar('Google Photos connected!');
+                    } catch (e) { console.warn('Google auth callback error:', e); }
+                    // Clean the code from URL
+                    const cleanUrl = new URL(window.location.href);
+                    cleanUrl.searchParams.delete('code');
+                    cleanUrl.searchParams.delete('scope');
+                    cleanUrl.searchParams.delete('authuser');
+                    cleanUrl.searchParams.delete('prompt');
+                    window.history.replaceState({}, document.title, cleanUrl.toString());
+                }
 
                 // Clean up URL if uid was in it
                 if (urlUid) {
@@ -229,11 +280,17 @@
                 try { await fetchChecklist(); } catch (e) { console.warn("Could not load checklist:", e); }
                 try { await fetchCustomItems(); } catch (e) { console.warn("Could not load custom items:", e); }
                 try { await fetchComments(); } catch (e) { console.warn("Could not load comments:", e); }
+                // Load photo config and data
+                try { await fetchPhotoConfig(); } catch (e) { console.warn("Could not load photo config:", e); }
+                try { await fetchPhotos(); } catch (e) { console.warn("Could not load photos:", e); }
+                try { await fetchPhotoTags(); } catch (e) { console.warn("Could not load photo tags:", e); }
+
                 // Re-render current tab now that data is loaded
                 if (currentTab === 'itinerary') renderTimeline();
                 if (currentTab === 'info') renderInfo();
                 if (currentTab === 'packing') renderPackingList();
                 if (currentTab === 'comments') renderComments();
+                if (currentTab === 'gallery') renderGallery();
                 setupRsvpPolling();
                 setupCommentPolling();
 
@@ -972,6 +1029,14 @@
                                     ${shouldAutoExpand ? dirLink : ''}
                                 </div>
                                 <p class="text-slate-500 text-xs mt-3 leading-relaxed">${s.desc[currentLang] || s.desc.en}</p>
+                                ${(() => {
+                                    const sp = getStopPhotos(s.stop_id, 6);
+                                    const tc = (photoTagsReverse[s.stop_id] || []).length;
+                                    if (sp.length === 0) return '';
+                                    return '<div class="stop-photo-strip mt-3">' + sp.map(p =>
+                                        '<img src="' + p.baseUrl + '=w120-h90-c" class="stop-photo-thumb" onclick="event.stopPropagation();galleryFilter=\'' + s.stop_id + '\';switchTab(\'gallery\')" loading="lazy">'
+                                    ).join('') + (tc > 6 ? '<button onclick="event.stopPropagation();galleryFilter=\'' + s.stop_id + '\';switchTab(\'gallery\')" class="stop-photo-more">+' + (tc - 6) + '</button>' : '') + '</div>';
+                                })()}
                                 <div id="expand-${s.stop_id}" class="card-expand-content ${shouldAutoExpand && !hasLongNotes ? '' : 'open'} ${hasLongNotes ? '' : 'always-open'}">
                                     ${hasLongNotes ? `<p class="text-slate-400 text-[10px] mb-4 italic leading-relaxed border-l-2 border-indigo-50 pl-3 whitespace-pre-line">${s.longNotes}</p>` : ''}
                                     ${hasLongNotes ? dirLink : ''}
@@ -2628,6 +2693,347 @@
             .catch(e => { console.error('Error updating day:', e); alert('Failed to update day'); });
         };
 
+        // ── Google Photos / Gallery Functions ──
+
+        async function fetchPhotoConfig() {
+            const res = await fetch(`${API_BASE}/api/photos/config`);
+            const data = await res.json();
+            photoConfig = data;
+        }
+
+        async function fetchPhotos() {
+            if (!photoConfig.connected || !photoConfig.albumId) { allPhotos = []; return; }
+            try {
+                const res = await fetch(`${API_BASE}/api/photos`);
+                const data = await res.json();
+                if (Array.isArray(data)) allPhotos = data;
+                else allPhotos = [];
+            } catch (e) { console.warn('Fetch photos error:', e); allPhotos = []; }
+        }
+
+        async function fetchPhotoTags() {
+            try {
+                const res = await fetch(`${API_BASE}/api/photos/tags`);
+                const data = await res.json();
+                photoTags = {};
+                photoTagsReverse = {};
+                if (Array.isArray(data)) {
+                    data.forEach(t => {
+                        photoTags[t.media_item_id] = t.stop_id;
+                        if (!photoTagsReverse[t.stop_id]) photoTagsReverse[t.stop_id] = [];
+                        photoTagsReverse[t.stop_id].push(t.media_item_id);
+                    });
+                }
+            } catch (e) { console.warn('Fetch photo tags error:', e); }
+        }
+
+        window.startGoogleAuth = async function() {
+            try {
+                const res = await fetch(`${API_BASE}/api/photos/auth-url`);
+                const data = await res.json();
+                if (data.authUrl) {
+                    window.location.href = data.authUrl;
+                } else {
+                    alert(data.error || 'Could not get auth URL. Make sure Google credentials are configured in the worker.');
+                }
+            } catch (e) {
+                alert('Error connecting to Google Photos: ' + e.message);
+            }
+        };
+
+        window.changeAlbum = async function() {
+            try {
+                showStatusBar('Loading albums...');
+                const res = await fetch(`${API_BASE}/api/photos/albums`);
+                const albums = await res.json();
+                if (!Array.isArray(albums)) { alert(albums.error || 'Error loading albums'); return; }
+                renderAlbumList(albums);
+                document.getElementById('gallery-content').classList.add('hidden');
+                document.getElementById('gallery-album-select').classList.remove('hidden');
+                document.getElementById('gallery-setup').classList.add('hidden');
+            } catch (e) { alert('Error loading albums: ' + e.message); }
+        };
+
+        function renderAlbumList(albums) {
+            const container = document.getElementById('album-list');
+            if (!container) return;
+            if (albums.length === 0) {
+                container.innerHTML = '<p class="text-sm text-slate-400 text-center py-4">No albums found. Create a shared album in Google Photos first.</p>';
+                return;
+            }
+            container.innerHTML = albums.map(a =>
+                `<button onclick="selectAlbum('${escapeHtml(a.id)}', '${escapeHtml((a.title || '').replace(/'/g, "\\'"))}')" class="w-full text-left p-4 bg-white hover:bg-indigo-50 rounded-xl border border-slate-200 hover:border-indigo-300 transition-all flex items-center justify-between gap-3">
+                    <div>
+                        <p class="text-sm font-bold text-slate-700">${escapeHtml(a.title || 'Untitled')}</p>
+                        <p class="text-[10px] text-slate-400">${a.count || 0} items${a.shared ? ' · Shared' : ''}</p>
+                    </div>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>`
+            ).join('');
+        }
+
+        window.selectAlbum = async function(albumId, albumTitle) {
+            try {
+                await fetch(`${API_BASE}/api/photos/album`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ albumId, albumTitle })
+                });
+                photoConfig.albumId = albumId;
+                photoConfig.albumTitle = albumTitle;
+                photoConfig.connected = true;
+                showStatusBar('Album selected! Loading photos...');
+                await fetchPhotos();
+                await fetchPhotoTags();
+                renderGallery();
+            } catch (e) { alert('Error selecting album: ' + e.message); }
+        };
+
+        window.refreshPhotoCache = async function() {
+            try {
+                showStatusBar('Refreshing photos...');
+                await fetch(`${API_BASE}/api/photos/cache/clear`, { method: 'POST' });
+                await fetchPhotos();
+                renderGallery();
+                showStatusBar('Photos refreshed!');
+            } catch (e) { alert('Error refreshing: ' + e.message); }
+        };
+
+        window.filterGallery = function(filter) {
+            galleryFilter = filter;
+            renderGallery();
+        };
+
+        function getFilteredPhotos() {
+            if (galleryFilter === 'all') return allPhotos;
+            if (galleryFilter === 'untagged') return allPhotos.filter(p => !photoTags[p.id]);
+            // Filter by stop_id
+            const stopPhotos = photoTagsReverse[galleryFilter] || [];
+            return allPhotos.filter(p => stopPhotos.includes(p.id));
+        }
+
+        function renderGallery() {
+            const t = i18n[currentLang];
+            const setupEl = document.getElementById('gallery-setup');
+            const albumSelectEl = document.getElementById('gallery-album-select');
+            const contentEl = document.getElementById('gallery-content');
+            const notConnectedEl = document.getElementById('gallery-not-connected');
+            const emptyEl = document.getElementById('gallery-empty');
+            const gridEl = document.getElementById('gallery-grid');
+            const adminBar = document.getElementById('gallery-admin-bar');
+            const filtersEl = document.getElementById('gallery-day-filters');
+
+            if (!setupEl || !contentEl || !gridEl) return;
+
+            // Hide all states first
+            setupEl.classList.add('hidden');
+            albumSelectEl.classList.add('hidden');
+            contentEl.classList.add('hidden');
+            notConnectedEl.classList.add('hidden');
+            emptyEl.classList.add('hidden');
+
+            if (!photoConfig.connected) {
+                if (isAdmin) {
+                    setupEl.classList.remove('hidden');
+                } else {
+                    contentEl.classList.remove('hidden');
+                    notConnectedEl.classList.remove('hidden');
+                }
+                return;
+            }
+
+            if (!photoConfig.albumId) {
+                if (isAdmin) {
+                    changeAlbum();
+                } else {
+                    contentEl.classList.remove('hidden');
+                    notConnectedEl.classList.remove('hidden');
+                }
+                return;
+            }
+
+            contentEl.classList.remove('hidden');
+
+            // Admin bar
+            if (isAdmin) {
+                adminBar.classList.remove('hidden');
+                document.getElementById('gallery-album-name').textContent = photoConfig.albumTitle || photoConfig.albumId;
+            } else {
+                adminBar.classList.add('hidden');
+            }
+
+            // Build day/stop filter pills
+            let filterHtml = `<button onclick="filterGallery('all')" class="gallery-filter-btn ${galleryFilter === 'all' ? 'gallery-filter-active' : ''} text-[10px] font-bold px-3 py-1.5 rounded-full transition-all" data-filter="all">${t.galleryAll}</button>`;
+            if (isAdmin) {
+                filterHtml += `<button onclick="filterGallery('untagged')" class="gallery-filter-btn ${galleryFilter === 'untagged' ? 'gallery-filter-active' : ''} text-[10px] font-bold px-3 py-1.5 rounded-full transition-all" data-filter="untagged">${t.galleryUntagged}</button>`;
+            }
+            // Add stop-based filters (grouped by day)
+            itineraryDays.forEach(day => {
+                day.stops.forEach(stop => {
+                    const count = (photoTagsReverse[stop.stop_id] || []).length;
+                    if (count > 0 || isAdmin) {
+                        const label = (stop.title[currentLang] || stop.title.en);
+                        const shortLabel = label.length > 20 ? label.substring(0, 18) + '...' : label;
+                        filterHtml += `<button onclick="filterGallery('${stop.stop_id}')" class="gallery-filter-btn ${galleryFilter === stop.stop_id ? 'gallery-filter-active' : ''} text-[10px] font-bold px-3 py-1.5 rounded-full transition-all" data-filter="${stop.stop_id}">${escapeHtml(shortLabel)}${count ? ' (' + count + ')' : ''}</button>`;
+                    }
+                });
+            });
+            filtersEl.innerHTML = filterHtml;
+
+            // Get filtered photos
+            const filtered = getFilteredPhotos();
+
+            if (filtered.length === 0) {
+                gridEl.innerHTML = '';
+                emptyEl.classList.remove('hidden');
+                return;
+            }
+
+            // Render photo grid
+            lightboxPhotos = filtered;
+            gridEl.innerHTML = filtered.map((photo, idx) => {
+                const thumbUrl = photo.baseUrl + '=w400-h300-c';
+                const stopId = photoTags[photo.id];
+                let stopLabel = '';
+                if (stopId) {
+                    for (const day of itineraryDays) {
+                        const stop = day.stops.find(s => s.stop_id === stopId);
+                        if (stop) { stopLabel = stop.title[currentLang] || stop.title.en; break; }
+                    }
+                }
+                const dateStr = photo.creationTime ? new Date(photo.creationTime).toLocaleDateString() : '';
+                const isVideo = photo.mimeType && photo.mimeType.startsWith('video/');
+
+                return `<div class="gallery-item" onclick="openLightbox(${idx})">
+                    <img src="${thumbUrl}" alt="${escapeHtml(photo.filename || '')}" loading="lazy" class="gallery-thumb">
+                    ${isVideo ? '<div class="gallery-video-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>' : ''}
+                    ${stopLabel ? '<div class="gallery-stop-badge">' + escapeHtml(stopLabel.length > 15 ? stopLabel.substring(0,13) + '...' : stopLabel) + '</div>' : ''}
+                    ${isAdmin && !stopId ? '<div class="gallery-untag-badge">?</div>' : ''}
+                </div>`;
+            }).join('');
+        }
+
+        // Lightbox
+        window.openLightbox = function(idx) {
+            lightboxIndex = idx;
+            const photo = lightboxPhotos[idx];
+            if (!photo) return;
+
+            const lightbox = document.getElementById('photo-lightbox');
+            const img = document.getElementById('lightbox-img');
+            const dateEl = document.getElementById('lightbox-date');
+            const adminTag = document.getElementById('lightbox-admin-tag');
+            const stopSelect = document.getElementById('lightbox-stop-select');
+
+            const isVideo = photo.mimeType && photo.mimeType.startsWith('video/');
+            const imgWrap = document.querySelector('.lightbox-img-wrap');
+
+            if (isVideo) {
+                imgWrap.innerHTML = `<video id="lightbox-video" src="${photo.baseUrl + '=dv'}" controls autoplay class="lightbox-video" style="max-width:100%;max-height:80vh;"></video>`;
+            } else {
+                imgWrap.innerHTML = `<img id="lightbox-img" src="${photo.baseUrl + '=w1600-h1200'}" alt="Photo" style="max-width:100%;max-height:80vh;object-fit:contain;">`;
+            }
+
+            dateEl.textContent = photo.creationTime ? new Date(photo.creationTime).toLocaleString() : photo.filename || '';
+
+            // Admin tagging
+            if (isAdmin) {
+                adminTag.classList.remove('hidden');
+                let options = '<option value="">Untagged</option>';
+                itineraryDays.forEach(day => {
+                    const dayDate = day.date ? new Date(day.date + 'T00:00:00') : null;
+                    const dayLabel = dayDate ? dayDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) : day.day_id;
+                    day.stops.forEach(stop => {
+                        const title = stop.title[currentLang] || stop.title.en;
+                        const selected = photoTags[photo.id] === stop.stop_id ? ' selected' : '';
+                        options += `<option value="${stop.stop_id}"${selected}>${dayLabel} - ${escapeHtml(title)}</option>`;
+                    });
+                });
+                stopSelect.innerHTML = options;
+            } else {
+                adminTag.classList.add('hidden');
+            }
+
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.closeLightbox = function(e) {
+            if (e && e.target !== document.getElementById('photo-lightbox')) return;
+            const lightbox = document.getElementById('photo-lightbox');
+            lightbox.classList.remove('active');
+            document.body.style.overflow = '';
+            // Stop video if playing
+            const video = document.getElementById('lightbox-video');
+            if (video) video.pause();
+        };
+
+        window.lightboxPrev = function() {
+            if (lightboxIndex > 0) openLightbox(lightboxIndex - 1);
+        };
+
+        window.lightboxNext = function() {
+            if (lightboxIndex < lightboxPhotos.length - 1) openLightbox(lightboxIndex + 1);
+        };
+
+        // Keyboard navigation for lightbox
+        document.addEventListener('keydown', function(e) {
+            const lightbox = document.getElementById('photo-lightbox');
+            if (!lightbox || !lightbox.classList.contains('active')) return;
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowLeft') lightboxPrev();
+            if (e.key === 'ArrowRight') lightboxNext();
+        });
+
+        window.tagPhotoFromLightbox = async function() {
+            const photo = lightboxPhotos[lightboxIndex];
+            if (!photo) return;
+            const stopSelect = document.getElementById('lightbox-stop-select');
+            const stopId = stopSelect.value;
+
+            try {
+                if (stopId) {
+                    await fetch(`${API_BASE}/api/photos/tag`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ media_item_id: photo.id, stop_id: stopId })
+                    });
+                    // Remove from old stop if existed
+                    const oldStop = photoTags[photo.id];
+                    if (oldStop && photoTagsReverse[oldStop]) {
+                        photoTagsReverse[oldStop] = photoTagsReverse[oldStop].filter(id => id !== photo.id);
+                    }
+                    photoTags[photo.id] = stopId;
+                    if (!photoTagsReverse[stopId]) photoTagsReverse[stopId] = [];
+                    if (!photoTagsReverse[stopId].includes(photo.id)) photoTagsReverse[stopId].push(photo.id);
+                } else {
+                    // Remove tag
+                    const oldStop = photoTags[photo.id];
+                    await fetch(`${API_BASE}/api/photos/tag/${encodeURIComponent(photo.id)}`, { method: 'DELETE' });
+                    if (oldStop && photoTagsReverse[oldStop]) {
+                        photoTagsReverse[oldStop] = photoTagsReverse[oldStop].filter(id => id !== photo.id);
+                    }
+                    delete photoTags[photo.id];
+                }
+                showStatusBar('Photo tag updated');
+                // Re-render gallery behind the lightbox
+                renderGallery();
+                // Re-render timeline to update stop thumbnails
+                if (currentTab !== 'gallery') renderTimeline();
+            } catch (e) {
+                console.error('Tag photo error:', e);
+                showStatusBar('Error tagging photo');
+            }
+        };
+
+        // Get photos for a specific stop (for stop card thumbnails)
+        function getStopPhotos(stopId, limit) {
+            const mediaIds = photoTagsReverse[stopId] || [];
+            if (mediaIds.length === 0) return [];
+            const photos = allPhotos.filter(p => mediaIds.includes(p.id));
+            return limit ? photos.slice(0, limit) : photos;
+        }
+
         // ── Itinerary Drag-and-drop (SortableJS) ──
         function initItinerarySortable() {
             if (typeof Sortable === 'undefined') return;
@@ -2683,12 +3089,12 @@
             }
         }
 
-        const tabRoutes = { itinerary: 'itinerary', info: 'info', packing: 'packing', comments: 'comments' };
+        const tabRoutes = { itinerary: 'itinerary', info: 'info', packing: 'packing', comments: 'comments', gallery: 'gallery' };
 
         window.switchTab = function(tab, pushHash = true) {
             if (!tabRoutes[tab]) tab = 'itinerary';
             currentTab = tab;
-            const tabs = ['itinerary', 'info', 'packing', 'comments'];
+            const tabs = ['itinerary', 'info', 'packing', 'comments', 'gallery'];
             tabs.forEach(t => {
                 const container = document.getElementById(`tab-${t}`);
                 const btn = document.getElementById(`tab-btn-${t}`);
@@ -2701,6 +3107,7 @@
             if (tab === 'info') renderInfo();
             if (tab === 'packing') renderPackingList();
             if (tab === 'comments') { renderComments(); markCommentsRead(); dismissChatNotification(); }
+            if (tab === 'gallery') renderGallery();
             if (pushHash) {
                 history.pushState({ tab }, '', '#' + tab);
             }

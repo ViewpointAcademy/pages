@@ -162,6 +162,9 @@
                 <button id="tab-btn-comments" onclick="switchTab('comments')" class="tab-btn tab-inactive px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all">
                     <span id="tab-label-comments">Comments</span>
                 </button>
+                <button id="tab-btn-gallery" onclick="switchTab('gallery')" class="tab-btn tab-inactive px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all">
+                    <span id="tab-label-gallery">Gallery</span>
+                </button>
             </div>
 
             <!-- Tab: Itinerary -->
@@ -204,6 +207,60 @@
             <!-- Tab: Packing List -->
             <div id="tab-packing" class="hidden">
                 <div class="masonry-grid" id="packing-container"></div>
+            </div>
+
+            <!-- Tab: Gallery -->
+            <div id="tab-gallery" class="hidden">
+                <!-- Admin setup (shown when not connected) -->
+                <div id="gallery-setup" class="hidden max-w-lg mx-auto py-12 text-center">
+                    <svg class="mx-auto mb-4 text-slate-300" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    <h3 class="text-lg font-bold text-slate-700 mb-2">Google Photos Gallery</h3>
+                    <p class="text-sm text-slate-500 mb-6">Connect your Google Photos account to share trip photos with the group.</p>
+                    <button onclick="startGoogleAuth()" id="btn-connect-google" class="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold text-sm hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200">Connect Google Photos</button>
+                </div>
+
+                <!-- Album selector (shown after auth, before album selected) -->
+                <div id="gallery-album-select" class="hidden max-w-lg mx-auto py-8">
+                    <h3 class="text-lg font-bold text-slate-700 mb-4">Select Album</h3>
+                    <div id="album-list" class="space-y-2"></div>
+                </div>
+
+                <!-- Gallery content (shown when connected + album selected) -->
+                <div id="gallery-content" class="hidden">
+                    <!-- Admin bar -->
+                    <div id="gallery-admin-bar" class="hidden flex flex-wrap items-center justify-between gap-3 mb-4 bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3">
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-black text-amber-600 bg-amber-100 px-2 py-0.5 rounded">ADMIN</span>
+                            <span id="gallery-album-name" class="text-xs font-bold text-amber-700"></span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="refreshPhotoCache()" class="text-[10px] font-bold text-amber-600 hover:text-amber-800 bg-white px-3 py-1.5 rounded-lg border border-amber-200 transition-colors">Refresh Photos</button>
+                            <button onclick="changeAlbum()" class="text-[10px] font-bold text-amber-600 hover:text-amber-800 bg-white px-3 py-1.5 rounded-lg border border-amber-200 transition-colors">Change Album</button>
+                        </div>
+                    </div>
+
+                    <!-- Day filter pills -->
+                    <div id="gallery-day-filters" class="flex flex-wrap gap-2 mb-6">
+                        <button onclick="filterGallery('all')" class="gallery-filter-btn gallery-filter-active text-[10px] font-bold px-3 py-1.5 rounded-full transition-all" data-filter="all">All Photos</button>
+                    </div>
+
+                    <!-- Photo grid -->
+                    <div id="gallery-grid" class="gallery-grid"></div>
+
+                    <!-- Empty state -->
+                    <div id="gallery-empty" class="hidden text-center py-12">
+                        <svg class="mx-auto mb-3 text-slate-300" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                        <p class="text-sm text-slate-400 font-bold">No photos yet</p>
+                        <p class="text-xs text-slate-400 mt-1">Photos added to the shared album will appear here.</p>
+                    </div>
+
+                    <!-- Not connected state (for non-admin users) -->
+                    <div id="gallery-not-connected" class="hidden text-center py-12">
+                        <svg class="mx-auto mb-3 text-slate-300" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                        <p class="text-sm text-slate-400 font-bold">Photos coming soon!</p>
+                        <p class="text-xs text-slate-400 mt-1">Trip photos will be shared here after the journey.</p>
+                    </div>
+                </div>
             </div>
 
             <!-- Tab: Comments -->
@@ -408,6 +465,27 @@
                 <div class="flex gap-3 pt-4">
                     <button onclick="closeCreateSectionModal()" class="flex-1 bg-slate-100 text-slate-600 py-3 rounded-xl font-bold text-xs uppercase hover:bg-slate-200 transition-colors">Cancel</button>
                     <button onclick="submitSection()" class="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-bold text-xs uppercase hover:bg-indigo-700 transition-colors">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PHOTO LIGHTBOX MODAL -->
+    <div id="photo-lightbox" onclick="closeLightbox(event)">
+        <div class="lightbox-content" onclick="event.stopPropagation()">
+            <button onclick="closeLightbox()" class="lightbox-close">&times;</button>
+            <button onclick="lightboxPrev()" class="lightbox-nav lightbox-prev">&lsaquo;</button>
+            <button onclick="lightboxNext()" class="lightbox-nav lightbox-next">&rsaquo;</button>
+            <div class="lightbox-img-wrap">
+                <img id="lightbox-img" src="" alt="Photo">
+            </div>
+            <div class="lightbox-info">
+                <p id="lightbox-date" class="text-xs text-slate-400"></p>
+                <div id="lightbox-admin-tag" class="hidden mt-2 flex items-center gap-2">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase">Assign to stop:</label>
+                    <select id="lightbox-stop-select" onchange="tagPhotoFromLightbox()" class="text-xs bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 focus:border-indigo-400 focus:outline-none">
+                        <option value="">Untagged</option>
+                    </select>
                 </div>
             </div>
         </div>
