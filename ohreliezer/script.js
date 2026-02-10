@@ -272,7 +272,8 @@
                 try { await fetchChecklist(); } catch (e) { console.warn("Could not load checklist:", e); }
                 try { await fetchCustomItems(); } catch (e) { console.warn("Could not load custom items:", e); }
                 try { await fetchComments(); } catch (e) { console.warn("Could not load comments:", e); }
-                // Re-render packing list now that data is loaded
+                // Re-render current tab now that data is loaded
+                if (currentTab === 'info') renderInfo();
                 if (currentTab === 'packing') renderPackingList();
                 if (currentTab === 'comments') renderComments();
                 setupRsvpPolling();
