@@ -142,7 +142,7 @@
         // Packing list loaded from DB (replaces old hardcoded packingList)
         let packingSections = []; // [{section_id, heading_en, heading_yi, items: [{item_id, label_en, label_yi, detail_en, detail_yi, is_locked}]}]
 
-        let currentTab = 'gallery';
+        let currentTab = null;
         let checkedItems = new Set();
         let customItems = []; // { item_id, label, section_id }
         let comments = [];
@@ -155,6 +155,37 @@
         ];
         let lastReadCommentTime = localStorage.getItem('lastReadCommentTime') || '';
 
+        // Data versioning and caching system
+        const dataCache = {
+            itinerary: { version: null, loaded: false },
+            info: { version: null, loaded: false },
+            packing: { version: null, loaded: false },
+            comments: { version: null, loaded: false },
+            gallery: { version: null, loaded: false }
+        };
+
+        // Invalidate data cache to force refresh
+        function invalidateDataCache(dataType) {
+            if (dataCache[dataType]) {
+                dataCache[dataType].version = null;
+                dataCache[dataType].loaded = false;
+                localStorage.removeItem(`cache_${dataType}_version`);
+            }
+        }
+
+        // Save cache version to localStorage
+        function saveCacheVersion(dataType, version) {
+            if (version) localStorage.setItem(`cache_${dataType}_version`, version);
+            dataCache[dataType].version = version;
+        }
+
+        // Load cache version from localStorage
+        function loadCacheVersion(dataType) {
+            const version = localStorage.getItem(`cache_${dataType}_version`);
+            if (version) dataCache[dataType].version = version;
+            return version;
+        }
+
         // Google Photos state
         let photoConfig = { connected: false, albumId: null, albumTitle: null };
         let allPhotos = []; // [{id, baseUrl, filename, mimeType, width, height, creationTime, description}]
@@ -165,6 +196,131 @@
         let lightboxPhotos = []; // filtered photo list for lightbox navigation
         let lastNotifiedCommentTime = localStorage.getItem('lastNotifiedCommentTime') || '';
         let notificationPermissionAsked = false;
+
+        // Data Cache Infrastructure - tracks versions and fetch times
+        const dataCache = {
+            itinerary: { version: null, data: null, lastFetch: 0, loaded: false },
+            info: { version: null, data: null, lastFetch: 0, loaded: false },
+            packing: { version: null, data: null, lastFetch: 0, loaded: false },
+            comments: { version: null, data: null, lastFetch: 0, loaded: false },
+            gallery: { version: null, data: null, lastFetch: 0, loaded: false }
+        };
+
+        // Invalidate cache for a specific data type
+        function invalidateDataCache(dataType) {
+            if (!dataCache[dataType]) {
+                console.warn(`Unknown data type: ${dataType}`);
+                return;
+            }
+            dataCache[dataType].version = null;
+            dataCache[dataType].data = null;
+            dataCache[dataType].lastFetch = 0;
+            dataCache[dataType].loaded = false;
+            localStorage.removeItem(`cache_${dataType}`);
+        }
+
+        // Save cache to localStorage
+        function saveCacheToLocalStorage(dataType) {
+            if (!dataCache[dataType]) return;
+            try {
+                const cacheData = {
+                    version: dataCache[dataType].version,
+                    data: dataCache[dataType].data,
+                    lastFetch: dataCache[dataType].lastFetch
+                };
+                localStorage.setItem(`cache_${dataType}`, JSON.stringify(cacheData));
+            } catch (e) {
+                console.warn(`Could not save cache for ${dataType}:`, e);
+            }
+        }
+
+        // Load cache from localStorage
+        function loadCacheFromLocalStorage(dataType) {
+            if (!dataCache[dataType]) return;
+            try {
+                const cached = localStorage.getItem(`cache_${dataType}`);
+                if (cached) {
+                    const cacheData = JSON.parse(cached);
+                    dataCache[dataType].version = cacheData.version;
+                    dataCache[dataType].data = cacheData.data;
+                    dataCache[dataType].lastFetch = cacheData.lastFetch;
+                    dataCache[dataType].loaded = true;
+                    return true;
+                }
+            } catch (e) {
+                console.warn(`Could not load cache for ${dataType}:`, e);
+            }
+            return false;
+        }
+
+        // Check and fetch data with version tracking
+        async function checkAndFetchData(dataType) {
+            if (!dataCache[dataType]) {
+                console.warn(`Unknown data type: ${dataType}`);
+                return null;
+            }
+
+            try {
+                // Get server version
+                const versionRes = await fetch(`${API_BASE}/api/${dataType}/version`, {
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                if (!versionRes.ok) {
+                    console.warn(`Could not fetch version for ${dataType}`);
+                    // Return cached data if available
+                    if (dataCache[dataType].data) {
+                        dataCache[dataType].loaded = true;
+                        return dataCache[dataType].data;
+                    }
+                    return null;
+                }
+
+                const { version } = await versionRes.json();
+
+                // If cached version matches server version, use cache
+                if (dataCache[dataType].version === version && dataCache[dataType].data) {
+                    dataCache[dataType].loaded = true;
+                    return dataCache[dataType].data;
+                }
+
+                // Version mismatch or no cache - fetch fresh data
+                const dataRes = await fetch(`${API_BASE}/api/${dataType}`, {
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                if (!dataRes.ok) {
+                    console.warn(`Could not fetch ${dataType}`);
+                    // Return cached data if available
+                    if (dataCache[dataType].data) {
+                        dataCache[dataType].loaded = true;
+                        return dataCache[dataType].data;
+                    }
+                    return null;
+                }
+
+                const data = await dataRes.json();
+
+                // Update cache with new data and version
+                dataCache[dataType].version = version;
+                dataCache[dataType].data = data;
+                dataCache[dataType].lastFetch = Date.now();
+                dataCache[dataType].loaded = true;
+
+                // Save to localStorage
+                saveCacheToLocalStorage(dataType);
+
+                return data;
+            } catch (e) {
+                console.error(`Error checking/fetching ${dataType}:`, e);
+                // Return cached data if available
+                if (dataCache[dataType].data) {
+                    dataCache[dataType].loaded = true;
+                    return dataCache[dataType].data;
+                }
+                return null;
+            }
+        }
 
         const catStyles = { travel: "bg-blue-50 text-blue-600", prayer: "bg-indigo-50 text-indigo-600", hotel: "bg-emerald-50 text-emerald-600", shabbos: "bg-amber-50 text-amber-700" };
 
@@ -224,6 +380,13 @@
 
         async function init() {
             try {
+                // Step 1: Restore cached data from localStorage
+                loadCacheFromLocalStorage('itinerary');
+                loadCacheFromLocalStorage('info');
+                loadCacheFromLocalStorage('packing');
+                loadCacheFromLocalStorage('comments');
+                loadCacheFromLocalStorage('gallery');
+
                 // Check for uid in URL (for syncing across devices)
                 const urlParams = new URLSearchParams(window.location.search);
                 const urlUid = urlParams.get('uid');
@@ -277,24 +440,62 @@
                     console.warn("Could not load profile:", e);
                 }
 
-                // Load RSVPs, checklist, and start polling
-                // Wrap fetches in individual try-catch to prevent one failure from breaking polling setup
+                // Step 2: Load essential data immediately (RSVPs and other non-tab data)
+                // These are not subject to lazy loading
                 try { await fetchRsvps(); } catch (e) { console.warn("Could not load RSVPs:", e); }
-                try { await fetchPackingData(); } catch (e) { console.warn("Could not load packing data:", e); }
-                try { await fetchInfoData(); } catch (e) { console.warn("Could not load info data:", e); }
-                try { await fetchItineraryData(); } catch (e) { console.warn("Could not load itinerary:", e); }
                 try { await fetchChecklist(); } catch (e) { console.warn("Could not load checklist:", e); }
                 try { await fetchCustomItems(); } catch (e) { console.warn("Could not load custom items:", e); }
-                try { await fetchComments(); } catch (e) { console.warn("Could not load comments:", e); }
-                // Load gallery photos
-                try { await fetchPhotos(); } catch (e) { console.warn("Could not load photos:", e); }
 
-                // Re-render current tab now that data is loaded
-                if (currentTab === 'itinerary') renderTimeline();
-                if (currentTab === 'info') renderInfo();
-                if (currentTab === 'packing') renderPackingList();
-                if (currentTab === 'comments') renderComments();
-                if (currentTab === 'gallery') renderGallery();
+                // Step 3: Lazy-load tab data using checkAndFetchData
+                // Start fetching in background but don't wait for all to complete
+                const dataFetchPromises = [
+                    fetchItineraryData().catch(e => console.warn("Could not load itinerary:", e)),
+                    fetchInfoData().catch(e => console.warn("Could not load info data:", e)),
+                    fetchPackingData().catch(e => console.warn("Could not load packing data:", e)),
+                    fetchComments().catch(e => console.warn("Could not load comments:", e)),
+                    fetchPhotos().catch(e => console.warn("Could not load photos:", e))
+                ];
+
+                // Render current tab with cached data immediately
+                if (currentTab === 'itinerary' && dataCache.itinerary.data) {
+                    processItineraryData(dataCache.itinerary.data);
+                    renderTimeline();
+                } else if (currentTab === 'itinerary') {
+                    renderTimeline();
+                }
+
+                if (currentTab === 'info' && dataCache.info.data) {
+                    processInfoData(dataCache.info.data);
+                    renderInfo();
+                } else if (currentTab === 'info') {
+                    renderInfo();
+                }
+
+                if (currentTab === 'packing' && dataCache.packing.data) {
+                    processPackingData(dataCache.packing.data);
+                    renderPackingList();
+                } else if (currentTab === 'packing') {
+                    renderPackingList();
+                }
+
+                if (currentTab === 'comments' && dataCache.comments.data) {
+                    processCommentsData(dataCache.comments.data);
+                    renderComments();
+                } else if (currentTab === 'comments') {
+                    renderComments();
+                }
+
+                if (currentTab === 'gallery' && dataCache.gallery.data) {
+                    allPhotos = dataCache.gallery.data;
+                    renderGallery();
+                } else if (currentTab === 'gallery') {
+                    renderGallery();
+                }
+
+                // Step 4: Wait for all data fetches to complete in background
+                await Promise.all(dataFetchPromises);
+
+                // Step 5: Setup polling and notifications
                 setupRsvpPolling();
                 setupCommentPolling();
 
@@ -336,6 +537,28 @@
                     initials: userData.name.split(' ').map(n=>n[0]).join('').toUpperCase().substring(0,2),
                     status: currentStatus
                 }] : []);
+
+                // In offline mode, restore cached data for rendering
+                if (currentTab === 'itinerary' && dataCache.itinerary.data) {
+                    processItineraryData(dataCache.itinerary.data);
+                    renderTimeline();
+                }
+                if (currentTab === 'info' && dataCache.info.data) {
+                    processInfoData(dataCache.info.data);
+                    renderInfo();
+                }
+                if (currentTab === 'packing' && dataCache.packing.data) {
+                    processPackingData(dataCache.packing.data);
+                    renderPackingList();
+                }
+                if (currentTab === 'comments' && dataCache.comments.data) {
+                    processCommentsData(dataCache.comments.data);
+                    renderComments();
+                }
+                if (currentTab === 'gallery' && dataCache.gallery.data) {
+                    allPhotos = dataCache.gallery.data;
+                    renderGallery();
+                }
             }
         }
 
@@ -1130,109 +1353,143 @@
         }
 
         async function fetchPackingData() {
-            if (isOffline) return;
+            if (isOffline) {
+                // Try to load from cache even offline
+                const cached = loadCacheFromLocalStorage('packing');
+                if (cached && dataCache.packing.data) {
+                    processPackingData(dataCache.packing.data);
+                }
+                return;
+            }
             try {
-                const res = await fetch(`${API_BASE}/api/packing`);
-                if (!res.ok) return;
-                const rows = await res.json();
-                // Group rows by section
-                const sectionMap = {};
-                (rows || []).forEach(r => {
-                    if (!sectionMap[r.section_id]) {
-                        sectionMap[r.section_id] = {
-                            section_id: r.section_id,
-                            heading_en: r.heading_en,
-                            heading_yi: r.heading_yi,
-                            section_sort: r.section_sort,
-                            items: []
-                        };
-                    }
-                    if (r.item_id) {
-                        sectionMap[r.section_id].items.push({
-                            id: r.item_id,
-                            label_en: r.label_en,
-                            label_yi: r.label_yi,
-                            detail_en: r.detail_en,
-                            detail_yi: r.detail_yi,
-                            locked: r.is_locked === 1,
-                            sort_order: r.sort_order
-                        });
-                    }
-                });
-                packingSections = Object.values(sectionMap).sort((a, b) => a.section_sort - b.section_sort);
+                const data = await checkAndFetchData('packing');
+                if (data) {
+                    processPackingData(data);
+                }
             } catch (e) {
                 console.warn("Could not load packing data:", e);
             }
         }
 
+        function processPackingData(rows) {
+            // Group rows by section
+            const sectionMap = {};
+            (rows || []).forEach(r => {
+                if (!sectionMap[r.section_id]) {
+                    sectionMap[r.section_id] = {
+                        section_id: r.section_id,
+                        heading_en: r.heading_en,
+                        heading_yi: r.heading_yi,
+                        section_sort: r.section_sort,
+                        items: []
+                    };
+                }
+                if (r.item_id) {
+                    sectionMap[r.section_id].items.push({
+                        id: r.item_id,
+                        label_en: r.label_en,
+                        label_yi: r.label_yi,
+                        detail_en: r.detail_en,
+                        detail_yi: r.detail_yi,
+                        locked: r.is_locked === 1,
+                        sort_order: r.sort_order
+                    });
+                }
+            });
+            packingSections = Object.values(sectionMap).sort((a, b) => a.section_sort - b.section_sort);
+        }
+
         async function fetchInfoData() {
-            if (isOffline) return;
+            if (isOffline) {
+                // Try to load from cache even offline
+                const cached = loadCacheFromLocalStorage('info');
+                if (cached && dataCache.info.data) {
+                    processInfoData(dataCache.info.data);
+                }
+                return;
+            }
             try {
-                const res = await fetch(`${API_BASE}/api/info`);
-                if (!res.ok) return;
-                const rows = await res.json();
-                const catMap = {};
-                (rows || []).forEach(r => {
-                    if (!catMap[r.category_id]) {
-                        catMap[r.category_id] = {
-                            category_id: r.category_id,
-                            heading_en: r.heading_en,
-                            heading_yi: r.heading_yi,
-                            category_sort: r.category_sort,
-                            items: []
-                        };
-                    }
-                    if (r.item_id) {
-                        catMap[r.category_id].items.push({
-                            id: r.item_id,
-                            text_en: r.text_en,
-                            text_yi: r.text_yi,
-                            sort_order: r.sort_order
-                        });
-                    }
-                });
-                infoCategories = Object.values(catMap).sort((a, b) => a.category_sort - b.category_sort);
+                const data = await checkAndFetchData('info');
+                if (data) {
+                    processInfoData(data);
+                }
             } catch (e) {
                 console.warn("Could not load info data:", e);
             }
         }
 
+        function processInfoData(rows) {
+            const catMap = {};
+            (rows || []).forEach(r => {
+                if (!catMap[r.category_id]) {
+                    catMap[r.category_id] = {
+                        category_id: r.category_id,
+                        heading_en: r.heading_en,
+                        heading_yi: r.heading_yi,
+                        category_sort: r.category_sort,
+                        items: []
+                    };
+                }
+                if (r.item_id) {
+                    catMap[r.category_id].items.push({
+                        id: r.item_id,
+                        text_en: r.text_en,
+                        text_yi: r.text_yi,
+                        sort_order: r.sort_order
+                    });
+                }
+            });
+            infoCategories = Object.values(catMap).sort((a, b) => a.category_sort - b.category_sort);
+        }
+
         async function fetchItineraryData() {
+            if (isOffline) {
+                // Try to load from cache even offline
+                const cached = loadCacheFromLocalStorage('itinerary');
+                if (cached && dataCache.itinerary.data) {
+                    processItineraryData(dataCache.itinerary.data);
+                }
+                return;
+            }
             try {
-                const res = await fetch(`${API_BASE}/api/itinerary`);
-                if (!res.ok) throw new Error('Failed to fetch itinerary');
-                const rows = await res.json();
-                const dayMap = {};
-                rows.forEach(r => {
-                    if (!dayMap[r.day_id]) {
-                        dayMap[r.day_id] = { day_id: r.day_id, date: r.date, day_sort: r.day_sort, stops: [] };
-                    }
-                    if (r.stop_id) {
-                        dayMap[r.day_id].stops.push({
-                            stop_id: r.stop_id,
-                            type: r.type,
-                            time: r.time_label || '',
-                            title: { en: r.title_en, yi: r.title_yi },
-                            loc: r.loc_yi ? { en: r.loc_en, yi: r.loc_yi } : r.loc_en,
-                            query: r.map_query,
-                            desc: { en: r.description_en, yi: r.description_yi },
-                            longNotes: r.long_notes,
-                            sort_order: r.sort_order
-                        });
-                    }
-                });
-                // Sort days by date ascending
-                itineraryDays = Object.values(dayMap).sort((a, b) => a.date.localeCompare(b.date));
-                // Derive day name and date number from ISO date
-                const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-                itineraryDays.forEach(d => {
-                    const dt = new Date(d.date + 'T12:00:00'); // noon to avoid timezone issues
-                    d.day = dayNames[dt.getUTCDay()];
-                    d.dateNum = String(dt.getUTCDate());
-                });
+                const data = await checkAndFetchData('itinerary');
+                if (data) {
+                    processItineraryData(data);
+                }
             } catch (e) {
                 console.warn('Could not load itinerary:', e);
             }
+        }
+
+        function processItineraryData(rows) {
+            const dayMap = {};
+            rows.forEach(r => {
+                if (!dayMap[r.day_id]) {
+                    dayMap[r.day_id] = { day_id: r.day_id, date: r.date, day_sort: r.day_sort, stops: [] };
+                }
+                if (r.stop_id) {
+                    dayMap[r.day_id].stops.push({
+                        stop_id: r.stop_id,
+                        type: r.type,
+                        time: r.time_label || '',
+                        title: { en: r.title_en, yi: r.title_yi },
+                        loc: r.loc_yi ? { en: r.loc_en, yi: r.loc_yi } : r.loc_en,
+                        query: r.map_query,
+                        desc: { en: r.description_en, yi: r.description_yi },
+                        longNotes: r.long_notes,
+                        sort_order: r.sort_order
+                    });
+                }
+            });
+            // Sort days by date ascending
+            itineraryDays = Object.values(dayMap).sort((a, b) => a.date.localeCompare(b.date));
+            // Derive day name and date number from ISO date
+            const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            itineraryDays.forEach(d => {
+                const dt = new Date(d.date + 'T12:00:00'); // noon to avoid timezone issues
+                d.day = dayNames[dt.getUTCDay()];
+                d.dateNum = String(dt.getUTCDate());
+            });
         }
 
         async function fetchChecklist() {
@@ -1261,23 +1518,38 @@
         }
 
         async function fetchComments() {
-            if (isOffline) return;
-            try {
-                const res = await fetch(`${API_BASE}/api/comments`);
-                if (!res.ok) throw new Error('Failed to fetch comments');
-                const newComments = await res.json();
-                const prevCount = comments.length;
-                comments = newComments;
-                if (currentTab === 'comments') {
-                    renderComments(prevCount === 0);
-                    markCommentsRead();
-                } else {
-                    updateUnreadBadge();
+            if (isOffline) {
+                // Try to load from cache even offline
+                const cached = loadCacheFromLocalStorage('comments');
+                if (cached && dataCache.comments.data) {
+                    processCommentsData(dataCache.comments.data);
                 }
-                checkNewNotifications(prevCount);
+                return;
+            }
+            try {
+                const data = await checkAndFetchData('comments');
+                if (data) {
+                    processCommentsData(data);
+                }
             } catch (e) {
                 console.warn("Could not load comments:", e);
             }
+        }
+
+        function processCommentsData(newComments) {
+            const prevCount = comments.length;
+            comments = newComments;
+            // Update cache after processing
+            dataCache.comments.data = newComments;
+            saveCacheToLocalStorage('comments');
+
+            if (currentTab === 'comments') {
+                renderComments(prevCount === 0);
+                markCommentsRead();
+            } else {
+                updateUnreadBadge();
+            }
+            checkNewNotifications(prevCount);
         }
 
         function markCommentsRead() {
@@ -1422,6 +1694,7 @@
                 input.value = '';
                 input.style.height = 'auto';
                 cancelReply();
+                invalidateDataCache('comments');
                 await fetchComments();
                 // Force scroll to bottom after own post
                 const list = document.getElementById('comments-list');
@@ -1453,6 +1726,7 @@
             try {
                 const res = await fetch(`${API_BASE}/api/comments/${encodeURIComponent(commentId)}`, { method: 'DELETE' });
                 if (!res.ok) throw new Error('Failed to delete comment');
+                invalidateDataCache('comments');
                 await fetchComments();
             } catch (e) {
                 console.error("Delete comment error:", e);
@@ -1510,6 +1784,7 @@
                     body: JSON.stringify({ uid: currentUser.uid, comment_text: newText })
                 });
                 if (!res.ok) throw new Error('Failed to edit comment');
+                invalidateDataCache('comments');
                 await fetchComments();
             } catch (e) {
                 console.error("Edit comment error:", e);
@@ -1979,10 +2254,12 @@
                         body: JSON.stringify(body)
                     });
                     if (!res.ok) throw new Error('Update failed');
+                    invalidateDataCache('packing');
                     showStatusBar('Item updated');
                 } catch (e) {
                     console.error('Admin edit item error:', e);
                     showStatusBar('Error updating item');
+                    invalidateDataCache('packing');
                     await fetchPackingData();
                     renderPackingList();
                 }
@@ -2018,6 +2295,7 @@
                 if (!res.ok) throw new Error('Failed to add item');
                 input.value = '';
                 if (detailInput) detailInput.value = '';
+                invalidateDataCache('packing');
                 await fetchPackingData();
                 renderPackingList();
                 showStatusBar('Item added');
@@ -2035,6 +2313,7 @@
                 const res = await fetch(`${API_BASE}/api/packing/items/${encodeURIComponent(itemId)}`, { method: 'DELETE' });
                 if (!res.ok) throw new Error('Failed to delete item');
                 checkedItems.delete(itemId);
+                invalidateDataCache('packing');
                 await fetchPackingData();
                 renderPackingList();
                 showStatusBar('Item removed');
@@ -2180,6 +2459,7 @@
                 });
                 if (!res.ok) throw new Error('Failed to add info item');
                 input.value = '';
+                invalidateDataCache('info');
                 await fetchInfoData();
                 renderInfo();
                 showStatusBar('Info item added');
@@ -2196,6 +2476,7 @@
             try {
                 const res = await fetch(`${API_BASE}/api/info/items/${encodeURIComponent(itemId)}`, { method: 'DELETE' });
                 if (!res.ok) throw new Error('Failed to delete info item');
+                invalidateDataCache('info');
                 await fetchInfoData();
                 renderInfo();
                 showStatusBar('Info item deleted');
@@ -2244,10 +2525,12 @@
                         body: JSON.stringify(body)
                     });
                     if (!res.ok) throw new Error('Update failed');
+                    invalidateDataCache('info');
                     showStatusBar('Info item updated');
                 } catch (e) {
                     console.error('Admin edit info item error:', e);
                     showStatusBar('Error updating info item');
+                    invalidateDataCache('info');
                     await fetchInfoData();
                     renderInfo();
                 }
@@ -2287,10 +2570,12 @@
                         body: JSON.stringify(body)
                     });
                     if (!res.ok) throw new Error('Update failed');
+                    invalidateDataCache('info');
                     showStatusBar('Category updated');
                 } catch (e) {
                     console.error('Admin edit info category error:', e);
                     showStatusBar('Error updating category');
+                    invalidateDataCache('info');
                     await fetchInfoData();
                     renderInfo();
                 }
@@ -2311,6 +2596,7 @@
             try {
                 const res = await fetch(`${API_BASE}/api/info/categories/${encodeURIComponent(categoryId)}`, { method: 'DELETE' });
                 if (!res.ok) throw new Error('Failed to delete info category');
+                invalidateDataCache('info');
                 await fetchInfoData();
                 renderInfo();
                 showStatusBar('Category deleted');
@@ -2334,6 +2620,7 @@
                 });
                 if (!res.ok) throw new Error('Failed to add info category');
                 input.value = '';
+                invalidateDataCache('info');
                 await fetchInfoData();
                 renderInfo();
                 showStatusBar('Category added');
@@ -2401,9 +2688,11 @@
                     body: JSON.stringify({ items: payload })
                 });
                 if (!res.ok) throw new Error('Reorder failed');
+                invalidateDataCache('info');
             } catch (e) {
                 console.error('Info reorder error:', e);
                 showStatusBar('Error saving order');
+                invalidateDataCache('info');
                 await fetchInfoData();
                 renderInfo();
             }
@@ -2421,9 +2710,11 @@
                     body: JSON.stringify({ categories: payload })
                 });
                 if (!res.ok) throw new Error('Category reorder failed');
+                invalidateDataCache('info');
             } catch (e) {
                 console.error('Info category reorder error:', e);
                 showStatusBar('Error saving category order');
+                invalidateDataCache('info');
                 await fetchInfoData();
                 renderInfo();
             }
@@ -2512,6 +2803,7 @@
                     body: JSON.stringify(body)
                 });
                 if (!res.ok) throw new Error('Failed to update stop');
+                invalidateDataCache('itinerary');
                 await fetchItineraryData();
                 renderTimeline();
             } catch (e) {
@@ -2525,6 +2817,7 @@
             try {
                 const res = await fetch(`${API_BASE}/api/itinerary/stops/${encodeURIComponent(stopId)}`, { method: 'DELETE' });
                 if (!res.ok) throw new Error('Failed to delete stop');
+                invalidateDataCache('itinerary');
                 await fetchItineraryData();
                 renderTimeline();
             } catch (e) {
@@ -2605,6 +2898,7 @@
                     body: JSON.stringify({ stop_id, day_id: dayId, type, time_label, title_en, title_yi, loc_en, loc_yi, description_en, description_yi, long_notes, map_query, sort_order: maxSort + 1 })
                 });
                 if (!res.ok) throw new Error('Failed to add stop');
+                invalidateDataCache('itinerary');
                 await fetchItineraryData();
                 renderTimeline();
             } catch (e) {
@@ -2640,6 +2934,7 @@
                 body: JSON.stringify({ day_id, date: dateStr, sort_order: maxSort + 1 })
             }).then(res => {
                 if (!res.ok) throw new Error('Failed to add day');
+                invalidateDataCache('itinerary');
                 return fetchItineraryData();
             }).then(() => renderTimeline())
             .catch(e => { console.error('Error adding day:', e); alert('Failed to add day'); });
@@ -2652,6 +2947,7 @@
             try {
                 const res = await fetch(`${API_BASE}/api/itinerary/days/${encodeURIComponent(dayId)}`, { method: 'DELETE' });
                 if (!res.ok) throw new Error('Failed to delete day');
+                invalidateDataCache('itinerary');
                 await fetchItineraryData();
                 renderTimeline();
             } catch (e) {
@@ -2692,6 +2988,7 @@
                 body: JSON.stringify({ date: newDate })
             }).then(res => {
                 if (!res.ok) throw new Error('Failed to update day');
+                invalidateDataCache('itinerary');
                 return fetchItineraryData();
             }).then(() => renderTimeline())
             .catch(e => { console.error('Error updating day:', e); alert('Failed to update day'); });
@@ -2708,6 +3005,10 @@
         async function fetchPhotos() {
             // Load photos from galleryPhotos array (defined above)
             allPhotos = galleryPhotos || [];
+            // Mark gallery as loaded even if no photos
+            dataCache.gallery.loaded = true;
+            dataCache.gallery.data = allPhotos;
+            saveCacheToLocalStorage('gallery');
         }
 
         async function fetchPhotoTags() {
@@ -3012,7 +3313,7 @@
 
         const tabRoutes = { itinerary: 'itinerary', info: 'info', packing: 'packing', comments: 'comments', gallery: 'gallery' };
 
-        window.switchTab = function(tab, pushHash = true) {
+        window.switchTab = async function(tab, pushHash = true) {
             if (!tabRoutes[tab]) tab = 'itinerary';
             currentTab = tab;
             const tabs = ['itinerary', 'info', 'packing', 'comments', 'gallery'];
@@ -3025,10 +3326,51 @@
                     btn.classList.toggle('tab-inactive', t !== tab);
                 }
             });
-            if (tab === 'info') renderInfo();
-            if (tab === 'packing') renderPackingList();
-            if (tab === 'comments') { renderComments(); markCommentsRead(); dismissChatNotification(); }
-            if (tab === 'gallery') renderGallery();
+
+            // Lazy load data if not already loaded
+            try {
+                if (tab === 'itinerary' && !dataCache.itinerary.loaded) {
+                    await fetchItineraryData();
+                    renderTimeline();
+                } else if (tab === 'itinerary') {
+                    renderTimeline();
+                }
+
+                if (tab === 'info' && !dataCache.info.loaded) {
+                    await fetchInfoData();
+                    renderInfo();
+                } else if (tab === 'info') {
+                    renderInfo();
+                }
+
+                if (tab === 'packing' && !dataCache.packing.loaded) {
+                    await fetchPackingData();
+                    renderPackingList();
+                } else if (tab === 'packing') {
+                    renderPackingList();
+                }
+
+                if (tab === 'comments' && !dataCache.comments.loaded) {
+                    await fetchComments();
+                    renderComments();
+                    markCommentsRead();
+                    dismissChatNotification();
+                } else if (tab === 'comments') {
+                    renderComments();
+                    markCommentsRead();
+                    dismissChatNotification();
+                }
+
+                if (tab === 'gallery' && !dataCache.gallery.loaded) {
+                    await fetchPhotos();
+                    renderGallery();
+                } else if (tab === 'gallery') {
+                    renderGallery();
+                }
+            } catch (e) {
+                console.error(`Error switching to tab ${tab}:`, e);
+            }
+
             if (pushHash) {
                 history.pushState({ tab }, '', '#' + tab);
             }
@@ -3036,7 +3378,7 @@
 
         function getTabFromHash() {
             const hash = window.location.hash.replace('#', '');
-            return tabRoutes[hash] || 'gallery';
+            return tabRoutes[hash] || 'itinerary';
         }
 
         window.addEventListener('popstate', () => {
@@ -3151,9 +3493,7 @@
 
             // Route to tab from URL hash
             const initialTab = getTabFromHash();
-            if (initialTab !== 'gallery') {
-                switchTab(initialTab, false);
-            }
+            switchTab(initialTab, false);
 
             init();
         };
