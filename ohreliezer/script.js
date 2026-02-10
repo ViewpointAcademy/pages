@@ -983,32 +983,34 @@
                     const deleteIcon = isAdmin ? `<button onclick="event.stopPropagation(); adminDeleteInfoItem('${item.id}')" class="flex-shrink-0 text-slate-300 hover:text-rose-500 transition-colors"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>` : '';
                     const dragHandle = isAdmin ? `<span class="drag-handle info-drag-handle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg></span>` : '';
 
-                    return `<li class="flex items-start gap-2 text-xs text-slate-600 group" data-item-id="${item.id}">
-                        ${isAdmin ? `<span class="opacity-0 group-hover:opacity-100 transition-opacity">${dragHandle}</span>` : ''}
+                    return `<li class="flex items-start gap-2 text-xs text-slate-600" data-item-id="${item.id}">
+                        ${dragHandle}
                         <span class="mt-1 w-1.5 h-1.5 rounded-full bg-indigo-400 flex-shrink-0"></span>
                         <span class="flex-1" id="info-item-text-${item.id}">${escapeHtml(text)}</span>
-                        ${isAdmin ? `<span class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center">${editIcon}${deleteIcon}</span>` : ''}
+                        ${editIcon}${deleteIcon}
                     </li>`;
                 }).join('');
 
+                const categoryDragHandle = isAdmin ? `<span class="drag-handle info-category-drag-handle mr-1"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg></span>` : '';
                 const editCategoryIcon = isAdmin ? `<button onclick="event.stopPropagation(); startEditInfoCategory('${cat.category_id}')" class="flex-shrink-0 text-slate-300 hover:text-indigo-500 transition-colors p-0.5"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>` : '';
                 const deleteCategoryIcon = isAdmin ? `<button onclick="event.stopPropagation(); adminDeleteInfoCategory('${cat.category_id}')" class="flex-shrink-0 text-slate-300 hover:text-rose-500 transition-colors"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>` : '';
 
                 const addItemPh = lang === 'yi' ? 'צולייגן א נייע זאך...' : 'Add new item...';
                 const addItemSection = isAdmin ? `
                     <div class="mt-3 pt-3 border-t border-slate-100">
-                        <div class="flex items-center gap-2">
-                            <input id="add-info-input-${cat.category_id}" type="text" placeholder="${addItemPh}" ${lang === 'yi' ? 'dir="rtl"' : ''} class="flex-1 text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 focus:border-indigo-400 focus:outline-none" onkeydown="if(event.key==='Enter') adminAddInfoItem('${cat.category_id}')">
-                            <button onclick="adminAddInfoItem('${cat.category_id}')" class="text-[10px] font-bold text-indigo-500 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap">+ ${lang === 'yi' ? 'צולייגן' : 'Add'}</button>
+                        <div class="flex items-start gap-2">
+                            <textarea id="add-info-input-${cat.category_id}" rows="2" placeholder="${addItemPh}" ${lang === 'yi' ? 'dir="rtl"' : ''} class="flex-1 text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 resize-none focus:border-indigo-400 focus:outline-none" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); adminAddInfoItem('${cat.category_id}')}"></textarea>
+                            <button onclick="adminAddInfoItem('${cat.category_id}')" class="self-start mt-1 text-[10px] font-bold text-indigo-500 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap">+ ${lang === 'yi' ? 'צולייגן' : 'Add'}</button>
                         </div>
                     </div>
                 ` : '';
 
                 return `
-                    <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
-                        <h3 class="text-sm font-bold text-slate-800 mb-3 flex items-center group" id="info-category-heading-${cat.category_id}">
+                    <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm" data-category-id="${cat.category_id}">
+                        <h3 class="text-sm font-bold text-slate-800 mb-3 flex items-center" id="info-category-heading-${cat.category_id}">
+                            ${categoryDragHandle}
                             <span class="flex-1">${escapeHtml(heading)}</span>
-                            ${isAdmin ? `<span class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center">${editCategoryIcon}${deleteCategoryIcon}</span>` : ''}
+                            ${editCategoryIcon}${deleteCategoryIcon}
                         </h3>
                         <ul id="info-sortable-${cat.category_id}" class="space-y-2" data-category-id="${cat.category_id}">
                             ${itemsHtml}
@@ -1029,7 +1031,7 @@
                 </div>
             ` : '';
 
-            container.innerHTML = categoriesHtml + addCategorySection;
+            container.innerHTML = `<div id="info-categories-sortable">${categoriesHtml}</div>` + addCategorySection;
             initInfoSortable();
         }
 
@@ -2079,16 +2081,16 @@
             const lang = currentLang === 'yi' ? 'yi' : 'en';
             const textKey = lang === 'yi' ? 'text_yi' : 'text_en';
             const curText = item[textKey] || item.text_en || item.text_yi;
-            textSpan.innerHTML = `<textarea rows="3" class="w-full text-xs bg-white border border-indigo-300 rounded px-2 py-1.5 resize-none" data-field="text" ${lang === 'yi' ? 'dir="rtl"' : ''}>${escapeHtml(curText)}</textarea>`;
+            textSpan.innerHTML = `<textarea rows="1" class="w-full text-xs bg-white border border-indigo-300 rounded px-2 py-1.5 overflow-hidden" data-field="text" ${lang === 'yi' ? 'dir="rtl"' : ''}>${escapeHtml(curText)}</textarea>`;
             const textarea = textSpan.querySelector('textarea');
 
             // Auto-resize textarea to fit content
-            textarea.style.height = 'auto';
-            textarea.style.height = textarea.scrollHeight + 'px';
-            textarea.addEventListener('input', () => {
+            const autoResize = () => {
                 textarea.style.height = 'auto';
                 textarea.style.height = textarea.scrollHeight + 'px';
-            });
+            };
+            requestAnimationFrame(autoResize);
+            textarea.addEventListener('input', autoResize);
 
             textarea.focus();
             textarea.setSelectionRange(textarea.value.length, textarea.value.length);
@@ -2114,12 +2116,13 @@
                     renderInfo();
                 }
             };
-            const cancelEdit = () => { renderInfo(); };
+            let cancelled = false;
+            const cancelEdit = () => { cancelled = true; renderInfo(); };
             textarea.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') { e.preventDefault(); saveEdit(); }
                 if (e.key === 'Escape') { e.preventDefault(); cancelEdit(); }
             });
-            textarea.addEventListener('blur', () => { setTimeout(() => saveEdit(), 150); });
+            textarea.addEventListener('blur', () => { setTimeout(() => { if (!cancelled) saveEdit(); }, 150); });
         };
 
         window.startEditInfoCategory = function(categoryId) {
@@ -2156,12 +2159,13 @@
                     renderInfo();
                 }
             };
-            const cancelEdit = () => { renderInfo(); };
+            let cancelled = false;
+            const cancelEdit = () => { cancelled = true; renderInfo(); };
             input.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') { e.preventDefault(); saveEdit(); }
                 if (e.key === 'Escape') { e.preventDefault(); cancelEdit(); }
             });
-            input.addEventListener('blur', () => { setTimeout(() => saveEdit(), 150); });
+            input.addEventListener('blur', () => { setTimeout(() => { if (!cancelled) saveEdit(); }, 150); });
         };
 
         window.adminDeleteInfoCategory = async function(categoryId) {
@@ -2225,6 +2229,21 @@
                 });
                 infoSortableInstances.push(inst);
             });
+
+            // Category-level drag and drop
+            const categoriesContainer = document.getElementById('info-categories-sortable');
+            if (categoriesContainer) {
+                const catInst = new Sortable(categoriesContainer, {
+                    handle: '.info-category-drag-handle',
+                    delay: 300,
+                    delayOnTouchOnly: true,
+                    animation: 150,
+                    ghostClass: 'sortable-ghost',
+                    chosenClass: 'sortable-chosen',
+                    onEnd: function(evt) { handleInfoCategoryReorder(evt); }
+                });
+                infoSortableInstances.push(catInst);
+            }
         }
 
         async function handleInfoReorder(categoryId, evt) {
@@ -2244,6 +2263,26 @@
             } catch (e) {
                 console.error('Info reorder error:', e);
                 showStatusBar('Error saving order');
+                await fetchInfoData();
+                renderInfo();
+            }
+        }
+
+        async function handleInfoCategoryReorder(evt) {
+            if (evt.oldIndex === evt.newIndex) return;
+            const [moved] = infoCategories.splice(evt.oldIndex, 1);
+            infoCategories.splice(evt.newIndex, 0, moved);
+            const payload = infoCategories.map((cat, idx) => ({ category_id: cat.category_id, sort_order: idx }));
+            try {
+                const res = await fetch(`${API_BASE}/api/info/categories/reorder`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ categories: payload })
+                });
+                if (!res.ok) throw new Error('Category reorder failed');
+            } catch (e) {
+                console.error('Info category reorder error:', e);
+                showStatusBar('Error saving category order');
                 await fetchInfoData();
                 renderInfo();
             }
