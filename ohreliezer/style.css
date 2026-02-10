@@ -460,3 +460,718 @@ body {
                 border-right: 3px solid #6366f1;
             }
         }
+
+        /* ===== ADMIN CHECKLIST MODAL STYLES ===== */
+
+        /* Modal overlay & container */
+        #admin-checklist-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        #admin-checklist-modal.active {
+            display: flex;
+        }
+
+        /* Form modals */
+        #form-create-section-modal,
+        #form-create-item-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(8px);
+            z-index: 101;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        #form-create-section-modal.active,
+        #form-create-item-modal.active {
+            display: flex;
+        }
+
+        /* Checklist Tab Styles */
+        .checklist-tab-btn {
+            color: #64748b;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .checklist-tab-btn:hover {
+            color: #334155;
+        }
+        .checklist-tab-active {
+            color: #1e1b4b;
+            border-bottom-color: #1e1b4b;
+            background: #f1f5f9;
+        }
+        .checklist-tab-inactive {
+            color: #94a3b8;
+            border-bottom-color: transparent;
+        }
+
+        /* Section & Item Card Styles */
+        .admin-section-card,
+        .admin-item-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            transition: all 0.15s ease;
+        }
+        .admin-section-card:hover,
+        .admin-item-card:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        .admin-card-drag-handle {
+            color: #cbd5e1;
+            font-weight: 800;
+            cursor: grab;
+            flex-shrink: 0;
+            padding: 4px;
+            border-radius: 6px;
+            transition: all 0.15s;
+        }
+        .admin-card-drag-handle:hover {
+            color: #64748b;
+            background: #f1f5f9;
+        }
+
+        .admin-card-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .admin-card-title {
+            font-weight: 600;
+            color: #1e1b4b;
+            font-size: 14px;
+        }
+        .admin-card-subtitle {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        .admin-card-flags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .admin-card-flag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+        .admin-flag-locked {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+        .admin-flag-default {
+            background: #dbeafe;
+            color: #0c4a6e;
+        }
+
+        .admin-card-actions {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        .admin-card-btn {
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-transform: uppercase;
+        }
+        .admin-card-btn-edit {
+            border-color: #cbd5e1;
+            color: #4f46e5;
+            background: white;
+        }
+        .admin-card-btn-edit:hover {
+            background: #eef2ff;
+            border-color: #4f46e5;
+        }
+        .admin-card-btn-delete {
+            border-color: #fecaca;
+            color: #dc2626;
+            background: white;
+        }
+        .admin-card-btn-delete:hover {
+            background: #fee2e2;
+            border-color: #dc2626;
+        }
+
+        /* Drag-over highlighting */
+        .admin-card-drag-over {
+            background: #f0fdf4;
+            border-color: #86efac;
+        }
+
+        /* Preview Section */
+        .checklist-preview-section {
+            border-top: 1px solid #e2e8f0;
+            padding-top: 12px;
+            margin-top: 12px;
+        }
+        .checklist-preview-section:first-child {
+            border-top: none;
+            padding-top: 0;
+            margin-top: 0;
+        }
+        .checklist-preview-heading {
+            font-weight: 700;
+            font-size: 13px;
+            color: #1e1b4b;
+            margin-bottom: 6px;
+        }
+        .checklist-preview-item {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            font-size: 12px;
+            padding: 4px 0;
+            color: #475569;
+        }
+        .checklist-preview-checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #cbd5e1;
+            border-radius: 4px;
+            flex-shrink: 0;
+            margin-top: 1px;
+            background: white;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        /* Empty states */
+        .admin-empty-state {
+            text-align: center;
+            padding: 24px;
+            color: #94a3b8;
+        }
+        .admin-empty-state-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+            opacity: 0.5;
+        }
+        .admin-empty-state-text {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        /* Form input styling */
+        input[type="text"],
+        input[type="number"],
+        select {
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            border-color: #4f46e5 !important;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        input[type="checkbox"] {
+            cursor: pointer;
+            accent-color: #4f46e5;
+        }
+
+        /* Responsive adjustments for checklist modal */
+        @media (max-width: 1024px) {
+            #admin-checklist-modal .max-w-4xl {
+                max-width: 100%;
+            }
+            #admin-checklist-modal > div {
+                flex-direction: column;
+            }
+            #checklist-preview {
+                width: 100%;
+                max-height: 200px;
+            }
+        }
+
+        /* RTL support */
+        [dir="rtl"] .admin-card-drag-handle {
+            margin-right: 12px;
+            margin-left: 0;
+        }
+        [dir="rtl"] .admin-card-actions {
+            flex-direction: row-reverse;
+        }
+
+        /* Packing list edit mode styles */
+        .packing-item-edit {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            background-color: #f5f5f5;
+            border-radius: 6px;
+            margin-bottom: 4px;
+        }
+
+        .packing-item-edit input {
+            flex: 1;
+            padding: 6px 8px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .packing-item-edit input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+        }
+
+        .packing-item-delete-btn {
+            padding: 4px 8px;
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color 0.2s;
+        }
+
+        .packing-item-delete-btn:hover {
+            background-color: #dc2626;
+        }
+
+        .packing-section-edit {
+            margin-bottom: 16px;
+            padding: 12px;
+            background-color: #fafafa;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .packing-section-header-edit {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .packing-section-header-edit input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        .packing-add-item-btn {
+            padding: 6px 12px;
+            background-color: #10b981;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+            margin-top: 8px;
+        }
+
+        .packing-add-item-btn:hover {
+            background-color: #059669;
+        }
+
+        .packing-save-btn {
+            padding: 10px 20px;
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background-color 0.2s;
+            margin-top: 16px;
+        }
+
+        .packing-save-btn:hover {
+            background-color: #4338ca;
+        }
+
+        .packing-save-btn:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        /* ===== PACKING EDIT MODE - CARD STYLES ===== */
+
+        /* Main card section wrapper - matches "My items" card styling */
+        .packing-edit-mode-section {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* Card section header with drag handle + input + delete button */
+        .packing-edit-mode-section-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        /* Drag handle icon styling */
+        .packing-edit-mode-section-header .drag-handle {
+            color: #cbd5e1;
+            font-weight: 800;
+            cursor: grab;
+            flex-shrink: 0;
+            padding: 4px;
+            border-radius: 6px;
+            transition: all 0.15s;
+        }
+        .packing-edit-mode-section-header .drag-handle:hover {
+            color: #64748b;
+            background: #f1f5f9;
+        }
+        .packing-edit-mode-section-header .drag-handle:active {
+            cursor: grabbing;
+        }
+
+        /* Editable section name input field */
+        .packing-edit-mode-section-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e1b4b;
+            background: white;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        .packing-edit-mode-section-input::placeholder {
+            color: #cbd5e1;
+        }
+        .packing-edit-mode-section-input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        /* Item row container */
+        .packing-edit-mode-item-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background 0.15s;
+        }
+        .packing-edit-mode-item-row:hover {
+            background: #f8fafc;
+        }
+
+        /* Item label text/input */
+        .packing-edit-mode-item-label {
+            flex: 1;
+            padding: 6px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 11px;
+            color: #475569;
+            background: white;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        .packing-edit-mode-item-label::placeholder {
+            color: #cbd5e1;
+        }
+        .packing-edit-mode-item-label:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        /* Lock icon for locked items */
+        .packing-edit-mode-item-locked {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            color: #b91c1c;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        /* Edit and delete buttons container */
+        .packing-edit-mode-item-controls {
+            display: flex;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        /* Edit button styling */
+        .packing-edit-mode-item-btn-edit {
+            padding: 5px 10px;
+            border: 1px solid #cbd5e1;
+            background: white;
+            color: #4f46e5;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-transform: uppercase;
+        }
+        .packing-edit-mode-item-btn-edit:hover {
+            background: #eef2ff;
+            border-color: #4f46e5;
+        }
+        .packing-edit-mode-item-btn-edit:active {
+            transform: scale(0.95);
+        }
+
+        /* Delete button styling */
+        .packing-edit-mode-item-btn-delete {
+            padding: 5px 10px;
+            border: 1px solid #fecaca;
+            background: white;
+            color: #dc2626;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-transform: uppercase;
+        }
+        .packing-edit-mode-item-btn-delete:hover {
+            background: #fee2e2;
+            border-color: #dc2626;
+        }
+        .packing-edit-mode-item-btn-delete:active {
+            transform: scale(0.95);
+        }
+
+        /* Add item button - green styling */
+        .packing-edit-mode-add-item-btn {
+            padding: 8px 16px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            margin-top: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .packing-edit-mode-add-item-btn:hover {
+            background: #059669;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+        }
+        .packing-edit-mode-add-item-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Save changes button - blue styling */
+        .packing-edit-mode-save-btn {
+            padding: 10px 24px;
+            background: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            margin-top: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .packing-edit-mode-save-btn:hover {
+            background: #4338ca;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+        .packing-edit-mode-save-btn:active {
+            transform: scale(0.95);
+        }
+        .packing-edit-mode-save-btn:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* Cancel/Close button - neutral styling */
+        .packing-edit-mode-cancel-btn {
+            padding: 10px 24px;
+            background: white;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .packing-edit-mode-cancel-btn:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+            color: #334155;
+        }
+        .packing-edit-mode-cancel-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Button group container */
+        .packing-edit-mode-button-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        /* RTL support for edit mode */
+        [dir="rtl"] .packing-edit-mode-section-header {
+            flex-direction: row-reverse;
+        }
+        [dir="rtl"] .packing-edit-mode-item-row {
+            flex-direction: row-reverse;
+        }
+        [dir="rtl"] .packing-edit-mode-item-controls {
+            flex-direction: row-reverse;
+        }
+        [dir="rtl"] .packing-edit-mode-add-item-btn {
+            flex-direction: row-reverse;
+        }
+        [dir="rtl"] .packing-edit-mode-save-btn {
+            flex-direction: row-reverse;
+        }
+        [dir="rtl"] .packing-edit-mode-cancel-btn {
+            flex-direction: row-reverse;
+        }
+        [dir="rtl"] .packing-edit-mode-button-group {
+            flex-direction: row-reverse;
+        }
+
+        /* Drag handle - always visible */
+        .drag-handle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px 2px;
+            cursor: grab;
+            user-select: none;
+            color: #cbd5e1;
+        }
+
+        .drag-handle:hover {
+            color: #94a3b8;
+        }
+
+        .drag-handle:active {
+            cursor: grabbing;
+            color: #64748b;
+        }
+
+        /* Delete button - always visible, not hidden on hover */
+        .delete-btn {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            padding: 4px 2px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            color: #cbd5e1;
+            transition: color 0.15s ease;
+        }
+
+        .delete-btn:hover {
+            color: #ef4444;
+        }
+
+        .delete-btn:active {
+            color: #dc2626;
+        }
+
+        /* Check item with drag and delete controls */
+        .check-item {
+            transition: background-color 0.15s ease, opacity 0.15s ease;
+        }
+
+        .check-item[draggable="true"] {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .check-item.dragging {
+            opacity: 0.5;
+            background-color: #f1f5f9;
+        }
+
+        /* Drag-over insertion line - before */
+        .check-item.drag-over-top {
+            border-top: 2px solid #4f46e5;
+            padding-top: calc(0.5rem - 1px);
+        }
+
+        /* Drag-over insertion line - after */
+        .check-item.drag-over-bottom {
+            border-bottom: 2px solid #4f46e5;
+            padding-bottom: calc(0.5rem - 1px);
+        }
+
+        /* RTL support for drag handle */
+        [dir="rtl"] .drag-handle {
+            margin-right: auto;
+            margin-left: 0;
+        }
+
+        [dir="rtl"] .delete-btn {
+            margin-left: auto;
+            margin-right: 0;
+        }
+

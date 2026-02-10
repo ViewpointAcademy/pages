@@ -179,72 +179,8 @@
             ]
         };
 
-        const packingList = {
-            en: [
-                { id: "essentials", heading: "Essentials", items: [
-                    {id: "essentials_0", label: "Tefillin"},
-                    {id: "essentials_1", label: "Passport"},
-                    {id: "essentials_2", label: "Charger"},
-                    {id: "essentials_3", label: "Adapter"},
-                    {id: "religious_0", label: "Siddur & Chumash", detail: "Donated by R' Shloma Goldstein", locked: true},
-                    {id: "religious_1", label: "Tehillim", detail: "Available at every Tzion", locked: true},
-                    {id: "religious_2", label: "Lecht", detail: "Mostly available, but recommended to take a few"}
-                ]},
-                { id: "clothing", heading: "Clothing", items: [
-                    {id: "clothing_0", label: "Boots/Kalachin"},
-                    {id: "clothing_1", label: "Coat & Sweater"},
-                    {id: "clothing_2", label: "4-5 sets of clothes"},
-                    {id: "clothing_3", label: "Extra pairs of socks"},
-                    {id: "clothing_4", label: "Pajamas"},
-                    {id: "clothing_5", label: "Bathing suit", detail: "For shvitz"},
-                    {id: "clothing_6", label: "Shabbos clothes", detail: "Shtramel, Bakitcha"}
-                ]},
-                { id: "food", heading: "Food", items: [
-                    {id: "food_0", label: "Tuesday night dinner", detail: "Kosher food is ordered but isn't always good/enough"},
-                    {id: "food_1", label: "Snacks/cookies/chips/sweets for the flight"}
-                ]},
-                { id: "other", heading: "Other", items: [
-                    {id: "essentials_4", label: "Air plugs"},
-                    {id: "religious_3", label: "Sefer/Gemara"},
-                    {id: "other_6", label: "Reading material"},
-                    {id: "other_1", label: "Tylenol/Motrin/Tums/Bandages"},
-                    {id: "other_2", label: "Lenses solution"},
-                    {id: "other_5", label: "Deodorant", detail: "If you need"}
-                ]}
-            ],
-            yi: [
-                { id: "essentials", heading: "עסענציעלס", items: [
-                    {id: "essentials_0", label: "תפילין"},
-                    {id: "essentials_1", label: "פאספארט"},
-                    {id: "essentials_2", label: "טשארזשער"},
-                    {id: "essentials_3", label: "אדאפטער"},
-                    {id: "religious_0", label: "סידור און חומש", detail: "בנדבת ר' שלמה גאלדשטיין", locked: true},
-                    {id: "religious_1", label: "תהלים", detail: "דא ביי יעדן ציון", locked: true},
-                    {id: "religious_2", label: "לעכט", detail: "מערסטנס דא, אבער רעקאמענדירט צו נעמען א פאר"}
-                ]},
-                { id: "clothing", heading: "בגדים", items: [
-                    {id: "clothing_0", label: "שטיוול/קאלאטשן"},
-                    {id: "clothing_1", label: "מאנטל און סוועטער"},
-                    {id: "clothing_2", label: "4-5 זעטס בגדים"},
-                    {id: "clothing_3", label: "עקסטרא זאקן"},
-                    {id: "clothing_4", label: "פיזשאמעס"},
-                    {id: "clothing_5", label: "באדינג סוט", detail: "פאר שוויץ"},
-                    {id: "clothing_6", label: "שבת בגדים", detail: "שטריימל, באקיטשע"}
-                ]},
-                { id: "food", heading: "עסן", items: [
-                    {id: "food_0", label: "דינסטאג נאכט סעודה", detail: "כשר עסן איז באשטעלט אבער איז נישט אלעמאל גוט/גענוג"},
-                    {id: "food_1", label: "סנעקס/קוקיס/טשיפס/זיסן פארן פלי"}
-                ]},
-                { id: "other", heading: "אנדערע", items: [
-                    {id: "essentials_4", label: "ער פלאגס"},
-                    {id: "religious_3", label: "ספר/גמרא"},
-                    {id: "other_6", label: "לייענונג מאטריאל"},
-                    {id: "other_1", label: "טיילענאל/מאטרין/טאמס/באנדאזשעס"},
-                    {id: "other_2", label: "לענזעס סאליושאן"},
-                    {id: "other_5", label: "דעאדאראנט", detail: "אויב איר דארפט"}
-                ]}
-            ]
-        };
+        // Packing list loaded from DB (replaces old hardcoded packingList)
+        let packingSections = []; // [{section_id, heading_en, heading_yi, items: [{item_id, label_en, label_yi, detail_en, detail_yi, is_locked}]}]
 
         let currentTab = 'itinerary';
         let checkedItems = new Set();
@@ -347,6 +283,7 @@
                 // Load RSVPs, checklist, and start polling
                 // Wrap fetches in individual try-catch to prevent one failure from breaking polling setup
                 try { await fetchRsvps(); } catch (e) { console.warn("Could not load RSVPs:", e); }
+                try { await fetchPackingData(); } catch (e) { console.warn("Could not load packing data:", e); }
                 try { await fetchChecklist(); } catch (e) { console.warn("Could not load checklist:", e); }
                 try { await fetchCustomItems(); } catch (e) { console.warn("Could not load custom items:", e); }
                 try { await fetchComments(); } catch (e) { console.warn("Could not load comments:", e); }
@@ -1064,6 +1001,42 @@
             `).join('');
         }
 
+        async function fetchPackingData() {
+            if (isOffline) return;
+            try {
+                const res = await fetch(`${API_BASE}/api/packing`);
+                if (!res.ok) return;
+                const rows = await res.json();
+                // Group rows by section
+                const sectionMap = {};
+                (rows || []).forEach(r => {
+                    if (!sectionMap[r.section_id]) {
+                        sectionMap[r.section_id] = {
+                            section_id: r.section_id,
+                            heading_en: r.heading_en,
+                            heading_yi: r.heading_yi,
+                            section_sort: r.section_sort,
+                            items: []
+                        };
+                    }
+                    if (r.item_id) {
+                        sectionMap[r.section_id].items.push({
+                            id: r.item_id,
+                            label_en: r.label_en,
+                            label_yi: r.label_yi,
+                            detail_en: r.detail_en,
+                            detail_yi: r.detail_yi,
+                            locked: r.is_locked === 1,
+                            sort_order: r.sort_order
+                        });
+                    }
+                });
+                packingSections = Object.values(sectionMap).sort((a, b) => a.section_sort - b.section_sort);
+            } catch (e) {
+                console.warn("Could not load packing data:", e);
+            }
+        }
+
         async function fetchChecklist() {
             if (isOffline || !currentUser) return;
             try {
@@ -1586,6 +1559,45 @@
             }
         };
 
+        window.adminAddPackingItem = async function(sectionId) {
+            const input = document.getElementById(`add-input-${sectionId}`);
+            if (!input) return;
+            const label = input.value.trim();
+            if (!label) return;
+            const itemId = sectionId + '_' + Date.now();
+            // For now use same label for both languages; admin can update via DB later
+            try {
+                const res = await fetch(`${API_BASE}/api/packing/items`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ item_id: itemId, section_id: sectionId, label_en: label, label_yi: label, sort_order: 999 })
+                });
+                if (!res.ok) throw new Error('Failed to add item');
+                input.value = '';
+                await fetchPackingData();
+                renderPackingList();
+                showStatusBar('Item added');
+            } catch (e) {
+                console.error("Admin add packing item error:", e);
+                showStatusBar('Error adding item');
+            }
+        };
+
+        window.adminDeletePackingItem = async function(itemId) {
+            if (!confirm('Remove this item for all users?')) return;
+            try {
+                const res = await fetch(`${API_BASE}/api/packing/items/${encodeURIComponent(itemId)}`, { method: 'DELETE' });
+                if (!res.ok) throw new Error('Failed to delete item');
+                checkedItems.delete(itemId);
+                await fetchPackingData();
+                renderPackingList();
+                showStatusBar('Item removed');
+            } catch (e) {
+                console.error("Admin delete packing item error:", e);
+                showStatusBar('Error removing item');
+            }
+        };
+
         window.toggleCheckItem = async function(itemId) {
             const isChecked = checkedItems.has(itemId);
             if (isChecked) {
@@ -1611,11 +1623,17 @@
             }
         };
 
-        function renderCheckItem(item, isCustom) {
+        function renderCheckItem(item, deleteType) {
+            // deleteType: 'custom' for user custom items, 'admin' for admin-deletable global items, falsy for none
             const isLocked = item.locked === true;
             const checked = isLocked || checkedItems.has(item.id);
             const detailMarkup = item.detail ? `<span class="check-info-wrap"><svg class="check-info-icon" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg><span class="check-inline-detail">${escapeHtml(item.detail)}</span></span>` : '';
-            const deleteBtn = isCustom ? `<button onclick="event.stopPropagation(); deleteCustomItem('${item.id}')" class="custom-item-delete ml-auto flex-shrink-0 text-slate-300 hover:text-rose-500 transition-colors" title="Remove"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>` : '';
+            let deleteBtn = '';
+            if (deleteType === 'custom') {
+                deleteBtn = `<button onclick="event.stopPropagation(); deleteCustomItem('${item.id}')" class="custom-item-delete ml-auto flex-shrink-0 text-slate-300 hover:text-rose-500 transition-colors" title="Remove"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>`;
+            } else if (deleteType === 'admin') {
+                deleteBtn = `<button onclick="event.stopPropagation(); adminDeletePackingItem('${item.id}')" class="custom-item-delete ml-auto flex-shrink-0 text-slate-300 hover:text-rose-500 transition-colors" title="Remove item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>`;
+            }
             return `
             <li class="check-item flex items-center gap-3 ${isLocked ? 'opacity-60 cursor-default' : 'cursor-pointer'} select-none" ${isLocked ? '' : `onclick="toggleCheckItem('${item.id}')"`}>
                 <div class="check-box ${checked ? 'checked' : ''}">
@@ -1631,23 +1649,43 @@
         function renderPackingList() {
             const container = document.getElementById('packing-container');
             if (!container) return;
-            const sections = packingList[currentLang] || packingList.en;
-            const customHeading = currentLang === 'yi' ? 'מיינע זאכן (פריווייט)' : 'My Items (private)';
-            const builtInHtml = sections.map(section => `
+            const lang = currentLang === 'yi' ? 'yi' : 'en';
+            const customHeading = lang === 'yi' ? 'מיינע זאכן (פריווייט)' : 'My Items (private)';
+            const addPlaceholder = lang === 'yi' ? 'צולייגן א זאך...' : 'Add item...';
+
+            const builtInHtml = packingSections.map(section => {
+                const heading = lang === 'yi' ? section.heading_yi : section.heading_en;
+                const itemsHtml = section.items.map(dbItem => {
+                    const item = {
+                        id: dbItem.id,
+                        label: lang === 'yi' ? dbItem.label_yi : dbItem.label_en,
+                        detail: lang === 'yi' ? dbItem.detail_yi : dbItem.detail_en,
+                        locked: dbItem.locked
+                    };
+                    const delType = (isAdmin && !dbItem.locked) ? 'admin' : false;
+                    return renderCheckItem(item, delType);
+                }).join('');
+                const adminAddHtml = isAdmin ? `
+                    <div class="mt-3 flex items-center gap-2">
+                        <input id="add-input-${section.section_id}" type="text" placeholder="${addPlaceholder}" class="add-item-input flex-1 text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 focus:border-indigo-400 focus:outline-none" onkeydown="if(event.key==='Enter') adminAddPackingItem('${section.section_id}')">
+                        <button onclick="adminAddPackingItem('${section.section_id}')" class="add-item-btn text-[10px] font-bold text-indigo-500 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors">+ Add</button>
+                    </div>` : '';
+                return `
                 <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
-                    <h3 class="text-sm font-bold text-slate-800 mb-3">${escapeHtml(section.heading)}</h3>
-                    <ul class="space-y-2">
-                        ${section.items.map(item => renderCheckItem(item, false)).join('')}
-                    </ul>
-                </div>`).join('');
+                    <h3 class="text-sm font-bold text-slate-800 mb-3">${escapeHtml(heading)}</h3>
+                    <ul class="space-y-2">${itemsHtml}</ul>
+                    ${adminAddHtml}
+                </div>`;
+            }).join('');
+
             const customHtml = `
                 <div class="bg-white rounded-2xl p-5 border border-indigo-100 shadow-sm">
                     <h3 class="text-sm font-bold text-indigo-700 mb-3">${escapeHtml(customHeading)}</h3>
                     <ul class="space-y-2">
-                        ${customItems.length ? customItems.map(ci => renderCheckItem({ id: ci.item_id, label: ci.label }, true)).join('') : `<li class="text-[11px] text-slate-400 py-1">${currentLang === 'yi' ? 'נאך נישט צוגעלייגט' : 'No custom items yet'}</li>`}
+                        ${customItems.length ? customItems.map(ci => renderCheckItem({ id: ci.item_id, label: ci.label }, 'custom')).join('') : `<li class="text-[11px] text-slate-400 py-1">${lang === 'yi' ? 'נאך נישט צוגעלייגט' : 'No custom items yet'}</li>`}
                     </ul>
                     <div class="mt-3 flex items-center gap-2">
-                        <input id="add-input-custom" type="text" placeholder="${currentLang === 'yi' ? 'צולייגן א זאך...' : 'Add item...'}" class="add-item-input flex-1 text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 focus:border-indigo-400 focus:outline-none" onkeydown="if(event.key==='Enter') addCustomItem()">
+                        <input id="add-input-custom" type="text" placeholder="${addPlaceholder}" class="add-item-input flex-1 text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 focus:border-indigo-400 focus:outline-none" onkeydown="if(event.key==='Enter') addCustomItem()">
                         <button onclick="addCustomItem()" class="add-item-btn text-[10px] font-bold text-indigo-500 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors">+ Add</button>
                     </div>
                 </div>`;
