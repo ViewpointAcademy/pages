@@ -266,6 +266,25 @@ body {
             outline: none;
         }
 
+        /* Info item textarea edit focus */
+        #info-container textarea:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+            outline: none;
+        }
+
+        /* Mobile: always show hover-reveal admin controls on touch devices */
+        @media (hover: none) {
+            #info-container .group > .opacity-0 {
+                opacity: 1 !important;
+            }
+            .chat-delete-btn,
+            .chat-reply-btn,
+            .chat-edit-btn {
+                opacity: 1 !important;
+            }
+        }
+
         /* Masonry grid layout */
         .masonry-grid {
             columns: 1;

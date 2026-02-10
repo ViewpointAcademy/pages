@@ -979,20 +979,20 @@
 
                 const itemsHtml = sortedItems.map(item => {
                     const text = (lang === 'yi' ? item.text_yi : item.text_en) || item.text_en || item.text_yi;
-                    const editIcon = isAdmin ? `<button onclick="event.stopPropagation(); startEditInfoItem('${item.id}')" class="ml-2 text-slate-300 hover:text-indigo-500 transition-colors"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>` : '';
-                    const deleteIcon = isAdmin ? `<button onclick="event.stopPropagation(); adminDeleteInfoItem('${item.id}')" class="ml-1 text-slate-300 hover:text-rose-500 transition-colors"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button>` : '';
-                    const dragHandle = isAdmin ? `<span class="info-drag-handle cursor-grab text-slate-300 hover:text-slate-500 mr-1"><svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="3" r="1"/><circle cx="8" cy="3" r="1"/><circle cx="3" cy="8" r="1"/><circle cx="8" cy="8" r="1"/><circle cx="3" cy="13" r="1"/><circle cx="8" cy="13" r="1"/></svg></span>` : '';
+                    const editIcon = isAdmin ? `<button onclick="event.stopPropagation(); startEditInfoItem('${item.id}')" class="flex-shrink-0 text-slate-300 hover:text-indigo-500 transition-colors p-0.5"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>` : '';
+                    const deleteIcon = isAdmin ? `<button onclick="event.stopPropagation(); adminDeleteInfoItem('${item.id}')" class="flex-shrink-0 text-slate-300 hover:text-rose-500 transition-colors"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>` : '';
+                    const dragHandle = isAdmin ? `<span class="drag-handle info-drag-handle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg></span>` : '';
 
                     return `<li class="flex items-start gap-2 text-xs text-slate-600 group" data-item-id="${item.id}">
-                        ${dragHandle}
+                        ${isAdmin ? `<span class="opacity-0 group-hover:opacity-100 transition-opacity">${dragHandle}</span>` : ''}
                         <span class="mt-1 w-1.5 h-1.5 rounded-full bg-indigo-400 flex-shrink-0"></span>
                         <span class="flex-1" id="info-item-text-${item.id}">${escapeHtml(text)}</span>
                         ${isAdmin ? `<span class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center">${editIcon}${deleteIcon}</span>` : ''}
                     </li>`;
                 }).join('');
 
-                const editCategoryIcon = isAdmin ? `<button onclick="event.stopPropagation(); startEditInfoCategory('${cat.category_id}')" class="ml-2 text-slate-300 hover:text-indigo-500 transition-colors"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>` : '';
-                const deleteCategoryIcon = isAdmin ? `<button onclick="event.stopPropagation(); adminDeleteInfoCategory('${cat.category_id}')" class="ml-1 text-slate-300 hover:text-rose-500 transition-colors"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button>` : '';
+                const editCategoryIcon = isAdmin ? `<button onclick="event.stopPropagation(); startEditInfoCategory('${cat.category_id}')" class="flex-shrink-0 text-slate-300 hover:text-indigo-500 transition-colors p-0.5"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>` : '';
+                const deleteCategoryIcon = isAdmin ? `<button onclick="event.stopPropagation(); adminDeleteInfoCategory('${cat.category_id}')" class="flex-shrink-0 text-slate-300 hover:text-rose-500 transition-colors"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>` : '';
 
                 const addItemPh = lang === 'yi' ? 'צולייגן א נייע זאך...' : 'Add new item...';
                 const addItemSection = isAdmin ? `
@@ -2079,12 +2079,21 @@
             const lang = currentLang === 'yi' ? 'yi' : 'en';
             const textKey = lang === 'yi' ? 'text_yi' : 'text_en';
             const curText = item[textKey] || item.text_en || item.text_yi;
-            textSpan.innerHTML = `<input type="text" class="w-full text-xs bg-white border border-indigo-300 rounded px-2 py-1" value="${escapeHtml(curText)}" data-field="text" ${lang === 'yi' ? 'dir="rtl"' : ''} />`;
-            const input = textSpan.querySelector('input');
-            input.focus();
-            input.select();
+            textSpan.innerHTML = `<textarea rows="3" class="w-full text-xs bg-white border border-indigo-300 rounded px-2 py-1.5 resize-none" data-field="text" ${lang === 'yi' ? 'dir="rtl"' : ''}>${escapeHtml(curText)}</textarea>`;
+            const textarea = textSpan.querySelector('textarea');
+
+            // Auto-resize textarea to fit content
+            textarea.style.height = 'auto';
+            textarea.style.height = textarea.scrollHeight + 'px';
+            textarea.addEventListener('input', () => {
+                textarea.style.height = 'auto';
+                textarea.style.height = textarea.scrollHeight + 'px';
+            });
+
+            textarea.focus();
+            textarea.setSelectionRange(textarea.value.length, textarea.value.length);
             const saveEdit = async () => {
-                const newText = input.value.trim();
+                const newText = textarea.value.trim();
                 if (!newText) { renderInfo(); return; }
                 item[textKey] = newText;
                 renderInfo();
@@ -2106,11 +2115,11 @@
                 }
             };
             const cancelEdit = () => { renderInfo(); };
-            input.addEventListener('keydown', (e) => {
+            textarea.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') { e.preventDefault(); saveEdit(); }
                 if (e.key === 'Escape') { e.preventDefault(); cancelEdit(); }
             });
-            input.addEventListener('blur', () => { setTimeout(() => saveEdit(), 150); });
+            textarea.addEventListener('blur', () => { setTimeout(() => saveEdit(), 150); });
         };
 
         window.startEditInfoCategory = function(categoryId) {
