@@ -236,6 +236,36 @@ body {
             }
         }
 
+        /* Drag handle */
+        .drag-handle {
+            color: #cbd5e1;
+            cursor: grab;
+            touch-action: none;
+            padding: 2px;
+            flex-shrink: 0;
+        }
+        .drag-handle:active {
+            cursor: grabbing;
+            color: #6366f1;
+        }
+
+        /* SortableJS drag states */
+        .sortable-ghost {
+            opacity: 0.4;
+            background: #eef2ff;
+            border-radius: 8px;
+        }
+        .sortable-chosen {
+            background: #f8fafc;
+        }
+
+        /* Inline edit focus */
+        .check-item input[type="text"]:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+            outline: none;
+        }
+
         /* Masonry grid layout */
         .masonry-grid {
             columns: 1;

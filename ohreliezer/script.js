@@ -1056,6 +1056,7 @@
                 const res = await fetch(`${API_BASE}/api/custom-items/${currentUser.uid}`);
                 if (!res.ok) return;
                 customItems = (await res.json()) || [];
+                customItems.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
             } catch (e) {
                 console.warn("Could not load custom items:", e);
             }
@@ -1534,7 +1535,8 @@
             const detailInput = document.getElementById('add-detail-custom');
             const detail = detailInput ? detailInput.value.trim() : '';
             const itemId = 'custom_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
-            customItems.push({ item_id: itemId, label, section_id: 'custom', detail: detail || null });
+            const sortOrder = customItems.length;
+            customItems.push({ item_id: itemId, label, section_id: 'custom', detail: detail || null, sort_order: sortOrder });
             input.value = '';
             if (detailInput) detailInput.value = '';
             renderPackingList();
@@ -1543,7 +1545,7 @@
                     await fetch(`${API_BASE}/api/custom-items`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ uid: currentUser.uid, item_id: itemId, label, section_id: 'custom', detail: detail || null })
+                        body: JSON.stringify({ uid: currentUser.uid, item_id: itemId, label, section_id: 'custom', detail: detail || null, sort_order: sortOrder })
                     });
                 } catch (e) { console.error("Save custom item error:", e); }
             }
@@ -1575,6 +1577,227 @@
                 detailRow.classList.add('hidden');
             }
         };
+
+        // ── Drag-and-drop (SortableJS) ──
+        let sortableInstances = [];
+
+        function initSortable() {
+            sortableInstances.forEach(s => s.destroy());
+            sortableInstances = [];
+            if (typeof Sortable === 'undefined') return;
+
+            // Admin: sortable built-in sections
+            if (isAdmin) {
+                packingSections.forEach(section => {
+                    const el = document.getElementById(`sortable-${section.section_id}`);
+                    if (!el) return;
+                    const inst = new Sortable(el, {
+                        handle: '.drag-handle',
+                        animation: 150,
+                        ghostClass: 'sortable-ghost',
+                        chosenClass: 'sortable-chosen',
+                        filter: '.text-slate-400', // skip empty-state <li>
+                        onEnd: function(evt) { handleBuiltinReorder(section.section_id, evt); }
+                    });
+                    sortableInstances.push(inst);
+                });
+            }
+
+            // All users: sortable custom items
+            if (currentUser) {
+                const customEl = document.getElementById('sortable-custom');
+                if (customEl && customItems.length > 0) {
+                    const inst = new Sortable(customEl, {
+                        handle: '.drag-handle',
+                        animation: 150,
+                        ghostClass: 'sortable-ghost',
+                        chosenClass: 'sortable-chosen',
+                        onEnd: function(evt) { handleCustomReorder(evt); }
+                    });
+                    sortableInstances.push(inst);
+                }
+            }
+        }
+
+        async function handleBuiltinReorder(sectionId, evt) {
+            const section = packingSections.find(s => s.section_id === sectionId);
+            if (!section || evt.oldIndex === evt.newIndex) return;
+            const [moved] = section.items.splice(evt.oldIndex, 1);
+            section.items.splice(evt.newIndex, 0, moved);
+            const payload = section.items.map((item, idx) => ({ item_id: item.id, sort_order: idx }));
+            try {
+                const res = await fetch(`${API_BASE}/api/packing/items/reorder`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ items: payload })
+                });
+                if (!res.ok) throw new Error('Reorder failed');
+            } catch (e) {
+                console.error('Reorder error:', e);
+                showStatusBar('Error saving order');
+                await fetchPackingData();
+                renderPackingList();
+            }
+        }
+
+        async function handleCustomReorder(evt) {
+            if (evt.oldIndex === evt.newIndex) return;
+            const [moved] = customItems.splice(evt.oldIndex, 1);
+            customItems.splice(evt.newIndex, 0, moved);
+            const payload = customItems.map((item, idx) => ({ item_id: item.item_id, sort_order: idx }));
+            if (!isOffline && currentUser) {
+                try {
+                    const res = await fetch(`${API_BASE}/api/custom-items/${currentUser.uid}/reorder`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ items: payload })
+                    });
+                    if (!res.ok) throw new Error('Reorder failed');
+                } catch (e) {
+                    console.error('Custom reorder error:', e);
+                    showStatusBar('Error saving order');
+                    await fetchCustomItems();
+                    renderPackingList();
+                }
+            }
+        }
+
+        // ── Inline editing ──
+        window.startEditItem = function(itemId, editType) {
+            const li = document.querySelector(`[data-item-id="${itemId}"]`);
+            if (!li) return;
+            if (editType === 'admin') {
+                startEditBuiltinItem(itemId, li);
+            } else {
+                startEditCustomItem(itemId, li);
+            }
+        };
+
+        function startEditCustomItem(itemId, li) {
+            const ci = customItems.find(i => i.item_id === itemId);
+            if (!ci) return;
+            const labelDiv = li.querySelector('.flex-1.min-w-0');
+            if (!labelDiv) return;
+            li.removeAttribute('onclick');
+            li.classList.remove('cursor-pointer');
+            li.classList.add('cursor-default');
+            const lang = currentLang === 'yi' ? 'yi' : 'en';
+            const detailPh = lang === 'yi' ? 'דעטאלן (אפציאנאל)...' : 'Details (optional)...';
+            labelDiv.innerHTML = `
+                <input type="text" class="w-full text-xs bg-white border border-indigo-300 rounded px-2 py-1 mb-1" value="${escapeHtml(ci.label)}" data-field="label" />
+                <input type="text" class="w-full text-[10px] bg-white border border-slate-200 rounded px-2 py-0.5 text-slate-500" value="${escapeHtml(ci.detail || '')}" placeholder="${detailPh}" data-field="detail" />
+            `;
+            const labelInput = labelDiv.querySelector('[data-field="label"]');
+            const detailInput = labelDiv.querySelector('[data-field="detail"]');
+            labelInput.focus();
+            labelInput.select();
+
+            const saveEdit = async () => {
+                const newLabel = labelInput.value.trim();
+                const newDetail = detailInput.value.trim();
+                if (!newLabel) { renderPackingList(); return; }
+                ci.label = newLabel;
+                ci.detail = newDetail || null;
+                renderPackingList();
+                if (!isOffline && currentUser) {
+                    try {
+                        await fetch(`${API_BASE}/api/custom-items/${currentUser.uid}/${encodeURIComponent(itemId)}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ label: newLabel, detail: newDetail || null })
+                        });
+                    } catch (e) {
+                        console.error('Edit custom item error:', e);
+                        showStatusBar('Error saving edit');
+                    }
+                }
+            };
+            const cancelEdit = () => { renderPackingList(); };
+            const keyHandler = (e) => {
+                if (e.key === 'Enter') { e.preventDefault(); saveEdit(); }
+                if (e.key === 'Escape') { e.preventDefault(); cancelEdit(); }
+            };
+            labelInput.addEventListener('keydown', keyHandler);
+            detailInput.addEventListener('keydown', keyHandler);
+            let blurTimeout;
+            const handleBlur = () => { blurTimeout = setTimeout(() => { if (document.activeElement === labelInput || document.activeElement === detailInput) return; saveEdit(); }, 150); };
+            const handleFocus = () => { clearTimeout(blurTimeout); };
+            labelInput.addEventListener('blur', handleBlur);
+            detailInput.addEventListener('blur', handleBlur);
+            labelInput.addEventListener('focus', handleFocus);
+            detailInput.addEventListener('focus', handleFocus);
+        }
+
+        function startEditBuiltinItem(itemId, li) {
+            let rawItem = null;
+            for (const section of packingSections) {
+                rawItem = section.items.find(i => i.id === itemId);
+                if (rawItem) break;
+            }
+            if (!rawItem) return;
+            const labelDiv = li.querySelector('.flex-1.min-w-0');
+            if (!labelDiv) return;
+            li.removeAttribute('onclick');
+            li.classList.remove('cursor-pointer');
+            li.classList.add('cursor-default');
+            labelDiv.innerHTML = `
+                <div class="space-y-1">
+                    <div class="flex items-center gap-1">
+                        <span class="text-[9px] font-bold text-slate-400 w-5 flex-shrink-0">EN</span>
+                        <input type="text" class="flex-1 text-xs bg-white border border-indigo-300 rounded px-2 py-0.5" value="${escapeHtml(rawItem.label_en)}" data-field="label_en" />
+                        <input type="text" class="flex-1 text-[10px] bg-white border border-slate-200 rounded px-2 py-0.5 text-slate-500" value="${escapeHtml(rawItem.detail_en || '')}" placeholder="Detail" data-field="detail_en" />
+                    </div>
+                    <div class="flex items-center gap-1" dir="rtl">
+                        <span class="text-[9px] font-bold text-slate-400 w-5 flex-shrink-0" dir="ltr">YI</span>
+                        <input type="text" class="flex-1 text-xs bg-white border border-indigo-300 rounded px-2 py-0.5" value="${escapeHtml(rawItem.label_yi)}" data-field="label_yi" />
+                        <input type="text" class="flex-1 text-[10px] bg-white border border-slate-200 rounded px-2 py-0.5 text-slate-500" value="${escapeHtml(rawItem.detail_yi || '')}" placeholder="דעטאלן" data-field="detail_yi" />
+                    </div>
+                </div>
+            `;
+            const firstInput = labelDiv.querySelector('[data-field="label_en"]');
+            firstInput.focus();
+            firstInput.select();
+            const allInputs = labelDiv.querySelectorAll('input');
+
+            const saveEdit = async () => {
+                const newLabelEn = labelDiv.querySelector('[data-field="label_en"]').value.trim();
+                const newLabelYi = labelDiv.querySelector('[data-field="label_yi"]').value.trim();
+                const newDetailEn = labelDiv.querySelector('[data-field="detail_en"]').value.trim();
+                const newDetailYi = labelDiv.querySelector('[data-field="detail_yi"]').value.trim();
+                if (!newLabelEn || !newLabelYi) { renderPackingList(); return; }
+                rawItem.label_en = newLabelEn;
+                rawItem.label_yi = newLabelYi;
+                rawItem.detail_en = newDetailEn || null;
+                rawItem.detail_yi = newDetailYi || null;
+                renderPackingList();
+                try {
+                    const res = await fetch(`${API_BASE}/api/packing/items/${encodeURIComponent(itemId)}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ label_en: newLabelEn, label_yi: newLabelYi, detail_en: newDetailEn || null, detail_yi: newDetailYi || null })
+                    });
+                    if (!res.ok) throw new Error('Update failed');
+                    showStatusBar('Item updated');
+                } catch (e) {
+                    console.error('Admin edit item error:', e);
+                    showStatusBar('Error updating item');
+                    await fetchPackingData();
+                    renderPackingList();
+                }
+            };
+            const cancelEdit = () => { renderPackingList(); };
+            allInputs.forEach(input => {
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') { e.preventDefault(); saveEdit(); }
+                    if (e.key === 'Escape') { e.preventDefault(); cancelEdit(); }
+                });
+            });
+            let blurTimeout;
+            allInputs.forEach(input => {
+                input.addEventListener('blur', () => { blurTimeout = setTimeout(() => { if ([...allInputs].includes(document.activeElement)) return; saveEdit(); }, 150); });
+                input.addEventListener('focus', () => { clearTimeout(blurTimeout); });
+            });
+        }
 
         window.adminAddPackingItem = async function(sectionId) {
             const input = document.getElementById(`add-input-${sectionId}`);
@@ -1644,25 +1867,31 @@
             }
         };
 
-        function renderCheckItem(item, deleteType) {
+        function renderCheckItem(item, deleteType, options) {
             // deleteType: 'custom' for user custom items, 'admin' for admin-deletable global items, falsy for none
+            // options: { draggable, editable }
+            const opts = options || {};
             const isLocked = item.locked === true;
             const checked = isLocked || checkedItems.has(item.id);
             const detailMarkup = item.detail ? `<span class="check-info-wrap"><svg class="check-info-icon" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg><span class="check-inline-detail">${escapeHtml(item.detail)}</span></span>` : '';
+            const dragHandle = opts.draggable ? `<div class="drag-handle" title="Drag to reorder"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg></div>` : '';
+            const editBtn = opts.editable ? `<button onclick="event.stopPropagation(); startEditItem('${item.id}', '${deleteType || ''}')" class="flex-shrink-0 text-slate-300 hover:text-indigo-500 transition-colors p-0.5" title="Edit"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>` : '';
             let deleteBtn = '';
             if (deleteType === 'custom') {
-                deleteBtn = `<button onclick="event.stopPropagation(); deleteCustomItem('${item.id}')" class="custom-item-delete ml-auto flex-shrink-0 text-slate-300 hover:text-rose-500 transition-colors" title="Remove"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>`;
+                deleteBtn = `<button onclick="event.stopPropagation(); deleteCustomItem('${item.id}')" class="custom-item-delete flex-shrink-0 text-slate-300 hover:text-rose-500 transition-colors" title="Remove"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>`;
             } else if (deleteType === 'admin') {
-                deleteBtn = `<button onclick="event.stopPropagation(); adminDeletePackingItem('${item.id}')" class="custom-item-delete ml-auto flex-shrink-0 text-slate-300 hover:text-rose-500 transition-colors" title="Remove item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>`;
+                deleteBtn = `<button onclick="event.stopPropagation(); adminDeletePackingItem('${item.id}')" class="custom-item-delete flex-shrink-0 text-slate-300 hover:text-rose-500 transition-colors" title="Remove item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>`;
             }
             return `
-            <li class="check-item flex items-center gap-3 ${isLocked ? 'opacity-60 cursor-default' : 'cursor-pointer'} select-none" ${isLocked ? '' : `onclick="toggleCheckItem('${item.id}')"`}>
+            <li class="check-item flex items-center gap-2 ${isLocked ? 'opacity-60 cursor-default' : 'cursor-pointer'} select-none" data-item-id="${item.id}" ${isLocked ? '' : `onclick="toggleCheckItem('${item.id}')"`}>
+                ${dragHandle}
                 <div class="check-box ${checked ? 'checked' : ''}">
                     ${checked ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>' : ''}
                 </div>
                 <div class="flex-1 min-w-0">
                     <span class="text-xs ${checked ? 'line-through text-slate-400' : 'text-slate-700'}">${escapeHtml(item.label)}</span>${detailMarkup}
                 </div>
+                ${editBtn}
                 ${deleteBtn}
             </li>`;
         }
@@ -1684,7 +1913,11 @@
                         locked: dbItem.locked
                     };
                     const delType = (isAdmin && !dbItem.locked) ? 'admin' : false;
-                    return renderCheckItem(item, delType);
+                    const itemOpts = {
+                        draggable: isAdmin && !dbItem.locked,
+                        editable: isAdmin && !dbItem.locked
+                    };
+                    return renderCheckItem(item, delType, itemOpts);
                 }).join('');
                 const detailPlaceholder = lang === 'yi' ? 'דעטאלן (אפציאנאל)...' : 'Details (optional)...';
                 const adminAddHtml = isAdmin ? `
@@ -1700,7 +1933,7 @@
                 return `
                 <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
                     <h3 class="text-sm font-bold text-slate-800 mb-3">${escapeHtml(heading)}</h3>
-                    <ul class="space-y-2">${itemsHtml}</ul>
+                    <ul id="sortable-${section.section_id}" class="space-y-2" data-section-id="${section.section_id}">${itemsHtml}</ul>
                     ${adminAddHtml}
                 </div>`;
             }).join('');
@@ -1709,8 +1942,8 @@
             const customHtml = `
                 <div class="bg-white rounded-2xl p-5 border border-indigo-100 shadow-sm">
                     <h3 class="text-sm font-bold text-indigo-700 mb-3">${escapeHtml(customHeading)}</h3>
-                    <ul class="space-y-2">
-                        ${customItems.length ? customItems.map(ci => renderCheckItem({ id: ci.item_id, label: ci.label, detail: ci.detail || null }, 'custom')).join('') : `<li class="text-[11px] text-slate-400 py-1">${lang === 'yi' ? 'נאך נישט צוגעלייגט' : 'No custom items yet'}</li>`}
+                    <ul id="sortable-custom" class="space-y-2" data-section-id="custom">
+                        ${customItems.length ? customItems.map(ci => renderCheckItem({ id: ci.item_id, label: ci.label, detail: ci.detail || null }, 'custom', { draggable: true, editable: true })).join('') : `<li class="text-[11px] text-slate-400 py-1">${lang === 'yi' ? 'נאך נישט צוגעלייגט' : 'No custom items yet'}</li>`}
                     </ul>
                     <div class="mt-3">
                         <div class="flex items-center gap-2">
@@ -1723,6 +1956,7 @@
                     </div>
                 </div>`;
             container.innerHTML = builtInHtml + customHtml;
+            initSortable();
         }
 
         const tabRoutes = { itinerary: 'itinerary', info: 'info', packing: 'packing', comments: 'comments' };
