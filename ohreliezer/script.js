@@ -160,24 +160,8 @@
             ]}
         ];
 
-        const travelInfo = {
-            en: [
-                { heading: "Luggage", items: ["1 checked bag up to 50LB is for free"] },
-                { heading: "Phone & Connectivity", items: ["Make sure your phone works internationally and has a reasonable price per day", "If not, rent a phone or SIM card for the trip"] },
-                { heading: "Weather", items: ["Weather in Europe is similar to the weather here"] },
-                { heading: "Hotel Notes", items: ["Mini bars in the hotel rooms charge a lot — if you take anything remember it's your bill", "There will be a specific room filled with drinks, snacks, cookies that will be for free"] },
-                { heading: "On-Trip Help", items: ["There will be someone traveling with us from Linsoa, he will be able to answer/help with your needs if possible"] },
-                { heading: "Miscellaneous Note", items: ["Siddur & Chumash donated by R' Shloma Goldstein", "Tehillim is available at every Tzion", "Lecht mostly available, but recommended to take a few"] }
-            ],
-            yi: [
-                { heading: "באגאזש", items: ["1 טשעקד בעג ביז 50 פונט איז אומזיסט"] },
-                { heading: "טעלעפאן", items: ["זייט זיכער אז אייער טעלעפאן ארבעט אינטערנאציאנאל מיט א רעזאנאבלע פרייז פער טאג", "אויב נישט, רענט א טעלעפאן אדער SIM קארטל פארן טריפ"] },
-                { heading: "וועטער", items: ["דער וועטער אין אייראפע איז ענליך צום וועטער דא"] },
-                { heading: "האטעל", items: ["מיני בארס אין צימערן קאסטן טייער — אויב איר נעמט עפעס, געדענקט אז עס איז אייער חשבון", "עס וועט זיין א ספעציעלער צימער מיט געטראנקן, סנעקס, קוקיס"] },
-                { heading: "הילף אויפן טריפ", items: ["עמיצער פון 'לנסוע' וועט מיטרייזן מיט אונז, צו זיין גרייט פאר הילף מיט אייערע באדערפענישן"] },
-                { heading: "תשמישי קדושה", items: ["סידור און חומש בנדבת ר' שלמה גאלדשטיין", "תהלים איז דא ביי יעדן ציון", "לעכט איז מערסטנס דא, אבער רעקאמענדירט צו נעמען א פאר"] }
-            ]
-        };
+        // Info categories loaded from DB (replaces old hardcoded travelInfo)
+        let infoCategories = []; // [{category_id, heading_en, heading_yi, category_sort, items: [{id, text_en, text_yi, sort_order}]}]
 
         // Packing list loaded from DB (replaces old hardcoded packingList)
         let packingSections = []; // [{section_id, heading_en, heading_yi, items: [{item_id, label_en, label_yi, detail_en, detail_yi, is_locked}]}]
@@ -284,6 +268,7 @@
                 // Wrap fetches in individual try-catch to prevent one failure from breaking polling setup
                 try { await fetchRsvps(); } catch (e) { console.warn("Could not load RSVPs:", e); }
                 try { await fetchPackingData(); } catch (e) { console.warn("Could not load packing data:", e); }
+                try { await fetchInfoData(); } catch (e) { console.warn("Could not load info data:", e); }
                 try { await fetchChecklist(); } catch (e) { console.warn("Could not load checklist:", e); }
                 try { await fetchCustomItems(); } catch (e) { console.warn("Could not load custom items:", e); }
                 try { await fetchComments(); } catch (e) { console.warn("Could not load comments:", e); }
@@ -985,20 +970,66 @@
         function renderInfo() {
             const container = document.getElementById('info-container');
             if (!container) return;
-            const sections = travelInfo[currentLang] || travelInfo.en;
-            container.innerHTML = sections.map(section => `
-                <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
-                    <h3 class="text-sm font-bold text-slate-800 mb-3">${escapeHtml(section.heading)}</h3>
-                    <ul class="space-y-2">
-                        ${section.items.map(item => `
-                            <li class="flex items-start gap-2 text-xs text-slate-600">
-                                <span class="mt-1 w-1.5 h-1.5 rounded-full bg-indigo-400 flex-shrink-0"></span>
-                                <span>${escapeHtml(item)}</span>
-                            </li>
-                        `).join('')}
-                    </ul>
+            const lang = currentLang;
+
+            const categoriesHtml = infoCategories.map(cat => {
+                const heading = lang === 'yi' ? cat.heading_yi : cat.heading_en;
+                const sortedItems = cat.items.sort((a, b) => a.sort_order - b.sort_order);
+
+                const itemsHtml = sortedItems.map(item => {
+                    const text = lang === 'yi' ? item.text_yi : item.text_en;
+                    const editIcon = isAdmin ? `<button onclick="event.stopPropagation(); startEditInfoItem('${item.id}')" class="ml-2 text-slate-300 hover:text-indigo-500 transition-colors"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>` : '';
+                    const deleteIcon = isAdmin ? `<button onclick="event.stopPropagation(); adminDeleteInfoItem('${item.id}')" class="ml-1 text-slate-300 hover:text-rose-500 transition-colors"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button>` : '';
+                    const dragHandle = isAdmin ? `<span class="info-drag-handle cursor-grab text-slate-300 hover:text-slate-500 mr-1"><svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="3" r="1"/><circle cx="8" cy="3" r="1"/><circle cx="3" cy="8" r="1"/><circle cx="8" cy="8" r="1"/><circle cx="3" cy="13" r="1"/><circle cx="8" cy="13" r="1"/></svg></span>` : '';
+
+                    return `<li class="flex items-start gap-2 text-xs text-slate-600 group" data-item-id="${item.id}">
+                        ${dragHandle}
+                        <span class="mt-1 w-1.5 h-1.5 rounded-full bg-indigo-400 flex-shrink-0"></span>
+                        <span class="flex-1" id="info-item-text-${item.id}">${escapeHtml(text)}</span>
+                        ${isAdmin ? `<span class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center">${editIcon}${deleteIcon}</span>` : ''}
+                    </li>`;
+                }).join('');
+
+                const editCategoryIcon = isAdmin ? `<button onclick="event.stopPropagation(); startEditInfoCategory('${cat.category_id}')" class="ml-2 text-slate-300 hover:text-indigo-500 transition-colors"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>` : '';
+                const deleteCategoryIcon = isAdmin ? `<button onclick="event.stopPropagation(); adminDeleteInfoCategory('${cat.category_id}')" class="ml-1 text-slate-300 hover:text-rose-500 transition-colors"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button>` : '';
+
+                const addItemSection = isAdmin ? `
+                    <div class="mt-3 pt-3 border-t border-slate-100">
+                        <div class="flex items-center gap-2">
+                            <input id="add-info-input-en-${cat.category_id}" type="text" placeholder="${lang === 'yi' ? 'ענגליש טעקסט...' : 'English text...'}" class="flex-1 text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 focus:border-indigo-400 focus:outline-none" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('add-info-input-yi-${cat.category_id}').focus();}">
+                            <input id="add-info-input-yi-${cat.category_id}" type="text" placeholder="${lang === 'yi' ? 'אידיש טעקסט...' : 'Yiddish text...'}" dir="rtl" class="flex-1 text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 focus:border-indigo-400 focus:outline-none" onkeydown="if(event.key==='Enter') adminAddInfoItem('${cat.category_id}')">
+                            <button onclick="adminAddInfoItem('${cat.category_id}')" class="text-[10px] font-bold text-indigo-500 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap">+ ${lang === 'yi' ? 'צולייגן' : 'Add'}</button>
+                        </div>
+                    </div>
+                ` : '';
+
+                return `
+                    <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+                        <h3 class="text-sm font-bold text-slate-800 mb-3 flex items-center group" id="info-category-heading-${cat.category_id}">
+                            <span class="flex-1">${escapeHtml(heading)}</span>
+                            ${isAdmin ? `<span class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center">${editCategoryIcon}${deleteCategoryIcon}</span>` : ''}
+                        </h3>
+                        <ul id="info-sortable-${cat.category_id}" class="space-y-2" data-category-id="${cat.category_id}">
+                            ${itemsHtml}
+                        </ul>
+                        ${addItemSection}
+                    </div>
+                `;
+            }).join('');
+
+            const addCategorySection = isAdmin ? `
+                <div class="bg-indigo-50 rounded-2xl p-5 border border-indigo-100 shadow-sm">
+                    <h3 class="text-sm font-bold text-indigo-700 mb-3">${lang === 'yi' ? 'צולייגן א נייע קאטעגאריע' : 'Add New Category'}</h3>
+                    <div class="flex items-center gap-2">
+                        <input id="add-info-category-en" type="text" placeholder="${lang === 'yi' ? 'ענגליש שורה...' : 'English heading...'}" class="flex-1 text-xs bg-white border border-indigo-200 rounded-lg px-3 py-1.5 focus:border-indigo-400 focus:outline-none" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('add-info-category-yi').focus();}">
+                        <input id="add-info-category-yi" type="text" placeholder="${lang === 'yi' ? 'אידיש שורה...' : 'Yiddish heading...'}" dir="rtl" class="flex-1 text-xs bg-white border border-indigo-200 rounded-lg px-3 py-1.5 focus:border-indigo-400 focus:outline-none" onkeydown="if(event.key==='Enter') adminAddInfoCategory()">
+                        <button onclick="adminAddInfoCategory()" class="text-[10px] font-bold text-indigo-500 hover:text-indigo-700 bg-white hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap">+ ${lang === 'yi' ? 'צולייגן' : 'Add'}</button>
+                    </div>
                 </div>
-            `).join('');
+            ` : '';
+
+            container.innerHTML = categoriesHtml + addCategorySection;
+            initInfoSortable();
         }
 
         async function fetchPackingData() {
@@ -1034,6 +1065,38 @@
                 packingSections = Object.values(sectionMap).sort((a, b) => a.section_sort - b.section_sort);
             } catch (e) {
                 console.warn("Could not load packing data:", e);
+            }
+        }
+
+        async function fetchInfoData() {
+            if (isOffline) return;
+            try {
+                const res = await fetch(`${API_BASE}/api/info`);
+                if (!res.ok) return;
+                const rows = await res.json();
+                const catMap = {};
+                (rows || []).forEach(r => {
+                    if (!catMap[r.category_id]) {
+                        catMap[r.category_id] = {
+                            category_id: r.category_id,
+                            heading_en: r.heading_en,
+                            heading_yi: r.heading_yi,
+                            category_sort: r.category_sort,
+                            items: []
+                        };
+                    }
+                    if (r.item_id) {
+                        catMap[r.category_id].items.push({
+                            id: r.item_id,
+                            text_en: r.text_en,
+                            text_yi: r.text_yi,
+                            sort_order: r.sort_order
+                        });
+                    }
+                });
+                infoCategories = Object.values(catMap).sort((a, b) => a.category_sort - b.category_sort);
+            } catch (e) {
+                console.warn("Could not load info data:", e);
             }
         }
 
@@ -1593,6 +1656,8 @@
                     if (!el) return;
                     const inst = new Sortable(el, {
                         handle: '.drag-handle',
+                        delay: 300,
+                        delayOnTouchOnly: true,
                         animation: 150,
                         ghostClass: 'sortable-ghost',
                         chosenClass: 'sortable-chosen',
@@ -1609,6 +1674,8 @@
                 if (customEl && customItems.length > 0) {
                     const inst = new Sortable(customEl, {
                         handle: '.drag-handle',
+                        delay: 300,
+                        delayOnTouchOnly: true,
                         animation: 150,
                         ghostClass: 'sortable-ghost',
                         chosenClass: 'sortable-chosen',
@@ -1957,6 +2024,266 @@
                 </div>`;
             container.innerHTML = builtInHtml + customHtml;
             initSortable();
+        }
+
+        // ── Info (Travel Info) Admin Functions ──
+
+        window.adminAddInfoItem = async function(categoryId) {
+            const inputEn = document.getElementById(`add-info-input-en-${categoryId}`);
+            const inputYi = document.getElementById(`add-info-input-yi-${categoryId}`);
+            if (!inputEn || !inputYi) return;
+            const textEn = inputEn.value.trim();
+            const textYi = inputYi.value.trim();
+            if (!textEn || !textYi) {
+                showStatusBar('Please fill both English and Yiddish fields');
+                return;
+            }
+            const itemId = categoryId + '_' + Date.now();
+            try {
+                const res = await fetch(`${API_BASE}/api/info/items`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ item_id: itemId, category_id: categoryId, text_en: textEn, text_yi: textYi, sort_order: 999 })
+                });
+                if (!res.ok) throw new Error('Failed to add info item');
+                inputEn.value = '';
+                inputYi.value = '';
+                await fetchInfoData();
+                renderInfo();
+                showStatusBar('Info item added');
+            } catch (e) {
+                console.error("Admin add info item error:", e);
+                showStatusBar('Error adding info item');
+            }
+        };
+
+        window.adminDeleteInfoItem = async function(itemId) {
+            const lang = currentLang === 'yi' ? 'yi' : 'en';
+            const msg = lang === 'yi' ? 'אויסמעקן דעם זאך פאר אלע באנוצער? דאס קען נישט צוריקגעדרייט ווערן.' : 'Delete this item for all users? This cannot be undone.';
+            if (!confirm(msg)) return;
+            try {
+                const res = await fetch(`${API_BASE}/api/info/items/${encodeURIComponent(itemId)}`, { method: 'DELETE' });
+                if (!res.ok) throw new Error('Failed to delete info item');
+                await fetchInfoData();
+                renderInfo();
+                showStatusBar('Info item deleted');
+            } catch (e) {
+                console.error("Admin delete info item error:", e);
+                showStatusBar('Error deleting info item');
+            }
+        };
+
+        window.startEditInfoItem = function(itemId) {
+            // Find the item in infoCategories
+            let item = null;
+            let category = null;
+            for (const cat of infoCategories) {
+                const found = cat.items.find(i => i.id === itemId);
+                if (found) {
+                    item = found;
+                    category = cat;
+                    break;
+                }
+            }
+            if (!item) return;
+
+            const textSpan = document.getElementById(`info-item-text-${itemId}`);
+            if (!textSpan) return;
+
+            const lang = currentLang;
+            textSpan.innerHTML = `
+                <div class="space-y-1">
+                    <input type="text" class="w-full text-xs bg-white border border-indigo-300 rounded px-2 py-1" value="${escapeHtml(item.text_en)}" data-field="text_en" placeholder="English text" />
+                    <input type="text" dir="rtl" class="w-full text-xs bg-white border border-indigo-300 rounded px-2 py-1" value="${escapeHtml(item.text_yi)}" data-field="text_yi" placeholder="אידיש טעקסט" />
+                </div>
+            `;
+
+            const firstInput = textSpan.querySelector('[data-field="text_en"]');
+            firstInput.focus();
+            firstInput.select();
+            const allInputs = textSpan.querySelectorAll('input');
+
+            const saveEdit = async () => {
+                const newTextEn = textSpan.querySelector('[data-field="text_en"]').value.trim();
+                const newTextYi = textSpan.querySelector('[data-field="text_yi"]').value.trim();
+                if (!newTextEn || !newTextYi) { renderInfo(); return; }
+                item.text_en = newTextEn;
+                item.text_yi = newTextYi;
+                renderInfo();
+                try {
+                    const res = await fetch(`${API_BASE}/api/info/items/${encodeURIComponent(itemId)}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ text_en: newTextEn, text_yi: newTextYi })
+                    });
+                    if (!res.ok) throw new Error('Update failed');
+                    showStatusBar('Info item updated');
+                } catch (e) {
+                    console.error('Admin edit info item error:', e);
+                    showStatusBar('Error updating info item');
+                    await fetchInfoData();
+                    renderInfo();
+                }
+            };
+            const cancelEdit = () => { renderInfo(); };
+            allInputs.forEach(input => {
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') { e.preventDefault(); saveEdit(); }
+                    if (e.key === 'Escape') { e.preventDefault(); cancelEdit(); }
+                });
+            });
+            let blurTimeout;
+            allInputs.forEach(input => {
+                input.addEventListener('blur', () => { blurTimeout = setTimeout(() => { if ([...allInputs].includes(document.activeElement)) return; saveEdit(); }, 150); });
+                input.addEventListener('focus', () => { clearTimeout(blurTimeout); });
+            });
+        };
+
+        window.startEditInfoCategory = function(categoryId) {
+            const category = infoCategories.find(c => c.category_id === categoryId);
+            if (!category) return;
+
+            const headingEl = document.getElementById(`info-category-heading-${categoryId}`);
+            if (!headingEl) return;
+
+            const lang = currentLang;
+            headingEl.innerHTML = `
+                <div class="flex-1 space-y-1">
+                    <input type="text" class="w-full text-sm font-bold bg-white border border-indigo-300 rounded px-2 py-1" value="${escapeHtml(category.heading_en)}" data-field="heading_en" placeholder="English heading" />
+                    <input type="text" dir="rtl" class="w-full text-sm font-bold bg-white border border-indigo-300 rounded px-2 py-1" value="${escapeHtml(category.heading_yi)}" data-field="heading_yi" placeholder="אידיש שורה" />
+                </div>
+            `;
+
+            const firstInput = headingEl.querySelector('[data-field="heading_en"]');
+            firstInput.focus();
+            firstInput.select();
+            const allInputs = headingEl.querySelectorAll('input');
+
+            const saveEdit = async () => {
+                const newHeadingEn = headingEl.querySelector('[data-field="heading_en"]').value.trim();
+                const newHeadingYi = headingEl.querySelector('[data-field="heading_yi"]').value.trim();
+                if (!newHeadingEn || !newHeadingYi) { renderInfo(); return; }
+                category.heading_en = newHeadingEn;
+                category.heading_yi = newHeadingYi;
+                renderInfo();
+                try {
+                    const res = await fetch(`${API_BASE}/api/info/categories/${encodeURIComponent(categoryId)}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ heading_en: newHeadingEn, heading_yi: newHeadingYi })
+                    });
+                    if (!res.ok) throw new Error('Update failed');
+                    showStatusBar('Category updated');
+                } catch (e) {
+                    console.error('Admin edit info category error:', e);
+                    showStatusBar('Error updating category');
+                    await fetchInfoData();
+                    renderInfo();
+                }
+            };
+            const cancelEdit = () => { renderInfo(); };
+            allInputs.forEach(input => {
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') { e.preventDefault(); saveEdit(); }
+                    if (e.key === 'Escape') { e.preventDefault(); cancelEdit(); }
+                });
+            });
+            let blurTimeout;
+            allInputs.forEach(input => {
+                input.addEventListener('blur', () => { blurTimeout = setTimeout(() => { if ([...allInputs].includes(document.activeElement)) return; saveEdit(); }, 150); });
+                input.addEventListener('focus', () => { clearTimeout(blurTimeout); });
+            });
+        };
+
+        window.adminDeleteInfoCategory = async function(categoryId) {
+            const lang = currentLang === 'yi' ? 'yi' : 'en';
+            const msg = lang === 'yi' ? 'אויסמעקן די גאנצע קאטעגאריע און אלע איטעמס? דאס קען נישט צוריקגעדרייט ווערן.' : 'Delete this entire category and all its items? This cannot be undone.';
+            if (!confirm(msg)) return;
+            try {
+                const res = await fetch(`${API_BASE}/api/info/categories/${encodeURIComponent(categoryId)}`, { method: 'DELETE' });
+                if (!res.ok) throw new Error('Failed to delete info category');
+                await fetchInfoData();
+                renderInfo();
+                showStatusBar('Category deleted');
+            } catch (e) {
+                console.error("Admin delete info category error:", e);
+                showStatusBar('Error deleting category');
+            }
+        };
+
+        window.adminAddInfoCategory = async function() {
+            const inputEn = document.getElementById('add-info-category-en');
+            const inputYi = document.getElementById('add-info-category-yi');
+            if (!inputEn || !inputYi) return;
+            const headingEn = inputEn.value.trim();
+            const headingYi = inputYi.value.trim();
+            if (!headingEn || !headingYi) {
+                showStatusBar('Please fill both English and Yiddish headings');
+                return;
+            }
+            const categoryId = 'cat_' + Date.now();
+            try {
+                const res = await fetch(`${API_BASE}/api/info/categories`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ category_id: categoryId, heading_en: headingEn, heading_yi: headingYi, sort_order: 999 })
+                });
+                if (!res.ok) throw new Error('Failed to add info category');
+                inputEn.value = '';
+                inputYi.value = '';
+                await fetchInfoData();
+                renderInfo();
+                showStatusBar('Category added');
+            } catch (e) {
+                console.error("Admin add info category error:", e);
+                showStatusBar('Error adding category');
+            }
+        };
+
+        // ── Info Drag-and-drop (SortableJS) ──
+        let infoSortableInstances = [];
+
+        function initInfoSortable() {
+            infoSortableInstances.forEach(s => s.destroy());
+            infoSortableInstances = [];
+            if (typeof Sortable === 'undefined' || !isAdmin) return;
+
+            infoCategories.forEach(cat => {
+                const el = document.getElementById(`info-sortable-${cat.category_id}`);
+                if (!el) return;
+                const inst = new Sortable(el, {
+                    handle: '.info-drag-handle',
+                    delay: 300,
+                    delayOnTouchOnly: true,
+                    animation: 150,
+                    ghostClass: 'sortable-ghost',
+                    chosenClass: 'sortable-chosen',
+                    onEnd: function(evt) { handleInfoReorder(cat.category_id, evt); }
+                });
+                infoSortableInstances.push(inst);
+            });
+        }
+
+        async function handleInfoReorder(categoryId, evt) {
+            if (evt.oldIndex === evt.newIndex) return;
+            const cat = infoCategories.find(c => c.category_id === categoryId);
+            if (!cat) return;
+            const [moved] = cat.items.splice(evt.oldIndex, 1);
+            cat.items.splice(evt.newIndex, 0, moved);
+            const payload = cat.items.map((item, idx) => ({ item_id: item.id, sort_order: idx }));
+            try {
+                const res = await fetch(`${API_BASE}/api/info/items/reorder`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ items: payload })
+                });
+                if (!res.ok) throw new Error('Reorder failed');
+            } catch (e) {
+                console.error('Info reorder error:', e);
+                showStatusBar('Error saving order');
+                await fetchInfoData();
+                renderInfo();
+            }
         }
 
         const tabRoutes = { itinerary: 'itinerary', info: 'info', packing: 'packing', comments: 'comments' };
