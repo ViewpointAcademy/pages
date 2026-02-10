@@ -2491,11 +2491,22 @@
         };
 
         window.adminAddItineraryDay = function() {
-            const dateStr = prompt('Enter date (YYYY-MM-DD):');
-            if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-                if (dateStr !== null) alert('Please enter a valid date in YYYY-MM-DD format');
-                return;
-            }
+            // Replace the "+ Add Day" button with an inline date picker
+            const addDayBtn = document.querySelector('button[onclick="adminAddItineraryDay()"]');
+            if (!addDayBtn) return;
+            const wrapper = addDayBtn.parentElement;
+            wrapper.innerHTML = `
+                <div class="flex items-center gap-2">
+                    <input type="date" id="add-day-date-input" class="border border-indigo-300 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-indigo-300 focus:outline-none">
+                    <button onclick="submitAddItineraryDay()" class="px-4 py-2 bg-indigo-500 text-white rounded-lg text-sm hover:bg-indigo-600">Add</button>
+                    <button onclick="renderTimeline()" class="px-4 py-2 bg-slate-200 text-slate-600 rounded-lg text-sm hover:bg-slate-300">Cancel</button>
+                </div>`;
+            document.getElementById('add-day-date-input').focus();
+        };
+
+        window.submitAddItineraryDay = function() {
+            const dateStr = document.getElementById('add-day-date-input').value;
+            if (!dateStr) { alert('Please select a date'); return; }
 
             const day_id = 'day_' + Date.now();
             const maxSort = itineraryDays.length ? Math.max(...itineraryDays.map(d => d.day_sort || 0)) : 0;
@@ -2530,12 +2541,27 @@
             const day = itineraryDays.find(d => d.day_id === dayId);
             if (!day) return;
 
-            const newDate = prompt('Edit date (YYYY-MM-DD):', day.date);
-            if (!newDate || newDate === day.date) return;
-            if (!/^\d{4}-\d{2}-\d{2}$/.test(newDate)) {
-                alert('Please enter a valid date in YYYY-MM-DD format');
-                return;
-            }
+            // Replace the date badge with an inline date picker
+            const daySection = document.querySelector(`[data-day-id="${dayId}"]`);
+            if (!daySection) return;
+            const badge = daySection.querySelector('.date-badge');
+            if (!badge) return;
+            const wrapper = badge.parentElement;
+            wrapper.innerHTML = `
+                <div class="flex flex-col items-center gap-1">
+                    <input type="date" id="edit-day-date-${dayId}" value="${day.date}" class="border border-indigo-300 rounded px-1 py-1 text-xs bg-white w-[7.5rem] focus:ring-2 focus:ring-indigo-300 focus:outline-none">
+                    <div class="flex gap-1">
+                        <button onclick="submitEditItineraryDay('${dayId}')" class="px-2 py-0.5 bg-indigo-500 text-white rounded text-[10px] hover:bg-indigo-600">Save</button>
+                        <button onclick="renderTimeline()" class="px-2 py-0.5 bg-slate-200 text-slate-600 rounded text-[10px] hover:bg-slate-300">Cancel</button>
+                    </div>
+                </div>`;
+            document.getElementById('edit-day-date-' + dayId).focus();
+        };
+
+        window.submitEditItineraryDay = function(dayId) {
+            const day = itineraryDays.find(d => d.day_id === dayId);
+            const newDate = document.getElementById('edit-day-date-' + dayId).value;
+            if (!newDate || newDate === day.date) { renderTimeline(); return; }
 
             fetch(`${API_BASE}/api/itinerary/days/${encodeURIComponent(dayId)}`, {
                 method: 'PUT',
@@ -2566,6 +2592,10 @@
                     delayOnTouchOnly: true,
                     animation: 150,
                     ghostClass: 'opacity-30',
+                    scroll: true,
+                    scrollSensitivity: 80,
+                    scrollSpeed: 15,
+                    bubbleScroll: true,
                     onEnd: (evt) => handleItineraryStopReorder(day.day_id, evt)
                 });
             });
