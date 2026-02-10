@@ -2702,7 +2702,7 @@
         }
 
         async function fetchPhotos() {
-            if (!photoConfig.connected || !photoConfig.albumId) { allPhotos = []; return; }
+            if (!photoConfig.connected) { allPhotos = []; return; }
             try {
                 const res = await fetch(`${API_BASE}/api/photos`);
                 const data = await res.json();
@@ -2842,22 +2842,11 @@
                 return;
             }
 
-            if (!photoConfig.albumId) {
-                if (isAdmin) {
-                    changeAlbum();
-                } else {
-                    contentEl.classList.remove('hidden');
-                    notConnectedEl.classList.remove('hidden');
-                }
-                return;
-            }
-
             contentEl.classList.remove('hidden');
 
-            // Admin bar
+            // Admin bar (show refresh button, but no album selection)
             if (isAdmin) {
                 adminBar.classList.remove('hidden');
-                document.getElementById('gallery-album-name').textContent = photoConfig.albumTitle || photoConfig.albumId;
             } else {
                 adminBar.classList.add('hidden');
             }

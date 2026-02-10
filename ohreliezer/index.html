@@ -220,23 +220,12 @@
                 </div>
 
                 <!-- Album selector (shown after auth, before album selected) -->
-                <div id="gallery-album-select" class="hidden max-w-lg mx-auto py-8">
-                    <h3 class="text-lg font-bold text-slate-700 mb-4">Select Album</h3>
-                    <div id="album-list" class="space-y-2"></div>
-                </div>
-
-                <!-- Gallery content (shown when connected + album selected) -->
+                <!-- Gallery content (shown when connected) -->
                 <div id="gallery-content" class="hidden">
-                    <!-- Admin bar -->
+                    <!-- Admin bar (refresh photos only) -->
                     <div id="gallery-admin-bar" class="hidden flex flex-wrap items-center justify-between gap-3 mb-4 bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3">
-                        <div class="flex items-center gap-2">
-                            <span class="text-[10px] font-black text-amber-600 bg-amber-100 px-2 py-0.5 rounded">ADMIN</span>
-                            <span id="gallery-album-name" class="text-xs font-bold text-amber-700"></span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <button onclick="refreshPhotoCache()" class="text-[10px] font-bold text-amber-600 hover:text-amber-800 bg-white px-3 py-1.5 rounded-lg border border-amber-200 transition-colors">Refresh Photos</button>
-                            <button onclick="changeAlbum()" class="text-[10px] font-bold text-amber-600 hover:text-amber-800 bg-white px-3 py-1.5 rounded-lg border border-amber-200 transition-colors">Change Album</button>
-                        </div>
+                        <span class="text-[10px] font-black text-amber-600 bg-amber-100 px-2 py-0.5 rounded">ADMIN</span>
+                        <button onclick="refreshPhotoCache()" class="text-[10px] font-bold text-amber-600 hover:text-amber-800 bg-white px-3 py-1.5 rounded-lg border border-amber-200 transition-colors">Refresh Photos</button>
                     </div>
 
                     <!-- Day filter pills -->
