@@ -3395,7 +3395,7 @@
             }
         });
 
-        window.onload = () => {
+        window.onload = async () => {
             wasDesktop = isDesktop();
             // On load, respect `lang` URL parameter if present
             try {
@@ -3493,7 +3493,7 @@
 
             // Route to tab from URL hash
             const initialTab = getTabFromHash();
-            switchTab(initialTab, false);
+            await switchTab(initialTab, false);
 
             init();
         };
