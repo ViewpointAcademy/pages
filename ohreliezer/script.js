@@ -113,52 +113,8 @@
             chevron: `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>`
         };
 
-        const itinerary = [
-            { day: "Tue", dateNum: "10", stops: [
-                { id: 1, type: "travel", time: "9:00 PM", title: {en:"Departure from NY", yi:"מען פליט פון ניו יארק"}, loc: "JFK Airport", query: "JFK Airport Terminal", desc: {en:"Depart on Swiss Air LX15. Shachris on flight if possible.", yi:"מען פליט מיט סוויס ער LX15. שחרית אויפן פליגער אויב מעגליך."} }
-            ] },
-            { day: "Wed", dateNum: "11", stops: [
-                { id: 20, type: "travel", time: "2:05 PM", title: {en:"Arrival Budapest", yi:"אנקומען קיין בודאפעסט"}, loc: "Budapest Airport", query: "Budapest Airport", desc: {en:"Arrival. Mincha at baggage claim. Breakfast/lunch on bus.", yi:"אנקומען. מנחה ביים באגאזש. פרישטאג/מיטאג אויפן באס."} },
-                { id: 21, type: "prayer", time: "5:30 PM", title: {en:"Ratzfert Beis Hachaim", yi:"ראצפערט בית החיים"}, loc: {en:"Ratzfert", yi:"ראצפערט"}, query: "Rácalmás Jewish Cemetery, Hungary", desc: {en:"Mikvah, toilets, tfilah at Beis Hachaim.", yi:"מקוה, מתפלל זיין ביים ציון."} },
-                { id: 22, type: "prayer", time: "7:00 PM", title: {en:"Kalov Beis Hachaim", yi:"קאלוב בית החיים"}, loc: {en:"Kalov", yi:"קאלוב"}, query: "Nagykálló Jewish Cemetery, Hungary", desc: {en:"tfilah at Beis Hachaim.", yi:"מתפלל זיין ביים ציון."} },
-                { id: 23, type: "prayer", time: "8:45 PM", title: {en:"Kerestir", yi:"קערעסטיר"}, loc: {en:"Bodrogkeresztúr", yi:"קערעסטיר"}, query: "Reb Shayala's Guest House, Bodrogkeresztúr", desc: {en:"Maariv, dinner, siyum, historical talk by R' Yaakov Farber.", yi:"מעריב, סעודה, סיום, היסטארישע רעדע דורך ר׳ יעקב פארבער."} },
-                { id: 24, type: "hotel", time: "10:25 PM", title: {en:"Hotel Minnaro", yi:"האטעל מינארא"}, loc: {en:"Tokaj", yi:"טאקאי"}, query: "Hotel & Winery & SPA & Restaurant Minnaro Tokaj Hungary", desc: {en:"Check-in. Coffee/tea/snacks available overnight.", yi:"אריינטשעקן. קאווע/טיי/סנעקס דורכאויס די נאכט."} }
-            ]},
-            { day: "Thu", dateNum: "12", stops: [
-                { id: 30, type: "prayer", time: "7:30 AM", title: {en:"Morning in Tokaj", yi:"פרימארגן אין טאקאי"}, loc: {en:"Hotel Minnaro", yi:"האטעל מינארא"}, query: "Hotel & Winery & SPA & Restaurant Minnaro Tokaj Hungary", desc: {en:"Hotel checkout, Mikvah & Shachris. Two buses depart.", yi:"ארויסטשעקן, מקוה און שחרית. צוויי באסן פארן אפ."} },
-                { id: 31, type: "prayer", time: "8:45 AM", title: {en:"Kerestir Breakfast", yi:"פרישטאג אין קערעסטיר"}, loc: {en:"Kerestir Shul", yi:"קערעסטירער שול"}, query: "Reb Shayala's Guest House, Bodrogkeresztúr", desc: {en:"Breakfast in shul.", yi:"פרישטאג אין שול."} },
-                { id: 32, type: "prayer", time: "10:00 AM", title: {en:"Kerestir Beis Hachaim", yi:"קערעסטירער בית החיים"}, loc: {en:"Reb Shayala's Tziyun", yi:"רבי ישעי׳לעס ציון"}, query: "Reb Shayala's Guest House, Bodrogkeresztúr", desc: {en:"Very important — leaving on time is critical.", yi:"זייער וויכטיג — מען מוז פארן אויף דער צייט."} },
-                { id: 33, type: "prayer", time: "11:15 AM", title: {en:"Liska", yi:"ליסקא"}, loc: {en:"Reb Hershele Lisker", yi:"הרה״ק ר׳ הערשעלע ליסקער"}, query: "Olaszliszka Cemetery", desc: {en:"Quick cemetery stop.", yi:"א שנעלער תפלה ביים ציון."} },
-                { id: 34, type: "prayer", time: "12:15 PM", title: {en:"Ihel", yi:"אוהעל"}, loc: {en:"Yismach Moshe", yi:"דער הייליגער ישמח משה"}, query: "Sátoraljaújhely Jewish Cemetery", desc: {en:"tfilah at Beis Hachaim. Divrei hisorerus by the Rav.", yi:"מתפלל זיין ביים ציון. דברי התעוררות פונעם רב שליט״א."} },
-                { id: 35, type: "prayer", time: "4:30 PM", title: {en:"Tanz", yi:"צאנז"}, loc: {en:"Historic Shul", yi:"היסטארישע שול"}, query: "Nowy Sącz Jewish Cemetery", desc: {en:"Historic shul visit, Mincha, light meal.", yi:"באזוך אין היסטארישע שול, מנחה, לייכטע איבערבייסונג."} },
-                { id: 36, type: "hotel", time: "8:15 PM", title: {en:"Krakow Hotel", yi:"קראקא האטעל"}, loc: {en:"Krakow", yi:"קראקא"}, query: "Kazimierz Krakow", desc: {en:"Check-in (remaining for rest of trip).", yi:"אריינטשעקן (מען בלייבט דא פאר דער רעשט פון טריפ)."} },
-                { id: 37, type: "prayer", time: "9:15 PM", title: {en:"Maariv & Shiur", yi:"מעריב און שיעור"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Maariv followed by weekly shiur by R' Yoel Lefkowitz.", yi:"מעריב, שיעור דורך ר׳ יואל לעפקאוויטש."} },
-                { id: 38, type: "hotel", time: "10:00 PM", title: {en:"Dinner & Kumzitz", yi:"סעודה און קומזיץ"}, loc: {en:"Krakow", yi:"קראקא"}, query: null, desc: {en:"Main dinner, siyum & kumzitz.", yi:"הויפט סעודה, סיום און קומזיץ."} }
-            ]},
-            { day: "Fri", dateNum: "13", stops: [
-                { id: 40, type: "prayer", time: "8:30 AM", title: {en:"Shachris & Breakfast", yi:"שחרית און פרישטאג"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Shachris & breakfast at hotel.", yi:"שחרית און פרישטאג אין האטעל."} },
-                { id: 41, type: "prayer", time: "11:10 AM", title: {en:"Krakow Beis Hachaim", yi:"קראקא בית החיים"}, loc: {en:"Rema & Others", yi:"דער רמ״א און אנדערע צדיקים"}, query: "Old Jewish Cemetery, Kraków", desc: {en:"Shul & tfilah at Beis Hachaim with divrei Torah.", yi:"שול און בית החיים באזוך מיט דברי תורה."} },
-                { id: 42, type: "travel", time: "12:40 PM", title: {en:"Jewish Quarter Tour", yi:"באזוך אין יידישן קווארטאל"}, loc: {en:"Kazimierz", yi:"קאזימירז"}, query: "Kazimierz, Kraków", desc: {en:"Guided tour of the Jewish Quarter.", yi:"געפירטער באזוך אין יידישן קווארטאל."} },
-                { id: 43, type: "hotel", time: "1:40 PM", title: {en:"Shabbos Prep", yi:"שבת צוגרייטונג"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Return to hotel. Shabbos prep, rest, mikvah, shvitz.", yi:"צוריק צום האטעל. שבת צוגרייטונג, זיך צולייגן, מקוה, שוויץ."} },
-                { id: 44, type: "shabbos", time: "4:39 PM", title: {en:"Candle Lighting", yi:"ליכט צינדן"}, loc: {en:"Krakow", yi:"קראקא"}, query: null, desc: {en:"Candle lighting.", yi:"ליכט צינדן."} },
-                { id: 45, type: "shabbos", time: "5:30 PM", title: {en:"Shabbos Mincha", yi:"מנחה עש״ק"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Shabbos Mincha.", yi:"מנחה ערב שבת קודש."} },
-                { id: 46, type: "shabbos", time: "7:00 PM", title: {en:"Shiur", yi:"שיעור"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Shiur after Maariv.", yi:"שיעור נאך מעריב."} },
-                { id: 47, type: "shabbos", time: "7:30 PM", title: {en:"Shabbos Meal", yi:"שבת סעודה"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Drashos by R' Yoel Lefkowitz & R' Mallach.", yi:"דרשות דורך ר׳ יואל לעפקאוויטש און ר׳ אברהם מרדכי מלאך."} }
-            ]},
-            { day: "Sat", dateNum: "14", stops: [
-                { id: 50, type: "shabbos", time: "Morning", title: {en:"Shabbos Davening", yi:"שחרית שב״ק"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Shachris, kiddush, Shabbos meal.", yi:"שחרית, קידוש, שבת סעודה."} },
-                { id: 51, type: "shabbos", time: "5:30 PM", title: {en:"Mincha & Havdalah", yi:"מנחה און הבדלה"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Mincha, drasha, Havdalah.", yi:"מנחה, דרשה, הבדלה."} },
-                { id: 52, type: "travel", time: "8:30 PM", title: {en:"Travel to Lizensk", yi:"נסיעה קיין ליזענסק"}, loc: {en:"~90 min drive", yi:"~90 מינוט פארן"}, query: "Leżajsk Beis Hachaim, Poland", desc: {en:"Depart to Lizensk (~90 min after Havdalah).", yi:"פארן קיין ליזענסק (~90 מינוט נאך הבדלה)."} },
-                { id: 53, type: "prayer", time: "10:45 PM", title: {en:"Lizensk", yi:"ליזענסק"}, loc: {en:"Rebbe Reb Elimelech", yi:"רבי ר׳ אלימלך"}, query: "Leżajsk Cemetery, Poland", desc: {en:"Melava Malka & tfilah at Beis Hachaim after chatzos.", yi:"מלוה מלכה און באזוך אויפן בית החיים נאך חצות."} },
-                { id: 54, type: "travel", time: "3:30 AM", title: {en:"Return to Krakow", yi:"צוריק קיין קראקא"}, loc: {en:"Hotel", yi:"האטעל"}, query: null, desc: {en:"Return to hotel.", yi:"צוריק צום האטעל."} }
-            ]},
-            { day: "Sun", dateNum: "15", stops: [
-                { id: 60, type: "travel", time: "8:45 AM", title: {en:"Hotel Checkout", yi:"ארויסטשעקן"}, loc: {en:"Krakow", yi:"קראקא"}, query: null, desc: {en:"Checkout. Daven & breakfast on bus.", yi:"ארויסטשעקן. דאווענען און פרישטאג אויפן באס."} },
-                { id: 61, type: "travel", time: "10:15 AM", title: {en:"Auschwitz", yi:"אוישוויץ"}, loc: {en:"Oswiecim", yi:"אוישוויץ"}, query: "Auschwitz-Birkenau Memorial", desc: {en:"Guided visit with R' Yaakov Farber.", yi:"געפירטער באזוך מיט ר׳ יעקב פארבער."} },
-                { id: 62, type: "travel", time: "1:30 PM", title: {en:"Departure from KRK", yi:"אפפליען פון קראקא"}, loc: {en:"KRK Airport", yi:"קראקא לופטפעלד"}, query: "Kraków Airport", desc: {en:"Departure to NY.", yi:"אפפליען קיין ניו יארק."} },
-                { id: 63, type: "travel", time: "8:30 PM", title: {en:"Arrival in NY", yi:"אנקומען קיין ניו יארק"}, loc: "JFK Airport", query: "JFK Airport", desc: {en:"Welcome home!", yi:"בעזה״ש צוריק אהיים!"} }
-            ]}
-        ];
+        // Itinerary loaded from DB (replaces old hardcoded itinerary)
+        let itineraryDays = []; // [{day_id, date, stops: [{stop_id, type, time_label, title_en, title_yi, loc_en, loc_yi, description_en, description_yi, long_notes, map_query}]}]
 
         // Info categories loaded from DB (replaces old hardcoded travelInfo)
         let infoCategories = []; // [{category_id, heading_en, heading_yi, category_sort, items: [{id, text_en, text_yi, sort_order}]}]
@@ -269,10 +225,12 @@
                 try { await fetchRsvps(); } catch (e) { console.warn("Could not load RSVPs:", e); }
                 try { await fetchPackingData(); } catch (e) { console.warn("Could not load packing data:", e); }
                 try { await fetchInfoData(); } catch (e) { console.warn("Could not load info data:", e); }
+                try { await fetchItineraryData(); } catch (e) { console.warn("Could not load itinerary:", e); }
                 try { await fetchChecklist(); } catch (e) { console.warn("Could not load checklist:", e); }
                 try { await fetchCustomItems(); } catch (e) { console.warn("Could not load custom items:", e); }
                 try { await fetchComments(); } catch (e) { console.warn("Could not load comments:", e); }
                 // Re-render current tab now that data is loaded
+                if (currentTab === 'itinerary') renderTimeline();
                 if (currentTab === 'info') renderInfo();
                 if (currentTab === 'packing') renderPackingList();
                 if (currentTab === 'comments') renderComments();
@@ -915,57 +873,88 @@
         function renderTimeline() {
             const container = document.getElementById('timeline-container');
             const t = i18n[currentLang];
-            container.innerHTML = `<div class="timeline-line-bg"></div>` + itinerary.map(day => `
-                <div class="day-section mb-12">
+
+            if (!itineraryDays.length) {
+                container.innerHTML = '<p class="text-center text-slate-400 py-8">Loading itinerary...</p>';
+                return;
+            }
+
+            container.innerHTML = `<div class="timeline-line-bg"></div>` + itineraryDays.map(day => `
+                <div class="day-section mb-12" data-day-id="${day.day_id}">
                     <div class="day-sidebar">
                         <div class="sticky-wrapper">
-                            <div class="date-badge">
+                            <div class="date-badge group relative">
                                 <span class="text-[8px] font-black text-indigo-200 uppercase">${t.days[day.day]}</span>
                                 <span class="text-xl font-black text-indigo-950">${day.dateNum}</span>
+                                ${isAdmin ? `<div class="absolute -top-1 -right-1 opacity-0 group-hover:opacity-100 transition-opacity flex gap-0.5">
+                                    <button onclick="startEditItineraryDay('${day.day_id}')" class="w-5 h-5 flex items-center justify-center rounded-full bg-white shadow text-indigo-400 hover:text-indigo-600" title="Edit date">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                    </button>
+                                    <button onclick="adminDeleteItineraryDay('${day.day_id}')" class="w-5 h-5 flex items-center justify-center rounded-full bg-white shadow text-red-400 hover:text-red-600" title="Delete day">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    </button>
+                                </div>` : ''}
                             </div>
                         </div>
                     </div>
-                    <div class="flex-grow space-y-4">
+                    <div class="flex-grow space-y-4" id="itinerary-stops-${day.day_id}">
                         ${day.stops.map(s => {
                             const hasLongNotes = !!s.longNotes;
                             const hasQuery = !!s.query;
                             const shouldAutoExpand = hasQuery && !hasLongNotes;
                             const locLabel = typeof s.loc === 'object' ? s.loc[currentLang] : s.loc;
-                            
-                            const safeQuery = encodeURIComponent(s.query).replace(/'/g, '%27');
-                            const safeTitle = encodeURIComponent(s.title[currentLang]).replace(/'/g, '%27');
+
+                            const safeQuery = hasQuery ? encodeURIComponent(s.query).replace(/'/g, '%27') : '';
+                            const safeTitle = encodeURIComponent((s.title[currentLang] || s.title.en || '')).replace(/'/g, '%27');
                             const dirLink = hasQuery ? `
                                         <a href="https://www.google.com/maps/search/?api=1&query=${safeQuery}"
-                                           onclick="return handleDirectionsClick(event, '${safeQuery}', '${safeTitle}', ${s.id})"
+                                           onclick="return handleDirectionsClick(event, '${safeQuery}', '${safeTitle}', '${s.stop_id}')"
                                            target="_blank" class="nav-link-minimal">
                                             ${icons.navigate} <span>${t.directions}</span>
                                         </a>` : '';
 
                             return `
-                            <div id="card-${s.id}" class="itinerary-card bg-white rounded-[2rem] p-5 border border-slate-100 shadow-sm relative overflow-hidden">
+                            <div id="card-${s.stop_id}" class="itinerary-card bg-white rounded-[2rem] p-5 border border-slate-100 shadow-sm relative overflow-hidden group" data-stop-id="${s.stop_id}">
+                                ${isAdmin ? `<div class="itinerary-drag-handle absolute top-2 left-2 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity text-slate-300 hover:text-slate-500">
+                                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>
+                                </div>` : ''}
+                                ${isAdmin ? `<div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button onclick="startEditItineraryStop('${s.stop_id}')" class="w-6 h-6 flex items-center justify-center rounded-full bg-white shadow text-indigo-400 hover:text-indigo-600" title="Edit stop">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                    </button>
+                                    <button onclick="adminDeleteItineraryStop('${s.stop_id}')" class="w-6 h-6 flex items-center justify-center rounded-full bg-white shadow text-red-400 hover:text-red-600" title="Delete stop">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    </button>
+                                </div>` : ''}
                                 <div class="flex justify-between items-start mb-3">
                                     <div class="category-pill ${catStyles[s.type] || 'bg-slate-50 text-slate-600'}">${icons[s.type] || ''}${t.types[s.type]}</div>
                                     <span class="text-[10px] lg:text-xs font-bold text-slate-400">${s.time}</span>
                                 </div>
-                                <h3 class="text-lg font-bold text-slate-800 leading-tight mb-1">${s.title[currentLang]}</h3>
+                                <h3 class="text-lg font-bold text-slate-800 leading-tight mb-1">${s.title[currentLang] || s.title.en}</h3>
                                 <div class="flex items-center justify-between">
                                     <p class="text-[10px] lg:text-xs font-bold text-indigo-500 uppercase tracking-wide">${locLabel}</p>
                                     ${shouldAutoExpand ? dirLink : ''}
                                 </div>
-                                <p class="text-slate-500 text-xs mt-3 leading-relaxed">${s.desc[currentLang]}</p>
-                                <div id="expand-${s.id}" class="card-expand-content ${shouldAutoExpand && !hasLongNotes ? '' : 'open'} ${hasLongNotes ? '' : 'always-open'}">
+                                <p class="text-slate-500 text-xs mt-3 leading-relaxed">${s.desc[currentLang] || s.desc.en}</p>
+                                <div id="expand-${s.stop_id}" class="card-expand-content ${shouldAutoExpand && !hasLongNotes ? '' : 'open'} ${hasLongNotes ? '' : 'always-open'}">
                                     ${hasLongNotes ? `<p class="text-slate-400 text-[10px] mb-4 italic leading-relaxed border-l-2 border-indigo-50 pl-3">${s.longNotes}</p>` : ''}
                                     ${hasLongNotes ? dirLink : ''}
                                 </div>
                                 ${hasLongNotes ? `
-                                    <button onclick="toggleCard(${s.id})" id="btn-${s.id}" class="mt-4 flex items-center gap-1 text-[9px] font-black text-slate-300 uppercase tracking-widest">
+                                    <button onclick="toggleCard('${s.stop_id}')" id="btn-${s.stop_id}" class="mt-4 flex items-center gap-1 text-[9px] font-black text-slate-300 uppercase tracking-widest">
                                         <span>${t.showDetails}</span><span class="transition-transform">${icons.chevron}</span>
                                     </button>
                                 ` : ''}
                             </div>`;
                         }).join('')}
+                        ${isAdmin ? `<button onclick="adminAddItineraryStop('${day.day_id}')" class="w-full py-3 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 hover:text-indigo-500 hover:border-indigo-300 transition-colors text-sm font-medium">+ Add Stop</button>` : ''}
                     </div>
-                </div>`).join('');
+                </div>`).join('') + (isAdmin ? `
+            <div class="flex justify-center mt-8">
+                <button onclick="adminAddItineraryDay()" class="px-6 py-3 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 hover:text-indigo-500 hover:border-indigo-300 transition-colors text-sm font-medium">+ Add Day</button>
+            </div>` : '');
+
+            if (isAdmin) initItinerarySortable();
         }
         
         function renderInfo() {
@@ -1100,6 +1089,44 @@
                 infoCategories = Object.values(catMap).sort((a, b) => a.category_sort - b.category_sort);
             } catch (e) {
                 console.warn("Could not load info data:", e);
+            }
+        }
+
+        async function fetchItineraryData() {
+            try {
+                const res = await fetch(`${API_BASE}/api/itinerary`);
+                if (!res.ok) throw new Error('Failed to fetch itinerary');
+                const rows = await res.json();
+                const dayMap = {};
+                rows.forEach(r => {
+                    if (!dayMap[r.day_id]) {
+                        dayMap[r.day_id] = { day_id: r.day_id, date: r.date, day_sort: r.day_sort, stops: [] };
+                    }
+                    if (r.stop_id) {
+                        dayMap[r.day_id].stops.push({
+                            stop_id: r.stop_id,
+                            type: r.type,
+                            time: r.time_label || '',
+                            title: { en: r.title_en, yi: r.title_yi },
+                            loc: r.loc_yi ? { en: r.loc_en, yi: r.loc_yi } : r.loc_en,
+                            query: r.map_query,
+                            desc: { en: r.description_en, yi: r.description_yi },
+                            longNotes: r.long_notes,
+                            sort_order: r.sort_order
+                        });
+                    }
+                });
+                // Sort days by date ascending
+                itineraryDays = Object.values(dayMap).sort((a, b) => a.date.localeCompare(b.date));
+                // Derive day name and date number from ISO date
+                const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                itineraryDays.forEach(d => {
+                    const dt = new Date(d.date + 'T12:00:00'); // noon to avoid timezone issues
+                    d.day = dayNames[dt.getUTCDay()];
+                    d.dateNum = String(dt.getUTCDate());
+                });
+            } catch (e) {
+                console.warn('Could not load itinerary:', e);
             }
         }
 
@@ -2286,6 +2313,287 @@
                 showStatusBar('Error saving category order');
                 await fetchInfoData();
                 renderInfo();
+            }
+        }
+
+        // ── Itinerary Admin CRUD Functions ──
+        window.startEditItineraryStop = function(stopId) {
+            // Find the stop data
+            let stopData = null, dayData = null;
+            for (const day of itineraryDays) {
+                const found = day.stops.find(s => s.stop_id === stopId);
+                if (found) { stopData = found; dayData = day; break; }
+            }
+            if (!stopData) return;
+
+            const card = document.getElementById('card-' + stopId);
+            if (!card) return;
+
+            const lang = currentLang;
+            const locEn = typeof stopData.loc === 'object' ? stopData.loc.en : stopData.loc;
+            const locYi = typeof stopData.loc === 'object' ? stopData.loc.yi : '';
+
+            card.innerHTML = `
+                <div class="space-y-2 text-xs">
+                    <div class="flex gap-2">
+                        <select id="edit-itin-type-${stopId}" class="border border-indigo-300 rounded px-2 py-1.5 text-xs bg-white">
+                            <option value="travel" ${stopData.type === 'travel' ? 'selected' : ''}>Travel</option>
+                            <option value="prayer" ${stopData.type === 'prayer' ? 'selected' : ''}>Prayer</option>
+                            <option value="hotel" ${stopData.type === 'hotel' ? 'selected' : ''}>Hotel</option>
+                            <option value="shabbos" ${stopData.type === 'shabbos' ? 'selected' : ''}>Shabbos</option>
+                        </select>
+                        <input id="edit-itin-time-${stopId}" class="flex-1 border border-indigo-300 rounded px-2 py-1.5 text-xs" placeholder="e.g. 9:00 PM" value="${escapeHtml(stopData.time)}">
+                    </div>
+                    <input id="edit-itin-title-en-${stopId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs" placeholder="Title (EN)" value="${escapeHtml(stopData.title.en)}">
+                    <input id="edit-itin-title-yi-${stopId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs" dir="rtl" placeholder="Title (YI)" value="${escapeHtml(stopData.title.yi)}">
+                    <input id="edit-itin-loc-en-${stopId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs" placeholder="Location (EN)" value="${escapeHtml(locEn)}">
+                    <input id="edit-itin-loc-yi-${stopId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs" dir="rtl" placeholder="Location (YI) - leave blank for EN only" value="${escapeHtml(locYi)}">
+                    <textarea id="edit-itin-desc-en-${stopId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs overflow-hidden" rows="2" placeholder="Description (EN)">${escapeHtml(stopData.desc.en)}</textarea>
+                    <textarea id="edit-itin-desc-yi-${stopId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs overflow-hidden" rows="2" dir="rtl" placeholder="Description (YI)">${escapeHtml(stopData.desc.yi)}</textarea>
+                    <textarea id="edit-itin-notes-${stopId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs overflow-hidden" rows="1" placeholder="Long Notes (optional)">${escapeHtml(stopData.longNotes || '')}</textarea>
+                    <input id="edit-itin-query-${stopId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs" placeholder='Google Maps search (e.g. "Auschwitz-Birkenau Memorial")' value="${escapeHtml(stopData.query || '')}">
+                    <div class="flex gap-2 pt-1">
+                        <button onclick="saveItineraryStop('${stopId}')" class="px-3 py-1 bg-indigo-500 text-white rounded text-xs hover:bg-indigo-600">Save</button>
+                        <button onclick="renderTimeline()" class="px-3 py-1 bg-slate-200 text-slate-600 rounded text-xs hover:bg-slate-300">Cancel</button>
+                    </div>
+                </div>`;
+
+            // Auto-resize textareas
+            card.querySelectorAll('textarea').forEach(ta => {
+                const autoResize = () => { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; };
+                requestAnimationFrame(autoResize);
+                ta.addEventListener('input', autoResize);
+            });
+        };
+
+        window.saveItineraryStop = async function(stopId) {
+            const type = document.getElementById('edit-itin-type-' + stopId).value;
+            const time_label = document.getElementById('edit-itin-time-' + stopId).value.trim();
+            const title_en = document.getElementById('edit-itin-title-en-' + stopId).value.trim();
+            const title_yi = document.getElementById('edit-itin-title-yi-' + stopId).value.trim();
+            const loc_en = document.getElementById('edit-itin-loc-en-' + stopId).value.trim();
+            const loc_yi = document.getElementById('edit-itin-loc-yi-' + stopId).value.trim() || null;
+            const description_en = document.getElementById('edit-itin-desc-en-' + stopId).value.trim();
+            const description_yi = document.getElementById('edit-itin-desc-yi-' + stopId).value.trim();
+            const long_notes = document.getElementById('edit-itin-notes-' + stopId).value.trim() || null;
+            const map_query = document.getElementById('edit-itin-query-' + stopId).value.trim() || null;
+
+            if (!title_en || !title_yi || !loc_en || !description_en || !description_yi) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/api/itinerary/stops/${encodeURIComponent(stopId)}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type, time_label, title_en, title_yi, loc_en, loc_yi, description_en, description_yi, long_notes, map_query })
+                });
+                if (!res.ok) throw new Error('Failed to update stop');
+                await fetchItineraryData();
+                renderTimeline();
+            } catch (e) {
+                console.error('Error updating stop:', e);
+                alert('Failed to save changes');
+            }
+        };
+
+        window.adminDeleteItineraryStop = async function(stopId) {
+            if (!confirm('Delete this stop?')) return;
+            try {
+                const res = await fetch(`${API_BASE}/api/itinerary/stops/${encodeURIComponent(stopId)}`, { method: 'DELETE' });
+                if (!res.ok) throw new Error('Failed to delete stop');
+                await fetchItineraryData();
+                renderTimeline();
+            } catch (e) {
+                console.error('Error deleting stop:', e);
+                alert('Failed to delete stop');
+            }
+        };
+
+        window.adminAddItineraryStop = function(dayId) {
+            const container = document.getElementById('itinerary-stops-' + dayId);
+            if (!container) return;
+
+            // Remove any existing add form
+            const existingForm = container.querySelector('.itinerary-add-form');
+            if (existingForm) { existingForm.remove(); return; }
+
+            const formDiv = document.createElement('div');
+            formDiv.className = 'itinerary-add-form itinerary-card bg-indigo-50 rounded-[2rem] p-5 border border-indigo-200 shadow-sm';
+            formDiv.innerHTML = `
+                <div class="space-y-2 text-xs">
+                    <p class="font-bold text-indigo-600 text-sm mb-2">New Stop</p>
+                    <div class="flex gap-2">
+                        <select id="add-itin-type-${dayId}" class="border border-indigo-300 rounded px-2 py-1.5 text-xs bg-white">
+                            <option value="travel">Travel</option>
+                            <option value="prayer">Prayer</option>
+                            <option value="hotel">Hotel</option>
+                            <option value="shabbos">Shabbos</option>
+                        </select>
+                        <input id="add-itin-time-${dayId}" class="flex-1 border border-indigo-300 rounded px-2 py-1.5 text-xs" placeholder="e.g. 9:00 PM">
+                    </div>
+                    <input id="add-itin-title-en-${dayId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs" placeholder="Title (EN)">
+                    <input id="add-itin-title-yi-${dayId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs" dir="rtl" placeholder="Title (YI)">
+                    <input id="add-itin-loc-en-${dayId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs" placeholder="Location (EN)">
+                    <input id="add-itin-loc-yi-${dayId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs" dir="rtl" placeholder="Location (YI) - leave blank for EN only">
+                    <textarea id="add-itin-desc-en-${dayId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs" rows="2" placeholder="Description (EN)"></textarea>
+                    <textarea id="add-itin-desc-yi-${dayId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs" rows="2" dir="rtl" placeholder="Description (YI)"></textarea>
+                    <textarea id="add-itin-notes-${dayId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs" rows="1" placeholder="Long Notes (optional)"></textarea>
+                    <input id="add-itin-query-${dayId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs" placeholder='Google Maps search (e.g. "Auschwitz-Birkenau Memorial")'>
+                    <div class="flex gap-2 pt-1">
+                        <button onclick="submitAddItineraryStop('${dayId}')" class="px-3 py-1 bg-indigo-500 text-white rounded text-xs hover:bg-indigo-600">Add</button>
+                        <button onclick="this.closest('.itinerary-add-form').remove()" class="px-3 py-1 bg-slate-200 text-slate-600 rounded text-xs hover:bg-slate-300">Cancel</button>
+                    </div>
+                </div>`;
+
+            // Insert before the "Add Stop" button
+            const addBtn = container.querySelector('button[onclick*="adminAddItineraryStop"]');
+            if (addBtn) container.insertBefore(formDiv, addBtn);
+            else container.appendChild(formDiv);
+        };
+
+        window.submitAddItineraryStop = async function(dayId) {
+            const type = document.getElementById('add-itin-type-' + dayId).value;
+            const time_label = document.getElementById('add-itin-time-' + dayId).value.trim();
+            const title_en = document.getElementById('add-itin-title-en-' + dayId).value.trim();
+            const title_yi = document.getElementById('add-itin-title-yi-' + dayId).value.trim();
+            const loc_en = document.getElementById('add-itin-loc-en-' + dayId).value.trim();
+            const loc_yi = document.getElementById('add-itin-loc-yi-' + dayId).value.trim() || null;
+            const description_en = document.getElementById('add-itin-desc-en-' + dayId).value.trim();
+            const description_yi = document.getElementById('add-itin-desc-yi-' + dayId).value.trim();
+            const long_notes = document.getElementById('add-itin-notes-' + dayId).value.trim() || null;
+            const map_query = document.getElementById('add-itin-query-' + dayId).value.trim() || null;
+
+            if (!title_en || !title_yi || !loc_en || !description_en || !description_yi) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            // Find max sort_order for this day
+            const day = itineraryDays.find(d => d.day_id === dayId);
+            const maxSort = day ? Math.max(0, ...day.stops.map(s => s.sort_order || 0)) : 0;
+
+            const stop_id = 'stop_' + Date.now();
+            try {
+                const res = await fetch(`${API_BASE}/api/itinerary/stops`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ stop_id, day_id: dayId, type, time_label, title_en, title_yi, loc_en, loc_yi, description_en, description_yi, long_notes, map_query, sort_order: maxSort + 1 })
+                });
+                if (!res.ok) throw new Error('Failed to add stop');
+                await fetchItineraryData();
+                renderTimeline();
+            } catch (e) {
+                console.error('Error adding stop:', e);
+                alert('Failed to add stop');
+            }
+        };
+
+        window.adminAddItineraryDay = function() {
+            const dateStr = prompt('Enter date (YYYY-MM-DD):');
+            if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+                if (dateStr !== null) alert('Please enter a valid date in YYYY-MM-DD format');
+                return;
+            }
+
+            const day_id = 'day_' + Date.now();
+            const maxSort = itineraryDays.length ? Math.max(...itineraryDays.map(d => d.day_sort || 0)) : 0;
+
+            fetch(`${API_BASE}/api/itinerary/days`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ day_id, date: dateStr, sort_order: maxSort + 1 })
+            }).then(res => {
+                if (!res.ok) throw new Error('Failed to add day');
+                return fetchItineraryData();
+            }).then(() => renderTimeline())
+            .catch(e => { console.error('Error adding day:', e); alert('Failed to add day'); });
+        };
+
+        window.adminDeleteItineraryDay = async function(dayId) {
+            const day = itineraryDays.find(d => d.day_id === dayId);
+            const stopCount = day ? day.stops.length : 0;
+            if (!confirm(`Delete this day and all ${stopCount} stops?`)) return;
+            try {
+                const res = await fetch(`${API_BASE}/api/itinerary/days/${encodeURIComponent(dayId)}`, { method: 'DELETE' });
+                if (!res.ok) throw new Error('Failed to delete day');
+                await fetchItineraryData();
+                renderTimeline();
+            } catch (e) {
+                console.error('Error deleting day:', e);
+                alert('Failed to delete day');
+            }
+        };
+
+        window.startEditItineraryDay = function(dayId) {
+            const day = itineraryDays.find(d => d.day_id === dayId);
+            if (!day) return;
+
+            const newDate = prompt('Edit date (YYYY-MM-DD):', day.date);
+            if (!newDate || newDate === day.date) return;
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(newDate)) {
+                alert('Please enter a valid date in YYYY-MM-DD format');
+                return;
+            }
+
+            fetch(`${API_BASE}/api/itinerary/days/${encodeURIComponent(dayId)}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ date: newDate })
+            }).then(res => {
+                if (!res.ok) throw new Error('Failed to update day');
+                return fetchItineraryData();
+            }).then(() => renderTimeline())
+            .catch(e => { console.error('Error updating day:', e); alert('Failed to update day'); });
+        };
+
+        // ── Itinerary Drag-and-drop (SortableJS) ──
+        function initItinerarySortable() {
+            if (typeof Sortable === 'undefined') return;
+
+            itineraryDays.forEach(day => {
+                const container = document.getElementById('itinerary-stops-' + day.day_id);
+                if (!container) return;
+
+                // Destroy existing instance
+                if (container._sortable) container._sortable.destroy();
+
+                container._sortable = new Sortable(container, {
+                    handle: '.itinerary-drag-handle',
+                    draggable: '[data-stop-id]',
+                    delay: 300,
+                    delayOnTouchOnly: true,
+                    animation: 150,
+                    ghostClass: 'opacity-30',
+                    onEnd: (evt) => handleItineraryStopReorder(day.day_id, evt)
+                });
+            });
+        }
+
+        async function handleItineraryStopReorder(dayId, evt) {
+            if (evt.oldIndex === evt.newIndex) return;
+
+            const day = itineraryDays.find(d => d.day_id === dayId);
+            if (!day) return;
+
+            // Splice the moved item
+            const [moved] = day.stops.splice(evt.oldIndex, 1);
+            day.stops.splice(evt.newIndex, 0, moved);
+
+            // Build reorder payload
+            const items = day.stops.map((s, i) => ({ item_id: s.stop_id, sort_order: i + 1 }));
+
+            try {
+                await fetch(`${API_BASE}/api/itinerary/stops/reorder`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ items })
+                });
+            } catch (e) {
+                console.error('Error reordering stops:', e);
+                await fetchItineraryData();
+                renderTimeline();
             }
         }
 
