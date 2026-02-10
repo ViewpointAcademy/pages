@@ -2827,17 +2827,17 @@
 
             // Hide all states first
             setupEl.classList.add('hidden');
-            albumSelectEl.classList.add('hidden');
+            if (albumSelectEl) albumSelectEl.classList.add('hidden');
             contentEl.classList.add('hidden');
-            notConnectedEl.classList.add('hidden');
-            emptyEl.classList.add('hidden');
+            if (notConnectedEl) notConnectedEl.classList.add('hidden');
+            if (emptyEl) emptyEl.classList.add('hidden');
 
             if (!photoConfig.connected) {
                 if (isAdmin) {
                     setupEl.classList.remove('hidden');
                 } else {
                     contentEl.classList.remove('hidden');
-                    notConnectedEl.classList.remove('hidden');
+                    if (notConnectedEl) notConnectedEl.classList.remove('hidden');
                 }
                 return;
             }
@@ -2845,10 +2845,12 @@
             contentEl.classList.remove('hidden');
 
             // Admin bar (show refresh button, but no album selection)
-            if (isAdmin) {
-                adminBar.classList.remove('hidden');
-            } else {
-                adminBar.classList.add('hidden');
+            if (adminBar) {
+                if (isAdmin) {
+                    adminBar.classList.remove('hidden');
+                } else {
+                    adminBar.classList.add('hidden');
+                }
             }
 
             // Build day/stop filter pills
@@ -2867,14 +2869,14 @@
                     }
                 });
             });
-            filtersEl.innerHTML = filterHtml;
+            if (filtersEl) filtersEl.innerHTML = filterHtml;
 
             // Get filtered photos
             const filtered = getFilteredPhotos();
 
             if (filtered.length === 0) {
                 gridEl.innerHTML = '';
-                emptyEl.classList.remove('hidden');
+                if (emptyEl) emptyEl.classList.remove('hidden');
                 return;
             }
 
