@@ -235,25 +235,26 @@
                     headers: { 'Content-Type': 'application/json' }
                 });
 
-                if (!versionRes.ok) {
-                    console.warn(`Could not fetch version for ${dataType}`);
-                    // Return cached data if available
-                    if (dataCache[dataType].data) {
-                        dataCache[dataType].loaded = true;
-                        return dataCache[dataType].data;
+                let version = null;
+
+                if (versionRes.ok) {
+                    try {
+                        const versionData = await versionRes.json();
+                        version = versionData.version;
+
+                        // If cached version matches server version, use cache
+                        if (dataCache[dataType].version === version && dataCache[dataType].data) {
+                            dataCache[dataType].loaded = true;
+                            return dataCache[dataType].data;
+                        }
+                    } catch (e) {
+                        console.warn(`Could not parse version for ${dataType}`);
                     }
-                    return null;
+                } else {
+                    console.warn(`Could not fetch version for ${dataType}, falling back to fetch data`);
                 }
 
-                const { version } = await versionRes.json();
-
-                // If cached version matches server version, use cache
-                if (dataCache[dataType].version === version && dataCache[dataType].data) {
-                    dataCache[dataType].loaded = true;
-                    return dataCache[dataType].data;
-                }
-
-                // Version mismatch or no cache - fetch fresh data
+                // Fetch fresh data (either version mismatch, no cache, or version endpoint failed)
                 const dataRes = await fetch(`${API_BASE}/api/${dataType}`, {
                     headers: { 'Content-Type': 'application/json' }
                 });
