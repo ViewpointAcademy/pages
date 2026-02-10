@@ -983,11 +983,11 @@
                     const deleteIcon = isAdmin ? `<button onclick="event.stopPropagation(); adminDeleteInfoItem('${item.id}')" class="flex-shrink-0 text-slate-300 hover:text-rose-500 transition-colors"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>` : '';
                     const dragHandle = isAdmin ? `<span class="drag-handle info-drag-handle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg></span>` : '';
 
-                    return `<li class="flex items-start gap-2 text-xs text-slate-600" data-item-id="${item.id}">
+                    return `<li class="flex items-start gap-2 text-xs text-slate-600 group" data-item-id="${item.id}">
                         ${dragHandle}
                         <span class="mt-1 w-1.5 h-1.5 rounded-full bg-indigo-400 flex-shrink-0"></span>
                         <span class="flex-1" id="info-item-text-${item.id}">${escapeHtml(text)}</span>
-                        ${editIcon}${deleteIcon}
+                        ${isAdmin ? `<span class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center">${editIcon}${deleteIcon}</span>` : ''}
                     </li>`;
                 }).join('');
 
@@ -1006,11 +1006,11 @@
                 ` : '';
 
                 return `
-                    <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm" data-category-id="${cat.category_id}">
-                        <h3 class="text-sm font-bold text-slate-800 mb-3 flex items-center" id="info-category-heading-${cat.category_id}">
+                    <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm mb-4" style="break-inside:avoid" data-category-id="${cat.category_id}">
+                        <h3 class="text-sm font-bold text-slate-800 mb-3 flex items-center group" id="info-category-heading-${cat.category_id}">
                             ${categoryDragHandle}
                             <span class="flex-1">${escapeHtml(heading)}</span>
-                            ${editCategoryIcon}${deleteCategoryIcon}
+                            ${isAdmin ? `<span class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center">${editCategoryIcon}${deleteCategoryIcon}</span>` : ''}
                         </h3>
                         <ul id="info-sortable-${cat.category_id}" class="space-y-2" data-category-id="${cat.category_id}">
                             ${itemsHtml}
@@ -1031,7 +1031,7 @@
                 </div>
             ` : '';
 
-            container.innerHTML = `<div id="info-categories-sortable">${categoriesHtml}</div>` + addCategorySection;
+            container.innerHTML = `<div id="info-categories-sortable" class="masonry-grid">${categoriesHtml}</div>` + addCategorySection;
             initInfoSortable();
         }
 
