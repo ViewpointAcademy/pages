@@ -1022,7 +1022,7 @@
 
             const addCatPh = lang === 'yi' ? 'נאמען פון קאטעגאריע...' : 'Category name...';
             const addCategorySection = isAdmin ? `
-                <div class="bg-indigo-50 rounded-2xl p-5 border border-indigo-100 shadow-sm">
+                <div class="bg-indigo-50 rounded-2xl p-5 border border-indigo-100 shadow-sm mb-4" style="break-inside:avoid">
                     <h3 class="text-sm font-bold text-indigo-700 mb-3">${lang === 'yi' ? 'צולייגן א נייע קאטעגאריע' : 'Add New Category'}</h3>
                     <div class="flex items-center gap-2">
                         <input id="add-info-category" type="text" placeholder="${addCatPh}" ${lang === 'yi' ? 'dir="rtl"' : ''} class="flex-1 text-xs bg-white border border-indigo-200 rounded-lg px-3 py-1.5 focus:border-indigo-400 focus:outline-none" onkeydown="if(event.key==='Enter') adminAddInfoCategory()">
@@ -1031,7 +1031,7 @@
                 </div>
             ` : '';
 
-            container.innerHTML = `<div id="info-categories-sortable" class="masonry-grid">${categoriesHtml}</div>` + addCategorySection;
+            container.innerHTML = `<div id="info-categories-sortable" class="masonry-grid">${categoriesHtml}${addCategorySection}</div>`;
             initInfoSortable();
         }
 
@@ -2235,6 +2235,7 @@
             if (categoriesContainer) {
                 const catInst = new Sortable(categoriesContainer, {
                     handle: '.info-category-drag-handle',
+                    draggable: '[data-category-id]',
                     delay: 300,
                     delayOnTouchOnly: true,
                     animation: 150,
