@@ -1559,21 +1559,34 @@
             }
         };
 
+        window.toggleDetailInput = function(sectionId) {
+            const input = document.getElementById(`add-input-${sectionId}`);
+            const detailRow = document.getElementById(`detail-row-${sectionId}`);
+            if (!input || !detailRow) return;
+            if (input.value.trim()) {
+                detailRow.classList.remove('hidden');
+            } else {
+                detailRow.classList.add('hidden');
+            }
+        };
+
         window.adminAddPackingItem = async function(sectionId) {
             const input = document.getElementById(`add-input-${sectionId}`);
+            const detailInput = document.getElementById(`add-detail-${sectionId}`);
             if (!input) return;
             const label = input.value.trim();
             if (!label) return;
+            const detail = detailInput ? detailInput.value.trim() : '';
             const itemId = sectionId + '_' + Date.now();
-            // For now use same label for both languages; admin can update via DB later
             try {
                 const res = await fetch(`${API_BASE}/api/packing/items`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ item_id: itemId, section_id: sectionId, label_en: label, label_yi: label, sort_order: 999 })
+                    body: JSON.stringify({ item_id: itemId, section_id: sectionId, label_en: label, label_yi: label, detail_en: detail || null, detail_yi: detail || null, sort_order: 999 })
                 });
                 if (!res.ok) throw new Error('Failed to add item');
                 input.value = '';
+                if (detailInput) detailInput.value = '';
                 await fetchPackingData();
                 renderPackingList();
                 showStatusBar('Item added');
@@ -1665,10 +1678,16 @@
                     const delType = (isAdmin && !dbItem.locked) ? 'admin' : false;
                     return renderCheckItem(item, delType);
                 }).join('');
+                const detailPlaceholder = lang === 'yi' ? 'דעטאלן (אפציאנאל)...' : 'Details (optional)...';
                 const adminAddHtml = isAdmin ? `
-                    <div class="mt-3 flex items-center gap-2">
-                        <input id="add-input-${section.section_id}" type="text" placeholder="${addPlaceholder}" class="add-item-input flex-1 text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 focus:border-indigo-400 focus:outline-none" onkeydown="if(event.key==='Enter') adminAddPackingItem('${section.section_id}')">
-                        <button onclick="adminAddPackingItem('${section.section_id}')" class="add-item-btn text-[10px] font-bold text-indigo-500 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors">+ Add</button>
+                    <div class="mt-3">
+                        <div class="flex items-center gap-2">
+                            <input id="add-input-${section.section_id}" type="text" placeholder="${addPlaceholder}" class="add-item-input flex-1 text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 focus:border-indigo-400 focus:outline-none" oninput="toggleDetailInput('${section.section_id}')" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('add-detail-${section.section_id}').focus();}">
+                            <button onclick="adminAddPackingItem('${section.section_id}')" class="add-item-btn text-[10px] font-bold text-indigo-500 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors">+ Add</button>
+                        </div>
+                        <div id="detail-row-${section.section_id}" class="hidden mt-1.5">
+                            <input id="add-detail-${section.section_id}" type="text" placeholder="${detailPlaceholder}" class="add-item-input w-full text-[10px] bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 focus:border-indigo-400 focus:outline-none text-slate-500" onkeydown="if(event.key==='Enter') adminAddPackingItem('${section.section_id}')">
+                        </div>
                     </div>` : '';
                 return `
                 <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
