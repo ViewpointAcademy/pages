@@ -973,11 +973,11 @@
             const lang = currentLang;
 
             const categoriesHtml = infoCategories.map(cat => {
-                const heading = lang === 'yi' ? cat.heading_yi : cat.heading_en;
+                const heading = (lang === 'yi' ? cat.heading_yi : cat.heading_en) || cat.heading_en || cat.heading_yi;
                 const sortedItems = cat.items.sort((a, b) => a.sort_order - b.sort_order);
 
                 const itemsHtml = sortedItems.map(item => {
-                    const text = lang === 'yi' ? item.text_yi : item.text_en;
+                    const text = (lang === 'yi' ? item.text_yi : item.text_en) || item.text_en || item.text_yi;
                     const editIcon = isAdmin ? `<button onclick="event.stopPropagation(); startEditInfoItem('${item.id}')" class="ml-2 text-slate-300 hover:text-indigo-500 transition-colors"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>` : '';
                     const deleteIcon = isAdmin ? `<button onclick="event.stopPropagation(); adminDeleteInfoItem('${item.id}')" class="ml-1 text-slate-300 hover:text-rose-500 transition-colors"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button>` : '';
                     const dragHandle = isAdmin ? `<span class="info-drag-handle cursor-grab text-slate-300 hover:text-slate-500 mr-1"><svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><circle cx="3" cy="3" r="1"/><circle cx="8" cy="3" r="1"/><circle cx="3" cy="8" r="1"/><circle cx="8" cy="8" r="1"/><circle cx="3" cy="13" r="1"/><circle cx="8" cy="13" r="1"/></svg></span>` : '';
@@ -993,11 +993,11 @@
                 const editCategoryIcon = isAdmin ? `<button onclick="event.stopPropagation(); startEditInfoCategory('${cat.category_id}')" class="ml-2 text-slate-300 hover:text-indigo-500 transition-colors"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>` : '';
                 const deleteCategoryIcon = isAdmin ? `<button onclick="event.stopPropagation(); adminDeleteInfoCategory('${cat.category_id}')" class="ml-1 text-slate-300 hover:text-rose-500 transition-colors"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg></button>` : '';
 
+                const addItemPh = lang === 'yi' ? 'צולייגן א נייע זאך...' : 'Add new item...';
                 const addItemSection = isAdmin ? `
                     <div class="mt-3 pt-3 border-t border-slate-100">
                         <div class="flex items-center gap-2">
-                            <input id="add-info-input-en-${cat.category_id}" type="text" placeholder="${lang === 'yi' ? 'ענגליש טעקסט...' : 'English text...'}" class="flex-1 text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 focus:border-indigo-400 focus:outline-none" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('add-info-input-yi-${cat.category_id}').focus();}">
-                            <input id="add-info-input-yi-${cat.category_id}" type="text" placeholder="${lang === 'yi' ? 'אידיש טעקסט...' : 'Yiddish text...'}" dir="rtl" class="flex-1 text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 focus:border-indigo-400 focus:outline-none" onkeydown="if(event.key==='Enter') adminAddInfoItem('${cat.category_id}')">
+                            <input id="add-info-input-${cat.category_id}" type="text" placeholder="${addItemPh}" ${lang === 'yi' ? 'dir="rtl"' : ''} class="flex-1 text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 focus:border-indigo-400 focus:outline-none" onkeydown="if(event.key==='Enter') adminAddInfoItem('${cat.category_id}')">
                             <button onclick="adminAddInfoItem('${cat.category_id}')" class="text-[10px] font-bold text-indigo-500 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap">+ ${lang === 'yi' ? 'צולייגן' : 'Add'}</button>
                         </div>
                     </div>
@@ -1017,12 +1017,12 @@
                 `;
             }).join('');
 
+            const addCatPh = lang === 'yi' ? 'נאמען פון קאטעגאריע...' : 'Category name...';
             const addCategorySection = isAdmin ? `
                 <div class="bg-indigo-50 rounded-2xl p-5 border border-indigo-100 shadow-sm">
                     <h3 class="text-sm font-bold text-indigo-700 mb-3">${lang === 'yi' ? 'צולייגן א נייע קאטעגאריע' : 'Add New Category'}</h3>
                     <div class="flex items-center gap-2">
-                        <input id="add-info-category-en" type="text" placeholder="${lang === 'yi' ? 'ענגליש שורה...' : 'English heading...'}" class="flex-1 text-xs bg-white border border-indigo-200 rounded-lg px-3 py-1.5 focus:border-indigo-400 focus:outline-none" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('add-info-category-yi').focus();}">
-                        <input id="add-info-category-yi" type="text" placeholder="${lang === 'yi' ? 'אידיש שורה...' : 'Yiddish heading...'}" dir="rtl" class="flex-1 text-xs bg-white border border-indigo-200 rounded-lg px-3 py-1.5 focus:border-indigo-400 focus:outline-none" onkeydown="if(event.key==='Enter') adminAddInfoCategory()">
+                        <input id="add-info-category" type="text" placeholder="${addCatPh}" ${lang === 'yi' ? 'dir="rtl"' : ''} class="flex-1 text-xs bg-white border border-indigo-200 rounded-lg px-3 py-1.5 focus:border-indigo-400 focus:outline-none" onkeydown="if(event.key==='Enter') adminAddInfoCategory()">
                         <button onclick="adminAddInfoCategory()" class="text-[10px] font-bold text-indigo-500 hover:text-indigo-700 bg-white hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap">+ ${lang === 'yi' ? 'צולייגן' : 'Add'}</button>
                     </div>
                 </div>
@@ -1807,41 +1807,37 @@
             li.removeAttribute('onclick');
             li.classList.remove('cursor-pointer');
             li.classList.add('cursor-default');
+            const lang = currentLang === 'yi' ? 'yi' : 'en';
+            const labelKey = lang === 'yi' ? 'label_yi' : 'label_en';
+            const detailKey = lang === 'yi' ? 'detail_yi' : 'detail_en';
+            const curLabel = rawItem[labelKey] || rawItem.label_en || rawItem.label_yi;
+            const curDetail = rawItem[detailKey] || rawItem.detail_en || rawItem.detail_yi || '';
+            const detailPh = lang === 'yi' ? 'דעטאלן (אפציאנאל)...' : 'Details (optional)...';
             labelDiv.innerHTML = `
-                <div class="space-y-1">
-                    <div class="flex items-center gap-1">
-                        <span class="text-[9px] font-bold text-slate-400 w-5 flex-shrink-0">EN</span>
-                        <input type="text" class="flex-1 text-xs bg-white border border-indigo-300 rounded px-2 py-0.5" value="${escapeHtml(rawItem.label_en)}" data-field="label_en" />
-                        <input type="text" class="flex-1 text-[10px] bg-white border border-slate-200 rounded px-2 py-0.5 text-slate-500" value="${escapeHtml(rawItem.detail_en || '')}" placeholder="Detail" data-field="detail_en" />
-                    </div>
-                    <div class="flex items-center gap-1" dir="rtl">
-                        <span class="text-[9px] font-bold text-slate-400 w-5 flex-shrink-0" dir="ltr">YI</span>
-                        <input type="text" class="flex-1 text-xs bg-white border border-indigo-300 rounded px-2 py-0.5" value="${escapeHtml(rawItem.label_yi)}" data-field="label_yi" />
-                        <input type="text" class="flex-1 text-[10px] bg-white border border-slate-200 rounded px-2 py-0.5 text-slate-500" value="${escapeHtml(rawItem.detail_yi || '')}" placeholder="דעטאלן" data-field="detail_yi" />
-                    </div>
-                </div>
+                <input type="text" class="w-full text-xs bg-white border border-indigo-300 rounded px-2 py-1 mb-1" value="${escapeHtml(curLabel)}" data-field="label" ${lang === 'yi' ? 'dir="rtl"' : ''} />
+                <input type="text" class="w-full text-[10px] bg-white border border-slate-200 rounded px-2 py-0.5 text-slate-500" value="${escapeHtml(curDetail)}" placeholder="${detailPh}" data-field="detail" ${lang === 'yi' ? 'dir="rtl"' : ''} />
             `;
-            const firstInput = labelDiv.querySelector('[data-field="label_en"]');
-            firstInput.focus();
-            firstInput.select();
+            const labelInput = labelDiv.querySelector('[data-field="label"]');
+            const detailInput = labelDiv.querySelector('[data-field="detail"]');
+            labelInput.focus();
+            labelInput.select();
             const allInputs = labelDiv.querySelectorAll('input');
 
             const saveEdit = async () => {
-                const newLabelEn = labelDiv.querySelector('[data-field="label_en"]').value.trim();
-                const newLabelYi = labelDiv.querySelector('[data-field="label_yi"]').value.trim();
-                const newDetailEn = labelDiv.querySelector('[data-field="detail_en"]').value.trim();
-                const newDetailYi = labelDiv.querySelector('[data-field="detail_yi"]').value.trim();
-                if (!newLabelEn || !newLabelYi) { renderPackingList(); return; }
-                rawItem.label_en = newLabelEn;
-                rawItem.label_yi = newLabelYi;
-                rawItem.detail_en = newDetailEn || null;
-                rawItem.detail_yi = newDetailYi || null;
+                const newLabel = labelInput.value.trim();
+                const newDetail = detailInput.value.trim();
+                if (!newLabel) { renderPackingList(); return; }
+                rawItem[labelKey] = newLabel;
+                rawItem[detailKey] = newDetail || null;
                 renderPackingList();
+                const body = {};
+                body[labelKey] = newLabel;
+                body[detailKey] = newDetail || null;
                 try {
                     const res = await fetch(`${API_BASE}/api/packing/items/${encodeURIComponent(itemId)}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ label_en: newLabelEn, label_yi: newLabelYi, detail_en: newDetailEn || null, detail_yi: newDetailYi || null })
+                        body: JSON.stringify(body)
                     });
                     if (!res.ok) throw new Error('Update failed');
                     showStatusBar('Item updated');
@@ -1975,8 +1971,8 @@
                 const itemsHtml = section.items.map(dbItem => {
                     const item = {
                         id: dbItem.id,
-                        label: lang === 'yi' ? dbItem.label_yi : dbItem.label_en,
-                        detail: lang === 'yi' ? dbItem.detail_yi : dbItem.detail_en,
+                        label: (lang === 'yi' ? dbItem.label_yi : dbItem.label_en) || dbItem.label_en || dbItem.label_yi,
+                        detail: (lang === 'yi' ? dbItem.detail_yi : dbItem.detail_en) || dbItem.detail_en || dbItem.detail_yi,
                         locked: dbItem.locked
                     };
                     const delType = (isAdmin && !dbItem.locked) ? 'admin' : false;
@@ -2029,15 +2025,13 @@
         // ── Info (Travel Info) Admin Functions ──
 
         window.adminAddInfoItem = async function(categoryId) {
-            const inputEn = document.getElementById(`add-info-input-en-${categoryId}`);
-            const inputYi = document.getElementById(`add-info-input-yi-${categoryId}`);
-            if (!inputEn || !inputYi) return;
-            const textEn = inputEn.value.trim();
-            const textYi = inputYi.value.trim();
-            if (!textEn || !textYi) {
-                showStatusBar('Please fill both English and Yiddish fields');
-                return;
-            }
+            const input = document.getElementById(`add-info-input-${categoryId}`);
+            if (!input) return;
+            const text = input.value.trim();
+            if (!text) return;
+            const lang = currentLang === 'yi' ? 'yi' : 'en';
+            const textEn = lang === 'en' ? text : text;
+            const textYi = lang === 'yi' ? text : text;
             const itemId = categoryId + '_' + Date.now();
             try {
                 const res = await fetch(`${API_BASE}/api/info/items`, {
@@ -2046,8 +2040,7 @@
                     body: JSON.stringify({ item_id: itemId, category_id: categoryId, text_en: textEn, text_yi: textYi, sort_order: 999 })
                 });
                 if (!res.ok) throw new Error('Failed to add info item');
-                inputEn.value = '';
-                inputYi.value = '';
+                input.value = '';
                 await fetchInfoData();
                 renderInfo();
                 showStatusBar('Info item added');
@@ -2074,47 +2067,33 @@
         };
 
         window.startEditInfoItem = function(itemId) {
-            // Find the item in infoCategories
             let item = null;
-            let category = null;
             for (const cat of infoCategories) {
                 const found = cat.items.find(i => i.id === itemId);
-                if (found) {
-                    item = found;
-                    category = cat;
-                    break;
-                }
+                if (found) { item = found; break; }
             }
             if (!item) return;
-
             const textSpan = document.getElementById(`info-item-text-${itemId}`);
             if (!textSpan) return;
-
-            const lang = currentLang;
-            textSpan.innerHTML = `
-                <div class="space-y-1">
-                    <input type="text" class="w-full text-xs bg-white border border-indigo-300 rounded px-2 py-1" value="${escapeHtml(item.text_en)}" data-field="text_en" placeholder="English text" />
-                    <input type="text" dir="rtl" class="w-full text-xs bg-white border border-indigo-300 rounded px-2 py-1" value="${escapeHtml(item.text_yi)}" data-field="text_yi" placeholder="אידיש טעקסט" />
-                </div>
-            `;
-
-            const firstInput = textSpan.querySelector('[data-field="text_en"]');
-            firstInput.focus();
-            firstInput.select();
-            const allInputs = textSpan.querySelectorAll('input');
-
+            const lang = currentLang === 'yi' ? 'yi' : 'en';
+            const textKey = lang === 'yi' ? 'text_yi' : 'text_en';
+            const curText = item[textKey] || item.text_en || item.text_yi;
+            textSpan.innerHTML = `<input type="text" class="w-full text-xs bg-white border border-indigo-300 rounded px-2 py-1" value="${escapeHtml(curText)}" data-field="text" ${lang === 'yi' ? 'dir="rtl"' : ''} />`;
+            const input = textSpan.querySelector('input');
+            input.focus();
+            input.select();
             const saveEdit = async () => {
-                const newTextEn = textSpan.querySelector('[data-field="text_en"]').value.trim();
-                const newTextYi = textSpan.querySelector('[data-field="text_yi"]').value.trim();
-                if (!newTextEn || !newTextYi) { renderInfo(); return; }
-                item.text_en = newTextEn;
-                item.text_yi = newTextYi;
+                const newText = input.value.trim();
+                if (!newText) { renderInfo(); return; }
+                item[textKey] = newText;
                 renderInfo();
+                const body = {};
+                body[textKey] = newText;
                 try {
                     const res = await fetch(`${API_BASE}/api/info/items/${encodeURIComponent(itemId)}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ text_en: newTextEn, text_yi: newTextYi })
+                        body: JSON.stringify(body)
                     });
                     if (!res.ok) throw new Error('Update failed');
                     showStatusBar('Info item updated');
@@ -2126,51 +2105,37 @@
                 }
             };
             const cancelEdit = () => { renderInfo(); };
-            allInputs.forEach(input => {
-                input.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') { e.preventDefault(); saveEdit(); }
-                    if (e.key === 'Escape') { e.preventDefault(); cancelEdit(); }
-                });
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') { e.preventDefault(); saveEdit(); }
+                if (e.key === 'Escape') { e.preventDefault(); cancelEdit(); }
             });
-            let blurTimeout;
-            allInputs.forEach(input => {
-                input.addEventListener('blur', () => { blurTimeout = setTimeout(() => { if ([...allInputs].includes(document.activeElement)) return; saveEdit(); }, 150); });
-                input.addEventListener('focus', () => { clearTimeout(blurTimeout); });
-            });
+            input.addEventListener('blur', () => { setTimeout(() => saveEdit(), 150); });
         };
 
         window.startEditInfoCategory = function(categoryId) {
             const category = infoCategories.find(c => c.category_id === categoryId);
             if (!category) return;
-
             const headingEl = document.getElementById(`info-category-heading-${categoryId}`);
             if (!headingEl) return;
-
-            const lang = currentLang;
-            headingEl.innerHTML = `
-                <div class="flex-1 space-y-1">
-                    <input type="text" class="w-full text-sm font-bold bg-white border border-indigo-300 rounded px-2 py-1" value="${escapeHtml(category.heading_en)}" data-field="heading_en" placeholder="English heading" />
-                    <input type="text" dir="rtl" class="w-full text-sm font-bold bg-white border border-indigo-300 rounded px-2 py-1" value="${escapeHtml(category.heading_yi)}" data-field="heading_yi" placeholder="אידיש שורה" />
-                </div>
-            `;
-
-            const firstInput = headingEl.querySelector('[data-field="heading_en"]');
-            firstInput.focus();
-            firstInput.select();
-            const allInputs = headingEl.querySelectorAll('input');
-
+            const lang = currentLang === 'yi' ? 'yi' : 'en';
+            const headingKey = lang === 'yi' ? 'heading_yi' : 'heading_en';
+            const curHeading = category[headingKey] || category.heading_en || category.heading_yi;
+            headingEl.innerHTML = `<input type="text" class="flex-1 text-sm font-bold bg-white border border-indigo-300 rounded px-2 py-1" value="${escapeHtml(curHeading)}" data-field="heading" ${lang === 'yi' ? 'dir="rtl"' : ''} />`;
+            const input = headingEl.querySelector('input');
+            input.focus();
+            input.select();
             const saveEdit = async () => {
-                const newHeadingEn = headingEl.querySelector('[data-field="heading_en"]').value.trim();
-                const newHeadingYi = headingEl.querySelector('[data-field="heading_yi"]').value.trim();
-                if (!newHeadingEn || !newHeadingYi) { renderInfo(); return; }
-                category.heading_en = newHeadingEn;
-                category.heading_yi = newHeadingYi;
+                const newHeading = input.value.trim();
+                if (!newHeading) { renderInfo(); return; }
+                category[headingKey] = newHeading;
                 renderInfo();
+                const body = {};
+                body[headingKey] = newHeading;
                 try {
                     const res = await fetch(`${API_BASE}/api/info/categories/${encodeURIComponent(categoryId)}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ heading_en: newHeadingEn, heading_yi: newHeadingYi })
+                        body: JSON.stringify(body)
                     });
                     if (!res.ok) throw new Error('Update failed');
                     showStatusBar('Category updated');
@@ -2182,17 +2147,11 @@
                 }
             };
             const cancelEdit = () => { renderInfo(); };
-            allInputs.forEach(input => {
-                input.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') { e.preventDefault(); saveEdit(); }
-                    if (e.key === 'Escape') { e.preventDefault(); cancelEdit(); }
-                });
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') { e.preventDefault(); saveEdit(); }
+                if (e.key === 'Escape') { e.preventDefault(); cancelEdit(); }
             });
-            let blurTimeout;
-            allInputs.forEach(input => {
-                input.addEventListener('blur', () => { blurTimeout = setTimeout(() => { if ([...allInputs].includes(document.activeElement)) return; saveEdit(); }, 150); });
-                input.addEventListener('focus', () => { clearTimeout(blurTimeout); });
-            });
+            input.addEventListener('blur', () => { setTimeout(() => saveEdit(), 150); });
         };
 
         window.adminDeleteInfoCategory = async function(categoryId) {
@@ -2212,25 +2171,19 @@
         };
 
         window.adminAddInfoCategory = async function() {
-            const inputEn = document.getElementById('add-info-category-en');
-            const inputYi = document.getElementById('add-info-category-yi');
-            if (!inputEn || !inputYi) return;
-            const headingEn = inputEn.value.trim();
-            const headingYi = inputYi.value.trim();
-            if (!headingEn || !headingYi) {
-                showStatusBar('Please fill both English and Yiddish headings');
-                return;
-            }
+            const input = document.getElementById('add-info-category');
+            if (!input) return;
+            const heading = input.value.trim();
+            if (!heading) return;
             const categoryId = 'cat_' + Date.now();
             try {
                 const res = await fetch(`${API_BASE}/api/info/categories`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ category_id: categoryId, heading_en: headingEn, heading_yi: headingYi, sort_order: 999 })
+                    body: JSON.stringify({ category_id: categoryId, heading_en: heading, heading_yi: heading, sort_order: 999 })
                 });
                 if (!res.ok) throw new Error('Failed to add info category');
-                inputEn.value = '';
-                inputYi.value = '';
+                input.value = '';
                 await fetchInfoData();
                 renderInfo();
                 showStatusBar('Category added');
