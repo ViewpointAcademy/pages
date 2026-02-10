@@ -1531,22 +1531,28 @@
             if (!input) return;
             const label = input.value.trim();
             if (!label) return;
+            const detailInput = document.getElementById('add-detail-custom');
+            const detail = detailInput ? detailInput.value.trim() : '';
             const itemId = 'custom_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
-            customItems.push({ item_id: itemId, label, section_id: 'custom' });
+            customItems.push({ item_id: itemId, label, section_id: 'custom', detail: detail || null });
             input.value = '';
+            if (detailInput) detailInput.value = '';
             renderPackingList();
             if (!isOffline && currentUser) {
                 try {
                     await fetch(`${API_BASE}/api/custom-items`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ uid: currentUser.uid, item_id: itemId, label, section_id: 'custom' })
+                        body: JSON.stringify({ uid: currentUser.uid, item_id: itemId, label, section_id: 'custom', detail: detail || null })
                     });
                 } catch (e) { console.error("Save custom item error:", e); }
             }
         };
 
         window.deleteCustomItem = async function(itemId) {
+            const lang = currentLang === 'yi' ? 'yi' : 'en';
+            const msg = lang === 'yi' ? 'אויסמעקן דעם זאך? דאס קען נישט צוריקגעדרייט ווערן.' : 'Delete this item? This cannot be undone.';
+            if (!confirm(msg)) return;
             customItems = customItems.filter(i => i.item_id !== itemId);
             checkedItems.delete(itemId);
             renderPackingList();
@@ -1597,7 +1603,9 @@
         };
 
         window.adminDeletePackingItem = async function(itemId) {
-            if (!confirm('Remove this item for all users?')) return;
+            const lang = currentLang === 'yi' ? 'yi' : 'en';
+            const msg = lang === 'yi' ? 'אויסמעקן דעם זאך פאר אלע באנוצער? דאס קען נישט צוריקגעדרייט ווערן.' : 'Remove this item for all users? This cannot be undone.';
+            if (!confirm(msg)) return;
             try {
                 const res = await fetch(`${API_BASE}/api/packing/items/${encodeURIComponent(itemId)}`, { method: 'DELETE' });
                 if (!res.ok) throw new Error('Failed to delete item');
@@ -1697,15 +1705,21 @@
                 </div>`;
             }).join('');
 
+            const detailPlaceholderCustom = lang === 'yi' ? 'דעטאלן (אפציאנאל)...' : 'Details (optional)...';
             const customHtml = `
                 <div class="bg-white rounded-2xl p-5 border border-indigo-100 shadow-sm">
                     <h3 class="text-sm font-bold text-indigo-700 mb-3">${escapeHtml(customHeading)}</h3>
                     <ul class="space-y-2">
-                        ${customItems.length ? customItems.map(ci => renderCheckItem({ id: ci.item_id, label: ci.label }, 'custom')).join('') : `<li class="text-[11px] text-slate-400 py-1">${lang === 'yi' ? 'נאך נישט צוגעלייגט' : 'No custom items yet'}</li>`}
+                        ${customItems.length ? customItems.map(ci => renderCheckItem({ id: ci.item_id, label: ci.label, detail: ci.detail || null }, 'custom')).join('') : `<li class="text-[11px] text-slate-400 py-1">${lang === 'yi' ? 'נאך נישט צוגעלייגט' : 'No custom items yet'}</li>`}
                     </ul>
-                    <div class="mt-3 flex items-center gap-2">
-                        <input id="add-input-custom" type="text" placeholder="${addPlaceholder}" class="add-item-input flex-1 text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 focus:border-indigo-400 focus:outline-none" onkeydown="if(event.key==='Enter') addCustomItem()">
-                        <button onclick="addCustomItem()" class="add-item-btn text-[10px] font-bold text-indigo-500 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors">+ Add</button>
+                    <div class="mt-3">
+                        <div class="flex items-center gap-2">
+                            <input id="add-input-custom" type="text" placeholder="${addPlaceholder}" class="add-item-input flex-1 text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 focus:border-indigo-400 focus:outline-none" oninput="toggleDetailInput('custom')" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('add-detail-custom').focus();}">
+                            <button onclick="addCustomItem()" class="add-item-btn text-[10px] font-bold text-indigo-500 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors">+ Add</button>
+                        </div>
+                        <div id="detail-row-custom" class="hidden mt-1.5">
+                            <input id="add-detail-custom" type="text" placeholder="${detailPlaceholderCustom}" class="add-item-input w-full text-[10px] bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 focus:border-indigo-400 focus:outline-none text-slate-500" onkeydown="if(event.key==='Enter') addCustomItem()">
+                        </div>
                     </div>
                 </div>`;
             container.innerHTML = builtInHtml + customHtml;
