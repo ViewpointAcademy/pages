@@ -587,6 +587,9 @@
                 summaryEl.classList.add('hidden');
             }
 
+            // Update admin toggle button
+            updateAdminToggleBtn(userData ? userData.is_admin : 0);
+
             // Reset to main view (not delete confirmation or edit name)
             document.getElementById('admin-main-view').classList.remove('hidden');
             document.getElementById('admin-delete-confirm').classList.add('hidden');
@@ -676,6 +679,39 @@
             } catch (err) {
                 console.error('Delete user error:', err);
                 showStatusBar('Error deleting user');
+            }
+        };
+
+        function updateAdminToggleBtn(isAdminUser) {
+            const btn = document.getElementById('admin-toggle-admin-btn');
+            if (!btn) return;
+            if (isAdminUser) {
+                btn.innerText = 'Remove Admin';
+                btn.className = 'flex-1 py-3 rounded-xl font-bold text-xs uppercase border-2 border-amber-300 text-amber-600 hover:bg-amber-50 transition-colors';
+            } else {
+                btn.innerText = 'Make Admin';
+                btn.className = 'flex-1 py-3 rounded-xl font-bold text-xs uppercase border-2 border-indigo-300 text-indigo-600 hover:bg-indigo-50 transition-colors';
+            }
+        }
+
+        window.toggleAdminStatus = async () => {
+            if (!currentAdminTarget || isOffline) return;
+            const userData = window._adminUserMap ? window._adminUserMap[currentAdminTarget.uid] : null;
+            const currentlyAdmin = userData ? userData.is_admin : 0;
+            const newStatus = currentlyAdmin ? 0 : 1;
+            try {
+                const res = await fetch(`${API_BASE}/api/users/${encodeURIComponent(currentAdminTarget.uid)}/admin`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ is_admin: newStatus })
+                });
+                if (!res.ok) throw new Error('Failed to update admin status');
+                if (userData) userData.is_admin = newStatus;
+                updateAdminToggleBtn(newStatus);
+                showStatusBar(newStatus ? 'User is now admin' : 'Admin removed');
+            } catch (err) {
+                console.error('Toggle admin error:', err);
+                showStatusBar('Error updating admin status');
             }
         };
 
@@ -1691,6 +1727,8 @@
                         animation: 150,
                         ghostClass: 'sortable-ghost',
                         chosenClass: 'sortable-chosen',
+                        forceFallback: true,
+                        fallbackClass: 'opacity-50',
                         filter: '.text-slate-400', // skip empty-state <li>
                         onEnd: function(evt) { handleBuiltinReorder(section.section_id, evt); }
                     });
@@ -1709,6 +1747,8 @@
                         animation: 150,
                         ghostClass: 'sortable-ghost',
                         chosenClass: 'sortable-chosen',
+                        forceFallback: true,
+                        fallbackClass: 'opacity-50',
                         onEnd: function(evt) { handleCustomReorder(evt); }
                     });
                     sortableInstances.push(inst);
@@ -2252,6 +2292,8 @@
                     animation: 150,
                     ghostClass: 'sortable-ghost',
                     chosenClass: 'sortable-chosen',
+                    forceFallback: true,
+                    fallbackClass: 'opacity-50',
                     onEnd: function(evt) { handleInfoReorder(cat.category_id, evt); }
                 });
                 infoSortableInstances.push(inst);
@@ -2268,6 +2310,8 @@
                     animation: 150,
                     ghostClass: 'sortable-ghost',
                     chosenClass: 'sortable-chosen',
+                    forceFallback: true,
+                    fallbackClass: 'opacity-50',
                     onEnd: function(evt) { handleInfoCategoryReorder(evt); }
                 });
                 infoSortableInstances.push(catInst);
@@ -2376,8 +2420,8 @@
             const long_notes = document.getElementById('edit-itin-notes-' + stopId).value.trim() || null;
             const map_query = document.getElementById('edit-itin-query-' + stopId).value.trim() || null;
 
-            if (!title || !loc || !desc) {
-                alert('Please fill in all required fields');
+            if (!title) {
+                alert('Please fill in the title');
                 return;
             }
 
@@ -2470,15 +2514,15 @@
             const long_notes = document.getElementById('add-itin-notes-' + dayId).value.trim() || null;
             const map_query = document.getElementById('add-itin-query-' + dayId).value.trim() || null;
 
-            if (!title || !loc || !desc) {
-                alert('Please fill in all required fields');
+            if (!title) {
+                alert('Please fill in the title');
                 return;
             }
 
             // New stop: use the entered text for both languages (edit the other lang later)
             const title_en = title, title_yi = title;
-            const loc_en = loc, loc_yi = null;
-            const description_en = desc, description_yi = desc;
+            const loc_en = loc || '', loc_yi = null;
+            const description_en = desc || '', description_yi = desc || '';
 
             // Find max sort_order for this day
             const day = itineraryDays.find(d => d.day_id === dayId);
@@ -2602,9 +2646,11 @@
                     delayOnTouchOnly: true,
                     animation: 150,
                     ghostClass: 'opacity-30',
+                    forceFallback: true,
+                    fallbackClass: 'opacity-50',
                     scroll: true,
-                    scrollSensitivity: 80,
-                    scrollSpeed: 15,
+                    scrollSensitivity: 100,
+                    scrollSpeed: 20,
                     bubbleScroll: true,
                     onEnd: (evt) => handleItineraryStopReorder(day.day_id, evt)
                 });

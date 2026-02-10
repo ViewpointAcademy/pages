@@ -291,7 +291,10 @@
                     <button onclick="adminUpdateStatus('no')" class="bg-rose-500 text-white py-3 rounded-xl font-bold text-xs uppercase">Set to No</button>
                     <button onclick="adminUpdateStatus(null)" class="bg-white border border-slate-200 text-slate-400 py-3 rounded-xl font-bold text-xs uppercase mt-2">Remove RSVP</button>
                 </div>
-                <button onclick="showDeleteConfirm()" class="w-full mt-4 py-3 rounded-xl font-bold text-xs uppercase border-2 border-rose-200 text-rose-500 hover:bg-rose-50 transition-colors">Delete User</button>
+                <div class="flex gap-2 mt-4">
+                    <button id="admin-toggle-admin-btn" onclick="toggleAdminStatus()" class="flex-1 py-3 rounded-xl font-bold text-xs uppercase border-2 transition-colors"></button>
+                    <button onclick="showDeleteConfirm()" class="flex-1 py-3 rounded-xl font-bold text-xs uppercase border-2 border-rose-200 text-rose-500 hover:bg-rose-50 transition-colors">Delete User</button>
+                </div>
             </div>
 
             <!-- Delete confirmation view -->
