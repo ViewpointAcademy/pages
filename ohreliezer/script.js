@@ -937,7 +937,7 @@
                                 </div>
                                 <p class="text-slate-500 text-xs mt-3 leading-relaxed">${s.desc[currentLang] || s.desc.en}</p>
                                 <div id="expand-${s.stop_id}" class="card-expand-content ${shouldAutoExpand && !hasLongNotes ? '' : 'open'} ${hasLongNotes ? '' : 'always-open'}">
-                                    ${hasLongNotes ? `<p class="text-slate-400 text-[10px] mb-4 italic leading-relaxed border-l-2 border-indigo-50 pl-3">${s.longNotes}</p>` : ''}
+                                    ${hasLongNotes ? `<p class="text-slate-400 text-[10px] mb-4 italic leading-relaxed border-l-2 border-indigo-50 pl-3 whitespace-pre-line">${s.longNotes}</p>` : ''}
                                     ${hasLongNotes ? dirLink : ''}
                                 </div>
                                 ${hasLongNotes ? `
@@ -2330,8 +2330,10 @@
             if (!card) return;
 
             const lang = currentLang;
-            const locEn = typeof stopData.loc === 'object' ? stopData.loc.en : stopData.loc;
-            const locYi = typeof stopData.loc === 'object' ? stopData.loc.yi : '';
+            const isYi = lang === 'yi';
+            const curTitle = stopData.title[lang] || stopData.title.en;
+            const curLoc = typeof stopData.loc === 'object' ? (stopData.loc[lang] || stopData.loc.en) : stopData.loc;
+            const curDesc = stopData.desc[lang] || stopData.desc.en;
 
             card.innerHTML = `
                 <div class="space-y-2 text-xs">
@@ -2344,12 +2346,9 @@
                         </select>
                         <input id="edit-itin-time-${stopId}" class="flex-1 border border-indigo-300 rounded px-2 py-1.5 text-xs" placeholder="e.g. 9:00 PM" value="${escapeHtml(stopData.time)}">
                     </div>
-                    <input id="edit-itin-title-en-${stopId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs" placeholder="Title (EN)" value="${escapeHtml(stopData.title.en)}">
-                    <input id="edit-itin-title-yi-${stopId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs" dir="rtl" placeholder="Title (YI)" value="${escapeHtml(stopData.title.yi)}">
-                    <input id="edit-itin-loc-en-${stopId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs" placeholder="Location (EN)" value="${escapeHtml(locEn)}">
-                    <input id="edit-itin-loc-yi-${stopId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs" dir="rtl" placeholder="Location (YI) - leave blank for EN only" value="${escapeHtml(locYi)}">
-                    <textarea id="edit-itin-desc-en-${stopId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs overflow-hidden" rows="2" placeholder="Description (EN)">${escapeHtml(stopData.desc.en)}</textarea>
-                    <textarea id="edit-itin-desc-yi-${stopId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs overflow-hidden" rows="2" dir="rtl" placeholder="Description (YI)">${escapeHtml(stopData.desc.yi)}</textarea>
+                    <input id="edit-itin-title-${stopId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs" ${isYi ? 'dir="rtl"' : ''} placeholder="Title" value="${escapeHtml(curTitle)}">
+                    <input id="edit-itin-loc-${stopId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs" ${isYi ? 'dir="rtl"' : ''} placeholder="Location" value="${escapeHtml(curLoc)}">
+                    <textarea id="edit-itin-desc-${stopId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs overflow-hidden" rows="2" ${isYi ? 'dir="rtl"' : ''} placeholder="Description">${escapeHtml(curDesc)}</textarea>
                     <textarea id="edit-itin-notes-${stopId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs overflow-hidden" rows="1" placeholder="Long Notes (optional)">${escapeHtml(stopData.longNotes || '')}</textarea>
                     <input id="edit-itin-query-${stopId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs" placeholder='Google Maps search (e.g. "Auschwitz-Birkenau Memorial")' value="${escapeHtml(stopData.query || '')}">
                     <div class="flex gap-2 pt-1">
@@ -2367,27 +2366,37 @@
         };
 
         window.saveItineraryStop = async function(stopId) {
+            const lang = currentLang;
+            const isYi = lang === 'yi';
             const type = document.getElementById('edit-itin-type-' + stopId).value;
             const time_label = document.getElementById('edit-itin-time-' + stopId).value.trim();
-            const title_en = document.getElementById('edit-itin-title-en-' + stopId).value.trim();
-            const title_yi = document.getElementById('edit-itin-title-yi-' + stopId).value.trim();
-            const loc_en = document.getElementById('edit-itin-loc-en-' + stopId).value.trim();
-            const loc_yi = document.getElementById('edit-itin-loc-yi-' + stopId).value.trim() || null;
-            const description_en = document.getElementById('edit-itin-desc-en-' + stopId).value.trim();
-            const description_yi = document.getElementById('edit-itin-desc-yi-' + stopId).value.trim();
+            const title = document.getElementById('edit-itin-title-' + stopId).value.trim();
+            const loc = document.getElementById('edit-itin-loc-' + stopId).value.trim();
+            const desc = document.getElementById('edit-itin-desc-' + stopId).value.trim();
             const long_notes = document.getElementById('edit-itin-notes-' + stopId).value.trim() || null;
             const map_query = document.getElementById('edit-itin-query-' + stopId).value.trim() || null;
 
-            if (!title_en || !title_yi || !loc_en || !description_en || !description_yi) {
+            if (!title || !loc || !desc) {
                 alert('Please fill in all required fields');
                 return;
+            }
+
+            const body = { type, time_label, long_notes, map_query };
+            if (isYi) {
+                body.title_yi = title;
+                body.loc_yi = loc;
+                body.description_yi = desc;
+            } else {
+                body.title_en = title;
+                body.loc_en = loc;
+                body.description_en = desc;
             }
 
             try {
                 const res = await fetch(`${API_BASE}/api/itinerary/stops/${encodeURIComponent(stopId)}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ type, time_label, title_en, title_yi, loc_en, loc_yi, description_en, description_yi, long_notes, map_query })
+                    body: JSON.stringify(body)
                 });
                 if (!res.ok) throw new Error('Failed to update stop');
                 await fetchItineraryData();
@@ -2419,6 +2428,8 @@
             const existingForm = container.querySelector('.itinerary-add-form');
             if (existingForm) { existingForm.remove(); return; }
 
+            const lang = currentLang;
+            const isYi = lang === 'yi';
             const formDiv = document.createElement('div');
             formDiv.className = 'itinerary-add-form itinerary-card bg-indigo-50 rounded-[2rem] p-5 border border-indigo-200 shadow-sm';
             formDiv.innerHTML = `
@@ -2433,12 +2444,9 @@
                         </select>
                         <input id="add-itin-time-${dayId}" class="flex-1 border border-indigo-300 rounded px-2 py-1.5 text-xs" placeholder="e.g. 9:00 PM">
                     </div>
-                    <input id="add-itin-title-en-${dayId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs" placeholder="Title (EN)">
-                    <input id="add-itin-title-yi-${dayId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs" dir="rtl" placeholder="Title (YI)">
-                    <input id="add-itin-loc-en-${dayId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs" placeholder="Location (EN)">
-                    <input id="add-itin-loc-yi-${dayId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs" dir="rtl" placeholder="Location (YI) - leave blank for EN only">
-                    <textarea id="add-itin-desc-en-${dayId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs" rows="2" placeholder="Description (EN)"></textarea>
-                    <textarea id="add-itin-desc-yi-${dayId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs" rows="2" dir="rtl" placeholder="Description (YI)"></textarea>
+                    <input id="add-itin-title-${dayId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs" ${isYi ? 'dir="rtl"' : ''} placeholder="Title">
+                    <input id="add-itin-loc-${dayId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs" ${isYi ? 'dir="rtl"' : ''} placeholder="Location">
+                    <textarea id="add-itin-desc-${dayId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs" rows="2" ${isYi ? 'dir="rtl"' : ''} placeholder="Description"></textarea>
                     <textarea id="add-itin-notes-${dayId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs" rows="1" placeholder="Long Notes (optional)"></textarea>
                     <input id="add-itin-query-${dayId}" class="w-full border border-indigo-300 rounded px-2 py-1.5 text-xs" placeholder='Google Maps search (e.g. "Auschwitz-Birkenau Memorial")'>
                     <div class="flex gap-2 pt-1">
@@ -2456,19 +2464,21 @@
         window.submitAddItineraryStop = async function(dayId) {
             const type = document.getElementById('add-itin-type-' + dayId).value;
             const time_label = document.getElementById('add-itin-time-' + dayId).value.trim();
-            const title_en = document.getElementById('add-itin-title-en-' + dayId).value.trim();
-            const title_yi = document.getElementById('add-itin-title-yi-' + dayId).value.trim();
-            const loc_en = document.getElementById('add-itin-loc-en-' + dayId).value.trim();
-            const loc_yi = document.getElementById('add-itin-loc-yi-' + dayId).value.trim() || null;
-            const description_en = document.getElementById('add-itin-desc-en-' + dayId).value.trim();
-            const description_yi = document.getElementById('add-itin-desc-yi-' + dayId).value.trim();
+            const title = document.getElementById('add-itin-title-' + dayId).value.trim();
+            const loc = document.getElementById('add-itin-loc-' + dayId).value.trim();
+            const desc = document.getElementById('add-itin-desc-' + dayId).value.trim();
             const long_notes = document.getElementById('add-itin-notes-' + dayId).value.trim() || null;
             const map_query = document.getElementById('add-itin-query-' + dayId).value.trim() || null;
 
-            if (!title_en || !title_yi || !loc_en || !description_en || !description_yi) {
+            if (!title || !loc || !desc) {
                 alert('Please fill in all required fields');
                 return;
             }
+
+            // New stop: use the entered text for both languages (edit the other lang later)
+            const title_en = title, title_yi = title;
+            const loc_en = loc, loc_yi = null;
+            const description_en = desc, description_yi = desc;
 
             // Find max sort_order for this day
             const day = itineraryDays.find(d => d.day_id === dayId);

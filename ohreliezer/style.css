@@ -273,11 +273,8 @@ body {
             outline: none;
         }
 
-        /* Mobile: always show hover-reveal controls on touch devices */
+        /* Mobile: always show chat controls on touch devices */
         @media (hover: none) {
-            #info-container .group .opacity-0 {
-                opacity: 1 !important;
-            }
             .chat-delete-btn,
             .chat-reply-btn,
             .chat-edit-btn {
