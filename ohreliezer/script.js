@@ -155,6 +155,13 @@
         ];
         let lastReadCommentTime = localStorage.getItem('lastReadCommentTime') || '';
 
+        // Google Photos shared album configuration
+        let googlePhotosConfig = {
+            sharedAlbumUrl: localStorage.getItem('googlePhotosSharedAlbumUrl') || '',
+            apiKey: localStorage.getItem('googlePhotosApiKey') || '',
+            albumId: localStorage.getItem('googlePhotosAlbumId') || ''
+        };
+
         // Google Photos state
         let photoConfig = { connected: false, albumId: null, albumTitle: null };
         let allPhotos = []; // [{id, baseUrl, filename, mimeType, width, height, creationTime, description}]
@@ -2972,8 +2979,58 @@
             photoConfig = data;
         }
 
+        async function fetchPhotosFromGooglePhotos() {
+            if (!googlePhotosConfig.apiKey || !googlePhotosConfig.albumId) {
+                console.warn('Google Photos API key or album ID not configured');
+                return [];
+            }
+
+            try {
+                const res = await fetch(
+                    `https://photoslibrary.googleapis.com/v1/sharedAlbums/${googlePhotosConfig.albumId}/mediaItems?key=${googlePhotosConfig.apiKey}`,
+                    { headers: { 'Content-Type': 'application/json' } }
+                );
+
+                if (!res.ok) {
+                    console.warn('Could not fetch Google Photos:', res.status);
+                    return [];
+                }
+
+                const data = await res.json();
+                if (!data.mediaItems) return [];
+
+                return data.mediaItems.map((item, idx) => ({
+                    id: item.id,
+                    name: item.filename,
+                    url: item.baseUrl + '=w800-h600',
+                    baseUrl: item.baseUrl,
+                    filename: item.filename,
+                    mimeType: item.mimeType,
+                    width: item.mediaMetadata?.width,
+                    height: item.mediaMetadata?.height,
+                    creationTime: item.mediaMetadata?.creationTime,
+                    description: item.description || ''
+                }));
+            } catch (e) {
+                console.error('Error fetching Google Photos:', e);
+                return [];
+            }
+        }
+
         async function fetchPhotos() {
-            // Load photos from galleryPhotos array (defined above)
+            // Try to load from Google Photos if configured
+            if (googlePhotosConfig.apiKey && googlePhotosConfig.albumId) {
+                const googlePhotos = await fetchPhotosFromGooglePhotos();
+                if (googlePhotos.length > 0) {
+                    allPhotos = googlePhotos;
+                    dataCache.gallery.data = allPhotos;
+                    dataCache.gallery.loaded = true;
+                    saveCacheToLocalStorage('gallery');
+                    return;
+                }
+            }
+
+            // Fall back to local galleryPhotos array
             allPhotos = galleryPhotos || [];
             // Mark gallery as loaded even if no photos
             dataCache.gallery.loaded = true;
@@ -3081,6 +3138,37 @@
             const stopPhotos = photoTagsReverse[galleryFilter] || [];
             return allPhotos.filter(p => stopPhotos.includes(p.id));
         }
+
+        // Admin function to configure Google Photos API key and album ID
+        window.configureGooglePhotos = function() {
+            const apiKey = prompt('Enter Google Photos API Key (get from Google Cloud Console):', googlePhotosConfig.apiKey);
+            if (apiKey === null) return;
+
+            const albumId = prompt('Enter Google Photos Shared Album ID (from shared album URL):', googlePhotosConfig.albumId);
+            if (albumId === null) return;
+
+            googlePhotosConfig.apiKey = apiKey;
+            googlePhotosConfig.albumId = albumId;
+
+            localStorage.setItem('googlePhotosApiKey', apiKey);
+            localStorage.setItem('googlePhotosAlbumId', albumId);
+
+            alert('Google Photos configuration updated. Photos will reload on next refresh.');
+            invalidateDataCache('gallery');
+            fetchPhotos().then(() => renderGallery());
+        };
+
+        // Admin function to clear Google Photos configuration
+        window.clearGooglePhotosConfig = function() {
+            if (!confirm('Clear Google Photos configuration?')) return;
+            googlePhotosConfig.apiKey = '';
+            googlePhotosConfig.albumId = '';
+            localStorage.removeItem('googlePhotosApiKey');
+            localStorage.removeItem('googlePhotosAlbumId');
+            alert('Google Photos configuration cleared.');
+            invalidateDataCache('gallery');
+            fetchPhotos().then(() => renderGallery());
+        };
 
         function renderGallery() {
             const gridEl = document.getElementById('gallery-grid');
