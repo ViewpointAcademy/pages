@@ -155,37 +155,6 @@
         ];
         let lastReadCommentTime = localStorage.getItem('lastReadCommentTime') || '';
 
-        // Data versioning and caching system
-        const dataCache = {
-            itinerary: { version: null, loaded: false },
-            info: { version: null, loaded: false },
-            packing: { version: null, loaded: false },
-            comments: { version: null, loaded: false },
-            gallery: { version: null, loaded: false }
-        };
-
-        // Invalidate data cache to force refresh
-        function invalidateDataCache(dataType) {
-            if (dataCache[dataType]) {
-                dataCache[dataType].version = null;
-                dataCache[dataType].loaded = false;
-                localStorage.removeItem(`cache_${dataType}_version`);
-            }
-        }
-
-        // Save cache version to localStorage
-        function saveCacheVersion(dataType, version) {
-            if (version) localStorage.setItem(`cache_${dataType}_version`, version);
-            dataCache[dataType].version = version;
-        }
-
-        // Load cache version from localStorage
-        function loadCacheVersion(dataType) {
-            const version = localStorage.getItem(`cache_${dataType}_version`);
-            if (version) dataCache[dataType].version = version;
-            return version;
-        }
-
         // Google Photos state
         let photoConfig = { connected: false, albumId: null, albumTitle: null };
         let allPhotos = []; // [{id, baseUrl, filename, mimeType, width, height, creationTime, description}]
