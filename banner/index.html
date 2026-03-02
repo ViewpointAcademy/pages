@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<iframe id="myFrame" src="yourURL" style="display:none;"></iframe>
+
+<script>
+window.addEventListener('DOMContentLoaded', (event) => {
+    var iframe = document.getElementById("myFrame");
+    var html = '<div style="position:fixed;width:100%;height:50px;background-color:red;z-index:9999;">Your banner content here</div>';
+
+    iframe.onload = function () {
+        var doc = iframe.contentWindow.document;
+        doc.body.insertAdjacentHTML('afterbegin', html);
+
+        // After adding the banner, make the iframe visible again
+        iframe.style.display = "block";
+    };
+});
+</script>
+
+</body>
+</html>

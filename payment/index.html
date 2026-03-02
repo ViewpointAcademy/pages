@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pay Invoice</title>
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 16px;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+        h2 { text-align: center; }
+        label { display: block; margin-bottom: 6px; font-weight: bold; }
+        input[type="number"], input[type="email"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 16px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        #payment-request-button { margin-bottom: 20px; }
+        #card-element {
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        #pay-button {
+            width: 100%;
+            padding: 14px;
+            background: #0070f3;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #pay-button:hover { background: #0059c9; }
+    </style>
+</head>
+<body>
+
+<h2>Pay Invoice</h2>
+
+<label for="email">Customer Email</label>
+<input type="email" id="email" placeholder="customer@example2.com" required />
+
+<label for="amount">Amount (USD)</label>
+<input type="number" id="amount" value="16.70" min="0.01" step="0.01" required />
+
+<div id="payment-request-button"></div>
+
+<div id="card-element"></div>
+
+<button id="pay-button">Pay</button>
+
+<script>
+    const stripe = Stripe('pk_live_xxxxxxxxxxx');
+    const elements = stripe.elements();
+
+    const invoiceId = 2896001000023741030;
+    const stripeCustomerId = 'cus_xxxxxxxxx'; // You pass this from CRM
+
+    function getAmountInCents() {
+        const amountValue = parseFloat(document.getElementById('amount').value);
+        return Math.round(amountValue * 100);
+    }
+
+    function getCustomerEmail() {
+        return document.getElementById('email').value.trim();
+    }
+
+    // --- Setup Payment Request Button ---
+    const paymentRequest = stripe.paymentRequest({
+        country: 'US',
+        currency: 'usd',
+        total: {
+            label: 'Invoice Payment',
+            amount: getAmountInCents(),
+        },
+        requestPayerName: true,
+        requestPayerEmail: true,
+    });
+
+    const prButton = elements.create('paymentRequestButton', {
+        paymentRequest: paymentRequest,
+    });
+
+    paymentRequest.canMakePayment().then(function (result) {
+        if (result) {
+            prButton.mount('#payment-request-button');
+        } else {
+            document.getElementById('payment-request-button').style.display = 'none';
+        }
+    });
+
+    // Update PaymentRequest total if amount is edited
+    document.getElementById('amount').addEventListener('input', () => {
+        paymentRequest.update({
+            total: {
+                label: 'Invoice Payment',
+                amount: getAmountInCents(),
+            },
+        });
+    });
+
+    // PaymentRequestButton payment
+    paymentRequest.on('paymentmethod', async function (ev) {
+        try {
+            // 1️⃣ Create PaymentIntent on your server
+            const intentResponse = await fetch('https://YOUR_CRM_FUNCTION_URL', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    amount: getAmountInCents(),
+                    invoiceId: invoiceId,
+                    stripeCustomerId: stripeCustomerId,
+                    customerEmail: getCustomerEmail()
+                }),
+            });
+
+            const intent = await intentResponse.json();
+            console.log('PaymentIntent:', intent);
+
+            // 2️⃣ Confirm the PaymentIntent client-side
+            const result = await stripe.confirmCardPayment(intent.client_secret, {
+                payment_method: ev.paymentMethod.id
+            });
+
+            if (result.error) {
+                ev.complete('fail');
+                alert('Payment failed: ' + result.error.message);
+            } else {
+                ev.complete('success');
+                alert('Payment successful!');
+            }
+        } catch (error) {
+            console.error(error);
+            ev.complete('fail');
+            alert('Error: ' + error.message);
+        }
+    });
+
+    // --- Fallback Card Element ---
+    const card = elements.create('card');
+    card.mount('#card-element');
+
+    document.getElementById('pay-button').addEventListener('click', async function () {
+        try {
+            const { paymentMethod, error } = await stripe.createPaymentMethod({
+                type: 'card',
+                card: card,
+                billing_details: {
+                    email: getCustomerEmail()
+                }
+            });
+
+            if (error) {
+                alert(error.message);
+                return;
+            }
+
+            // 1️⃣ Create PaymentIntent
+            const intentResponse = await fetch('https://YOUR_CRM_FUNCTION_URL', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    amount: getAmountInCents(),
+                    invoiceId: invoiceId,
+                    stripeCustomerId: stripeCustomerId,
+                    customerEmail: getCustomerEmail()
+                }),
+            });
+
+            const intent = await intentResponse.json();
+            console.log('PaymentIntent:', intent);
+
+            // 2️⃣ Confirm PaymentIntent with card
+            const result = await stripe.confirmCardPayment(intent.client_secret, {
+                payment_method: paymentMethod.id
+            });
+
+            if (result.error) {
+                alert('Payment failed: ' + result.error.message);
+            } else {
+                alert('Payment successful!');
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Error: ' + error.message);
+        }
+    });
+
+    // --- Prefill from URL params ---
+function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    const amountParam = getQueryParam('amount');
+    const emailParam = getQueryParam('email');
+
+    if (amountParam) {
+        document.getElementById('amount').value = parseFloat(amountParam).toFixed(2);
+    }
+
+    if (emailParam) {
+        document.getElementById('email').value = emailParam;
+    }
+
+    // Optional: trigger update of PaymentRequest total
+    paymentRequest.update({
+        total: {
+            label: 'Invoice Payment',
+            amount: getAmountInCents(),
+        },
+    });
+});
+
+</script>
+
+
+</body>
+</html>

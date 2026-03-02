@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Call Recording</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        audio {
+            width: 100%;
+            max-width: 600px;
+        }
+        a {
+            color: #0073e6;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h2 id="callSubject">Call Recording</h2>
+    <p id="callLink"></p>
+    <audio id="player" controls>
+        Your browser does not support the audio element.
+    </audio>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const audioUrl = params.get('url');
+        const subject = params.get('subject');
+        const callId = params.get('id');
+
+        if (subject) {
+            document.getElementById('callSubject').textContent = subject;
+            document.title = subject; // Update browser tab title
+        }
+
+        if (callId) {
+            document.getElementById('callLink').innerHTML =
+                `<a href="https://crm.zoho.com/crm/viewpoint/EntityInfo.do?module=Calls&id=${callId}" target="_blank">Open in Zoho CRM</a>`;
+        }
+
+        if (audioUrl) {
+            document.getElementById('player').src = audioUrl;
+        } else {
+            document.body.innerHTML = "<p style='color:red;'>No audio URL provided.</p>";
+        }
+    </script>
+</body>
+</html>
