@@ -3,8 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kosher Food Connect</title>
-    <link rel="icon" type="image/png" href="logo.png">
+    <title>Food Share | Kosher Connect</title>
+
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://apps.ephraimh.com/foodshare/">
+    <meta property="og:title" content="Food Share">
+    <meta property="og:description" content="Support your neighbors. Share surplus groceries or request essentials. Simple, safe, and local.">
+    <meta property="og:image" content="https://apps.ephraimh.com/foodshare/logo.png">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://apps.ephraimh.com/foodshare/logo.png">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
@@ -16,10 +27,22 @@
             background-size: 24px 24px;
         }
 
-        .glass-card {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: revealUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+
+        @keyframes revealUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(16, 185, 129, 0.1);
         }
 
         .modal-overlay {
@@ -27,36 +50,22 @@
             background: rgba(15, 23, 42, 0.7);
             backdrop-filter: blur(8px);
         }
-
-        .animate-in {
-            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(30px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .btn-shadow-emerald:hover {
-            box-shadow: 0 20px 25px -5px rgba(16, 185, 129, 0.1), 0 8px 10px -6px rgba(16, 185, 129, 0.1);
-        }
-
-        .btn-shadow-blue:hover {
-            box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.1), 0 8px 10px -6px rgba(59, 130, 246, 0.1);
-        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col text-slate-900">
 
     <nav class="sticky top-0 z-40 w-full bg-white/70 border-b border-slate-200/60 backdrop-blur-xl">
         <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-2.5">
-                <img src="logo.png" alt="Kosher Food Connect Logo" class="w-9 h-9 rounded-xl shadow-lg shadow-emerald-200 object-cover">
-                <span class="font-extrabold text-xl tracking-tight text-slate-900">KOSHER<span class="text-emerald-600">CONNECT</span></span>
+            <div class="flex items-center gap-3">
+                <img src="logo.png" alt="Logo" class="w-9 h-9 rounded-xl shadow-sm">
+                <div class="flex flex-col -space-y-1">
+                    <span class="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em]">Kosher Connect</span>
+                    <span class="font-extrabold text-xl tracking-tight text-emerald-600">Food Share</span>
+                </div>
             </div>
-            <div class="hidden sm:flex items-center gap-4">
-                <span class="text-[10px] font-bold text-emerald-700 uppercase tracking-widest bg-emerald-100/80 px-3 py-1.5 rounded-lg">
-                    Live: Brooklyn, NY
+            <div class="hidden sm:block">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-100/50 px-3 py-1.5 rounded-lg border border-slate-200/50">
+                    Community Initiative
                 </span>
             </div>
         </div>
@@ -64,73 +73,61 @@
 
     <main class="max-w-5xl mx-auto px-6 py-12 w-full">
         
-        <header class="mb-14 relative">
-            <div class="absolute -left-4 top-0 w-1 h-full bg-emerald-500 rounded-full hidden md:block"></div>
-            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 mb-4 tracking-tight">Support your neighbors.</h1>
-            <p class="text-lg text-slate-600 max-w-2xl leading-relaxed">A community-run space to share surplus groceries. Simple, safe, and entirely local.</p>
+        <header class="mb-14 relative reveal">
+            <div class="absolute -left-4 top-0 w-1.5 h-full bg-emerald-500 rounded-full hidden md:block"></div>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 mb-4 tracking-tight leading-tight">Support your neighbors.</h1>
+            <p class="text-xl text-slate-600 max-w-2xl leading-relaxed font-medium">A community-run space to share surplus groceries. Simple, safe, and entirely local.</p>
         </header>
 
-        <div class="grid grid-cols-3 gap-4 mb-12 bg-white/50 border border-slate-200/60 p-4 rounded-3xl">
-            <div class="text-center border-r border-slate-200">
-                <div class="text-xl font-bold text-emerald-600">124</div>
-                <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Donations</div>
+        <section class="mb-12 p-8 bg-white border border-slate-200 rounded-[2.5rem] shadow-sm reveal delay-1">
+            <h3 class="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Check Neighborhood Availability</h3>
+            <div class="flex flex-col md:flex-row gap-3">
+                <input type="text" id="neighborhoodInput" onkeypress="if(event.key==='Enter') checkNeighborhood()" placeholder="Enter neighborhood (e.g. Boro Park)..." 
+                       class="flex-1 px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all font-medium text-lg">
+                <button onclick="checkNeighborhood()" class="px-10 py-4 bg-slate-900 text-white font-bold rounded-2xl hover:bg-slate-800 transition-all active:scale-95 shadow-lg shadow-slate-200">Check Now</button>
             </div>
-            <div class="text-center border-r border-slate-200">
-                <div class="text-xl font-bold text-blue-600">89</div>
-                <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Boxes Shared</div>
-            </div>
-            <div class="text-center">
-                <div class="text-xl font-bold text-orange-500">2.4k</div>
-                <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Lbs Saved</div>
-            </div>
-        </div>
+            <div id="statusMessage" class="mt-4 hidden px-5 py-4 rounded-2xl font-bold text-sm transition-all duration-500"></div>
+        </section>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-            
-            <button onclick="openForm('https://forms.gle/wmcEWaV4zRHo6FNy7')" class="group relative flex flex-col items-start p-10 bg-white border border-slate-200 rounded-[2rem] text-left hover:border-emerald-500 btn-shadow-emerald transition-all duration-500">
-                <div class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-3xl mb-8 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500">
-                    🥛
-                </div>
-                <h3 class="text-2xl font-bold mb-3">Share Extras</h3>
-                <p class="text-slate-500 mb-8 leading-relaxed">Have unexpired milk, eggs, or formula? Post them here for a neighbor to pick up.</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16 reveal delay-2">
+            <button onclick="openForm('https://forms.gle/wmcEWaV4zRHo6FNy7')" class="group p-10 bg-white border border-slate-200 rounded-[2.5rem] text-left card-hover transition-all duration-500">
+                <div class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-3xl mb-8 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500">🥛</div>
+                <h3 class="text-2xl font-bold mb-3 text-slate-900">Share Extras</h3>
+                <p class="text-slate-500 mb-8 leading-relaxed">Have unexpired groceries or formula? Post them here for a neighbor to pick up.</p>
                 <div class="mt-auto flex items-center gap-2 font-bold text-emerald-600">
-                    <span class="bg-emerald-50 px-4 py-2 rounded-xl group-hover:bg-emerald-600 group-hover:text-white transition-colors">Start Donation Form</span>
-                    <span class="transform group-hover:translate-x-1 transition-transform">→</span>
+                    <span class="bg-emerald-50 px-5 py-2.5 rounded-xl group-hover:bg-emerald-600 group-hover:text-white transition-colors">Start Donation</span>
+                    <span class="transition-transform group-hover:translate-x-1">→</span>
                 </div>
             </button>
 
-            <button onclick="openForm('https://forms.gle/51YweecSZnCpQYkr5')" class="group relative flex flex-col items-start p-10 bg-white border border-slate-200 rounded-[2rem] text-left hover:border-blue-500 btn-shadow-blue transition-all duration-500">
-                <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-3xl mb-8 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
-                    📦
-                </div>
-                <h3 class="text-2xl font-bold mb-3">Receive Help</h3>
+            <button onclick="openForm('https://forms.gle/51YweecSZnCpQYkr5')" class="group p-10 bg-white border border-slate-200 rounded-[2.5rem] text-left card-hover transition-all duration-500">
+                <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-3xl mb-8 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">📦</div>
+                <h3 class="text-2xl font-bold mb-3 text-slate-900">Receive Help</h3>
                 <p class="text-slate-500 mb-8 leading-relaxed">In need of essentials this week? Submit a request for a community support box.</p>
                 <div class="mt-auto flex items-center gap-2 font-bold text-blue-600">
-                    <span class="bg-blue-50 px-4 py-2 rounded-xl group-hover:bg-blue-600 group-hover:text-white transition-colors">Submit Request</span>
-                    <span class="transform group-hover:translate-x-1 transition-transform">→</span>
+                    <span class="bg-blue-50 px-5 py-2.5 rounded-xl group-hover:bg-blue-600 group-hover:text-white transition-colors">Submit Request</span>
+                    <span class="transition-transform group-hover:translate-x-1">→</span>
                 </div>
             </button>
-
         </div>
 
-        <section class="bg-slate-900 rounded-[2rem] p-10 text-white shadow-2xl">
+        <section class="bg-slate-900 rounded-[2.5rem] p-10 text-white shadow-2xl reveal delay-3">
             <div class="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4">
                 <div>
                     <h2 class="text-2xl font-extrabold mb-1">Eligible Items</h2>
                     <p class="text-slate-400 text-sm">We only accept unexpired, factory-sealed items.</p>
                 </div>
                 <div class="h-px flex-1 bg-slate-800 mx-6 hidden md:block"></div>
-                <span class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] border border-slate-800 px-3 py-1 rounded-md">Safety First</span>
+                <span class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] border border-slate-800 px-3 py-1 rounded-md">Safety Standards</span>
             </div>
             
             <div class="flex flex-wrap gap-3">
-                <div class="px-5 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-sm font-medium hover:bg-emerald-500/10 hover:border-emerald-500/50 transition-all cursor-default">🥛 Low-Fat Milk</div>
-                <div class="px-5 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-sm font-medium hover:bg-emerald-500/10 hover:border-emerald-500/50 transition-all cursor-default">🥣 WIC Cereal</div>
-                <div class="px-5 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-sm font-medium hover:bg-emerald-500/10 hover:border-emerald-500/50 transition-all cursor-default">🍎 Canned Juice</div>
+                <div class="px-5 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-sm font-medium hover:bg-emerald-500/10 hover:border-emerald-500/50 transition-all cursor-default">🥛 Fresh Milk</div>
+                <div class="px-5 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-sm font-medium hover:bg-emerald-500/10 hover:border-emerald-500/50 transition-all cursor-default">🥣 Cereal & Grains</div>
                 <div class="px-5 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-sm font-medium hover:bg-emerald-500/10 hover:border-emerald-500/50 transition-all cursor-default">🥚 Fresh Eggs</div>
-                <div class="px-5 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-sm font-medium hover:bg-emerald-500/10 hover:border-emerald-500/50 transition-all cursor-default">🍞 Whole Wheat Bread</div>
-                <div class="px-5 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-sm font-medium hover:bg-emerald-500/10 hover:border-emerald-500/50 transition-all cursor-default">🍦 Greek Yogurt</div>
-                <div class="px-5 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-sm font-medium hover:bg-emerald-500/10 hover:border-emerald-500/50 transition-all cursor-default">🥜 Peanut Butter</div>
+                <div class="px-5 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-sm font-medium hover:bg-emerald-500/10 hover:border-emerald-500/50 transition-all cursor-default">🍞 Bread & Bakery</div>
+                <div class="px-5 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-sm font-medium hover:bg-emerald-500/10 hover:border-emerald-500/50 transition-all cursor-default">🍦 Yogurt & Cheese</div>
+                <div class="px-5 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-sm font-medium hover:bg-emerald-500/10 hover:border-emerald-500/50 transition-all cursor-default">🥜 Nut Butters</div>
                 <div class="px-5 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-sm font-medium hover:bg-emerald-500/10 hover:border-emerald-500/50 transition-all cursor-default">🫘 Beans & Lentils</div>
                 <div class="px-5 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-sm font-medium hover:bg-emerald-500/10 hover:border-emerald-500/50 transition-all cursor-default">🍼 Baby Formula</div>
                 <div class="px-5 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl text-sm font-medium hover:bg-emerald-500/10 hover:border-emerald-500/50 transition-all cursor-default">🐟 Canned Tuna</div>
@@ -140,9 +137,61 @@
     </main>
 
     <div id="modalOverlay" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="relative w-full max-w-4xl bg-white rounded-[2rem] shadow-2xl overflow-hidden animate-in h-[90vh]">
+        <div class="relative w-full max-w-4xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden h-[90vh]">
             <div class="flex items-center justify-between p-6 border-b border-slate-100">
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                    <span class="font-bold text-slate-800">Secure Community Form</span>
+                </div>
+                <button onclick="closeForm()" class="p-2 hover:bg-slate-100 rounded-xl transition-all">✕</button>
+            </div>
+            <iframe id="formFrame" class="w-full h-full" src="" frameborder="0"></iframe>
+        </div>
+    </div>
+
+    <footer class="mt-auto py-12 border-t border-slate-200/60 bg-white/50">
+        <div class="max-w-5xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6 text-slate-400">
+            <div class="flex items-center gap-3">
+                <img src="logo.png" alt="Logo" class="w-5 h-5 grayscale opacity-30">
+                <div class="flex flex-col leading-none">
+                    <span class="text-[10px] font-bold uppercase tracking-widest opacity-50">Food Share Initiative</span>
+                    <span class="text-[8px] font-black uppercase tracking-widest opacity-30">By Kosher Connect</span>
+                </div>
+            </div>
+            <p class="text-[10px] font-bold uppercase tracking-widest opacity-50">© 2026 Community Project</p>
+        </div>
+    </footer>
+
+    <script>
+        function checkNeighborhood() {
+            const input = document.getElementById('neighborhoodInput').value.trim().toLowerCase();
+            const status = document.getElementById('statusMessage');
+            const supported = ['brooklyn', 'lakewood', 'flatbush', 'williamsburg', 'boro park', 'borough park', 'monsey', 'passaic'];
+            
+            status.className = 'mt-4 px-5 py-4 rounded-2xl font-bold text-sm transform transition-all duration-500 scale-95 opacity-0';
+
+            setTimeout(() => {
+                if (input === "") { status.classList.add('hidden'); return; }
+                if (supported.some(area => input.includes(area))) {
+                    status.innerHTML = '✅ Serving your neighborhood';
+                    status.classList.add('bg-emerald-100', 'text-emerald-700');
+                } else {
+                    status.innerHTML = '🕒 Coming Soon. <button onclick="openForm(\'https://forms.gle/DRqY6KzL2hC14KCG7\')" class="underline font-black ml-1">Request Area</button>';
+                    status.classList.add('bg-orange-100', 'text-orange-700');
+                }
+                status.classList.remove('hidden', 'scale-95', 'opacity-0');
+                status.classList.add('scale-100', 'opacity-100');
+            }, 50);
+        }
+
+        const modal = document.getElementById('modalOverlay');
+        const frame = document.getElementById('formFrame');
+        function openForm(url) { frame.src = url; modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+        function closeForm() { modal.style.display = 'none'; frame.src = ''; document.body.style.overflow = 'auto'; }
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeForm(); });
+    </script>
+</body>
+</html>
                     <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
                     <h3 class="font-bold text-slate-800">Secure Community Form</h3>
                 </div>
