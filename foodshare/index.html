@@ -10,7 +10,7 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://apps.ephraimh.com/foodshare/">
     <meta property="og:title" content="Food Share">
-    <meta property="og:description" content="Support your neighbors. Share surplus groceries or request essentials.">
+    <meta property="og:description" content="Community-powered grocery sharing. Simple, safe, and local.">
     <meta property="og:image" content="https://apps.ephraimh.com/foodshare/logo.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -41,10 +41,19 @@
             box-shadow: 0 20px 25px -5px rgba(16, 185, 129, 0.1);
         }
 
-        .modal-overlay {
-            display: none;
+        #modalOverlay {
+            display: none; 
+            opacity: 0;
+            pointer-events: none;
             background: rgba(15, 23, 42, 0.7);
             backdrop-filter: blur(8px);
+            transition: opacity 0.3s ease;
+        }
+
+        #modalOverlay.active {
+            display: flex;
+            opacity: 1;
+            pointer-events: auto;
         }
     </style>
 </head>
@@ -70,10 +79,11 @@
     <main class="max-w-5xl mx-auto px-6 py-10 w-full">
 
         <section class="mb-12 p-8 bg-white border border-slate-200 rounded-[2.5rem] shadow-sm reveal">
-            <p class="text-slate-500 mb-6 font-medium">A community-run space to share surplus groceries. Simple, safe, and entirely local.</p>
+            <h1 class="text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">Community Food Share.</h1>
+            <p class="text-slate-500 mb-6 font-medium">A local space to share surplus groceries. Simple, safe, and community-powered.</p>
             
             <div class="flex flex-col md:flex-row gap-3">
-                <input type="text" id="neighborhoodInput" onkeypress="if(event.key==='Enter') checkNeighborhood()" placeholder="Enter neighborhood (e.g. Flatbush)..." 
+                <input type="text" id="neighborhoodInput" onkeypress="if(event.key==='Enter') checkNeighborhood()" placeholder="Enter neighborhood..." 
                        class="flex-1 px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all font-medium text-lg">
                 <button onclick="checkNeighborhood()" class="px-10 py-4 bg-slate-900 text-white font-bold rounded-2xl hover:bg-slate-800 transition-all active:scale-95 shadow-lg shadow-slate-200">Check Now</button>
             </div>
@@ -84,17 +94,17 @@
             <button onclick="openForm('https://forms.gle/wmcEWaV4zRHo6FNy7')" class="group p-10 bg-white border border-slate-200 rounded-[2.5rem] text-left card-hover transition-all duration-500">
                 <div class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-3xl mb-8 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500">🥛</div>
                 <h3 class="text-2xl font-bold mb-3 text-slate-900">Share Extras</h3>
-                <p class="text-slate-500 mb-8 leading-relaxed">Have unexpired groceries or formula? Post them here for a neighbor to pick up.</p>
+                <p class="text-slate-500 mb-8 leading-relaxed">Have unexpired groceries or formula? List them for a neighbor to pick up.</p>
                 <div class="mt-auto flex items-center gap-2 font-bold text-emerald-600">
-                    <span class="bg-emerald-50 px-5 py-2.5 rounded-xl group-hover:bg-emerald-600 group-hover:text-white transition-colors">Start Donation Form</span>
+                    <span class="bg-emerald-50 px-5 py-2.5 rounded-xl group-hover:bg-emerald-600 group-hover:text-white transition-colors">Start Sharing</span>
                     <span class="transition-transform group-hover:translate-x-1">→</span>
                 </div>
             </button>
 
             <button onclick="openForm('https://forms.gle/51YweecSZnCpQYkr5')" class="group p-10 bg-white border border-slate-200 rounded-[2.5rem] text-left card-hover transition-all duration-500">
                 <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-3xl mb-8 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">📦</div>
-                <h3 class="text-2xl font-bold mb-3 text-slate-900">Receive Help</h3>
-                <p class="text-slate-500 mb-8 leading-relaxed">In need of essentials this week? Submit a request for a community support box.</p>
+                <h3 class="text-2xl font-bold mb-3 text-slate-900">Request Items</h3>
+                <p class="text-slate-500 mb-8 leading-relaxed">Need specific essentials? Request a community grocery box for your household.</p>
                 <div class="mt-auto flex items-center gap-2 font-bold text-blue-600">
                     <span class="bg-blue-50 px-5 py-2.5 rounded-xl group-hover:bg-blue-600 group-hover:text-white transition-colors">Submit Request</span>
                     <span class="transition-transform group-hover:translate-x-1">→</span>
@@ -127,7 +137,7 @@
 
     </main>
 
-    <div id="modalOverlay" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div id="modalOverlay" class="fixed inset-0 z-50 items-center justify-center p-4">
         <div class="relative w-full max-w-4xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden h-[90vh]">
             <div class="flex items-center justify-between p-6 border-b border-slate-100">
                 <div class="flex items-center gap-2">
@@ -154,7 +164,11 @@
     </footer>
 
     <script>
-        // Neighborhood logic
+        const modal = document.getElementById('modalOverlay');
+        const frame = document.getElementById('formFrame');
+
+        window.onload = () => { closeForm(); };
+
         function checkNeighborhood() {
             const input = document.getElementById('neighborhoodInput').value.trim().toLowerCase();
             const status = document.getElementById('statusMessage');
@@ -176,18 +190,14 @@
             }, 50);
         }
 
-        // Modal Logic
-        const modal = document.getElementById('modalOverlay');
-        const frame = document.getElementById('formFrame');
-
         function openForm(url) {
             frame.src = url;
-            modal.style.display = 'flex';
+            modal.classList.add('active');
             document.body.style.overflow = 'hidden';
         }
 
         function closeForm() {
-            modal.style.display = 'none';
+            modal.classList.remove('active');
             frame.src = '';
             document.body.style.overflow = 'auto';
         }
