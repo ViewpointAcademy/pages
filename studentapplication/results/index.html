@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Viewpoint Application Results</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <style>
+    :root{--blue:#3057A4;--blue-dark:#244783;--gold:#c7a654;--ink:#172033;--muted:#657083;--line:#dfe6f2;--card:#fff;--green:#12805c;--green-bg:#e8f7ef;--red:#b42318;--red-bg:#fff0ee;--amber:#936b00;--amber-bg:#fff6db}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;font-family:Arial,Helvetica,sans-serif;color:var(--ink);background:radial-gradient(circle at top left,rgba(48,87,164,.14),transparent 34rem),linear-gradient(180deg,#f8fafc 0%,#eef3f9 100%);line-height:1.5}
+    .page{width:min(100%,960px);margin:0 auto;padding:32px 16px 56px}
+    .shell{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 50px rgba(23,32,51,.10);overflow:hidden}
+    .top{padding:28px clamp(20px,4vw,42px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:18px;background:#fff}
+    .brand{display:flex;align-items:center;gap:12px;min-width:0}.mark{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--blue) 0 58%,var(--gold) 58% 100%);position:relative;flex:0 0 42px}.mark:before,.mark:after{content:"";position:absolute;background:#fff;border-radius:999px;transform:rotate(24deg)}.mark:before{width:7px;height:29px;left:14px;top:7px}.mark:after{width:7px;height:22px;right:13px;top:12px}
+    .brand-title{font-size:22px;font-weight:800;color:var(--blue);letter-spacing:0;line-height:1}.brand-sub{margin-top:3px;font-size:11px;color:#9aa3b2;text-transform:uppercase;letter-spacing:.24em}.date{color:var(--muted);font-size:14px;text-align:right;white-space:nowrap}
+    .hero{padding:34px clamp(20px,4vw,42px) 20px;display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:30px;align-items:center}
+    h1{margin:0 0 10px;color:var(--blue);font-size:clamp(28px,5vw,44px);line-height:1.08;letter-spacing:0}.lead{margin:0;max-width:620px;color:#374151;font-size:16px}
+    .status-card{border:1px solid var(--line);background:#fbfcff;border-radius:14px;padding:16px}.label{margin:0 0 8px;color:var(--muted);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}.pill{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:9px 12px;font-weight:800;font-size:14px}.pill:before{content:"";width:9px;height:9px;border-radius:50%;background:currentColor}.pill.admitted{background:var(--green-bg);color:var(--green)}.pill.denied{background:var(--red-bg);color:var(--red)}.pill.training{background:var(--amber-bg);color:var(--amber)}.pill.locked{background:#eef2ff;color:var(--blue)}
+    .progress{padding:18px clamp(20px,4vw,42px) 26px}.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative}.steps:before{content:"";position:absolute;left:12.5%;right:12.5%;top:16px;height:3px;background:#9ecfff}.step{position:relative;text-align:center;color:#6b7280;font-size:12px;font-weight:700;min-width:0}.dot{width:34px;height:34px;margin:0 auto 8px;border-radius:50%;border:3px solid #43a7ff;background:#fff;position:relative;z-index:1}.step.done .dot,.step.active .dot{background:#43a7ff;box-shadow:inset 0 0 0 5px #43a7ff}
+    .content{padding:0 clamp(20px,4vw,42px) 38px}.panel{border:1px solid var(--line);border-radius:14px;padding:22px;background:#fff}.result-title{margin:0 0 8px;font-size:22px;color:var(--ink)}.copy{margin:0 0 16px;color:#374151}.notice{margin:18px 0 0;border-radius:12px;padding:14px 16px;font-size:14px}.notice.good{background:var(--green-bg);color:#07543c}.notice.bad{background:var(--red-bg);color:#7f1d1d}.notice.warn{background:var(--amber-bg);color:#6b4e00}
+    .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:20px}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:11px 18px;border-radius:999px;border:1px solid transparent;background:var(--blue);color:#fff;font-weight:800;font-size:14px;text-decoration:none;cursor:pointer;font-family:inherit}.btn:hover{background:var(--blue-dark)}.btn.secondary{background:#fff;color:var(--blue);border-color:#b9c7e8}.btn.secondary:hover{background:#f6f8ff}
+    .unlock{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;max-width:520px;margin-top:16px}input{width:100%;min-height:44px;border:1px solid #cfd7e6;border-radius:999px;padding:0 16px;font:inherit;color:var(--ink);outline:none}input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(48,87,164,.14)}.error{display:none;margin:10px 0 0;color:var(--red);font-size:13px;font-weight:700}
+    .foot{border-top:1px solid var(--line);padding:20px clamp(20px,4vw,42px);color:var(--muted);font-size:14px;background:#fbfcff}.foot strong{color:var(--ink)}
+    @media (max-width:760px){.top{align-items:flex-start;flex-direction:column}.date{text-align:left;white-space:normal}.hero{grid-template-columns:1fr}.status-card{max-width:360px}.steps:before{left:13%;right:13%}.step{font-size:11px}.unlock{grid-template-columns:1fr}.btn{width:100%}}
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="shell" aria-labelledby="pageTitle">
+      <header class="top">
+        <div class="brand" aria-label="Viewpoint Academy"><div class="mark" aria-hidden="true"></div><div><div class="brand-title">Viewpoint</div><div class="brand-sub">Academy</div></div></div>
+        <div class="date" id="today"></div>
+      </header>
+      <section class="hero">
+        <div><h1 id="pageTitle">Your application results are ready</h1><p class="lead" id="leadText">Review the reference committee's final result. If your result is concealed, enter the reveal code from your advisor.</p></div>
+        <aside class="status-card" aria-live="polite"><p class="label">Current result</p><div class="pill locked" id="statusPill">Concealed</div></aside>
+      </section>
+      <section class="progress" aria-label="Application progress"><div class="steps"><div class="step done"><div class="dot" aria-hidden="true"></div>Student<br>Applied</div><div class="step done"><div class="dot" aria-hidden="true"></div>Reference<br>Contacted</div><div class="step active"><div class="dot" aria-hidden="true"></div>Acceptance<br>Results</div><div class="step"><div class="dot" aria-hidden="true"></div>Enroll</div></div></section>
+      <section class="content"><div class="panel" id="resultPanel"></div></section>
+      <footer class="foot"><strong>Admission Team</strong><br>Phone: <span id="phoneText">+1 (212) 989-7177 ext. 5</span><br>Email: <a id="emailLink" href="mailto:classroom@viewpointlearn.com">classroom@viewpointlearn.com</a></footer>
+    </section>
+  </main>
+  <script>
+    const qs = new URLSearchParams(location.search);
+    const statusParam = (qs.get("s") || "").trim();
+    const revealParam = (qs.get("r") || "0").trim();
+    const first = (qs.get("first") || qs.get("name") || "").trim();
+    const program = (qs.get("program") || qs.get("course") || "your selected program").trim();
+    const term = (qs.get("term") || "basic computer training").trim();
+    const advisor = (qs.get("advisor") || "your advisor").trim();
+    const phone = (qs.get("phone") || "+1 (212) 989-7177 ext. 5").trim();
+    const email = (qs.get("email") || "classroom@viewpointlearn.com").trim();
+    const revealCode = (qs.get("c") || qs.get("code") || "").trim();
+    const text = value => String(value).replace(/[&<>'"]/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[char]));
+    const mail = value => encodeURIComponent(value).replace(/%20/g,"+");
+    const cleanPhone = value => value.replace(/[^+\d]/g, "");
+    const statuses = {
+      "0": {key:"denied",label:"Denied",title:"Application not approved",copy:"Thank you for your interest in " + program + ". After reviewing your application and references, we are not able to move forward with admission at this time.",noticeClass:"bad",notice:"If you believe this result was shown in error, please contact the Admission Team before taking any next steps."},
+      "1": {key:"admitted",label:"Admitted",title:"Congratulations" + (first ? ", " + first : "") + ". You have been admitted.",copy:"Your application for " + program + " has been approved. Please continue to enrollment and watch for next-step communication from the Admission Team.",noticeClass:"good",notice:"Your advisor can help confirm your schedule, payment status, and start details."},
+      "1.1": {key:"training",label:"Admitted with training requirement",title:"You have been admitted with one required term.",copy:"Your application for " + program + " has been approved. Before fully beginning the program, you will need to complete " + term + ".",noticeClass:"warn",notice:"This requirement helps make sure you are ready for the tools and course work used during training."}
+    };
+    const selected = statuses[statusParam] || statuses["1"];
+    const shouldReveal = revealParam === "1" || revealParam.toLowerCase() === "true";
+    const panel = document.getElementById("resultPanel");
+    const pill = document.getElementById("statusPill");
+    document.getElementById("today").textContent = new Intl.DateTimeFormat("en-US", {month:"long",day:"numeric",year:"numeric"}).format(new Date());
+    document.getElementById("phoneText").textContent = phone;
+    document.getElementById("emailLink").textContent = email;
+    document.getElementById("emailLink").href = "mailto:" + email;
+    function setPill(status){pill.className = "pill " + status.key; pill.textContent = status.label;}
+    function renderResult(){
+      setPill(selected);
+      document.getElementById("leadText").textContent = "Please review the committee's final result and contact " + advisor + " if you have questions.";
+      panel.innerHTML = '<p class="label">Final decision</p><h2 class="result-title">' + text(selected.title) + '</h2><p class="copy">' + text(selected.copy) + '</p><div class="notice ' + selected.noticeClass + '">' + text(selected.notice) + '</div><div class="actions"><a class="btn" href="mailto:' + text(email) + '?subject=' + mail('Application Results Question') + '">Contact Admission Team</a><a class="btn secondary" href="tel:' + cleanPhone(phone) + '">Call Advisor</a></div>';
+    }
+    function renderLocked(){
+      pill.className = "pill locked"; pill.textContent = "Concealed";
+      panel.innerHTML = '<p class="label">Results concealed</p><h2 class="result-title">Enter your reveal code</h2><p class="copy">For privacy, this result is currently concealed. Enter the code provided by your advisor, or contact the Admission Team to reveal your result.</p><div class="unlock"><input id="codeInput" autocomplete="one-time-code" inputmode="text" placeholder="Reveal code" aria-label="Reveal code"><button class="btn" id="unlockBtn" type="button">Reveal</button></div><p class="error" id="errorText">That code did not match. Please try again or talk to your advisor.</p><div class="actions"><a class="btn secondary" href="mailto:' + text(email) + '?subject=' + mail('Application Results Reveal Code') + '">Talk to Admission Team</a></div>';
+      document.getElementById("unlockBtn").addEventListener("click", tryUnlock);
+      document.getElementById("codeInput").addEventListener("keydown", event => { if(event.key === "Enter") tryUnlock(); });
+    }
+    function tryUnlock(){
+      const input = document.getElementById("codeInput").value.trim();
+      if(revealCode && input === revealCode){
+        const next = new URL(location.href);
+        next.searchParams.set("r", "1");
+        next.searchParams.delete("c");
+        next.searchParams.delete("code");
+        history.replaceState(null, "", next.toString());
+        renderResult();
+        return;
+      }
+      document.getElementById("errorText").style.display = "block";
+    }
+    if(shouldReveal){renderResult();}else{renderLocked();}
+  </script>
+</body>
+</html>
