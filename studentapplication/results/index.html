@@ -2,45 +2,206 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Viewpoint Application Results</title>
+  <title>Application Results</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="robots" content="noindex, nofollow" />
+
   <style>
-    :root{--blue:#3057A4;--blue-dark:#244783;--gold:#c7a654;--ink:#172033;--muted:#657083;--line:#dfe6f2;--card:#fff;--green:#12805c;--green-bg:#e8f7ef;--red:#b42318;--red-bg:#fff0ee;--amber:#936b00;--amber-bg:#fff6db}
+    :root{
+      --blue:#3057A4;
+      --blue-dark:#274b8a;
+      --ink:#222;
+      --muted:#6b7280;
+      --card:#fff;
+      --border:#e6e9f2;
+      --green:#12805c;
+      --green-bg:#e8f7ef;
+      --red:#b42318;
+      --red-bg:#fff0ee;
+      --amber:#936b00;
+      --amber-bg:#fff6db;
+      --lock-bg:#eef2ff;
+    }
     *{box-sizing:border-box}
-    body{margin:0;min-height:100vh;font-family:Arial,Helvetica,sans-serif;color:var(--ink);background:radial-gradient(circle at top left,rgba(48,87,164,.14),transparent 34rem),linear-gradient(180deg,#f8fafc 0%,#eef3f9 100%);line-height:1.5}
-    .page{width:min(100%,960px);margin:0 auto;padding:32px 16px 56px}
-    .shell{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 50px rgba(23,32,51,.10);overflow:hidden}
-    .top{padding:28px clamp(20px,4vw,42px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:18px;background:#fff}
-    .brand{display:flex;align-items:center;gap:12px;min-width:0}.mark{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--blue) 0 58%,var(--gold) 58% 100%);position:relative;flex:0 0 42px}.mark:before,.mark:after{content:"";position:absolute;background:#fff;border-radius:999px;transform:rotate(24deg)}.mark:before{width:7px;height:29px;left:14px;top:7px}.mark:after{width:7px;height:22px;right:13px;top:12px}
-    .brand-title{font-size:22px;font-weight:800;color:var(--blue);letter-spacing:0;line-height:1}.brand-sub{margin-top:3px;font-size:11px;color:#9aa3b2;text-transform:uppercase;letter-spacing:.24em}.date{color:var(--muted);font-size:14px;text-align:right;white-space:nowrap}
-    .hero{padding:34px clamp(20px,4vw,42px) 20px;display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:30px;align-items:center}
-    h1{margin:0 0 10px;color:var(--blue);font-size:clamp(28px,5vw,44px);line-height:1.08;letter-spacing:0}.lead{margin:0;max-width:620px;color:#374151;font-size:16px}
-    .status-card{border:1px solid var(--line);background:#fbfcff;border-radius:14px;padding:16px}.label{margin:0 0 8px;color:var(--muted);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}.pill{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:9px 12px;font-weight:800;font-size:14px}.pill:before{content:"";width:9px;height:9px;border-radius:50%;background:currentColor}.pill.admitted{background:var(--green-bg);color:var(--green)}.pill.denied{background:var(--red-bg);color:var(--red)}.pill.training{background:var(--amber-bg);color:var(--amber)}.pill.locked{background:#eef2ff;color:var(--blue)}
-    .progress{padding:18px clamp(20px,4vw,42px) 26px}.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative}.steps:before{content:"";position:absolute;left:12.5%;right:12.5%;top:16px;height:3px;background:#9ecfff}.step{position:relative;text-align:center;color:#6b7280;font-size:12px;font-weight:700;min-width:0}.dot{width:34px;height:34px;margin:0 auto 8px;border-radius:50%;border:3px solid #43a7ff;background:#fff;position:relative;z-index:1}.step.done .dot,.step.active .dot{background:#43a7ff;box-shadow:inset 0 0 0 5px #43a7ff}
-    .content{padding:0 clamp(20px,4vw,42px) 38px}.panel{border:1px solid var(--line);border-radius:14px;padding:22px;background:#fff}.result-title{margin:0 0 8px;font-size:22px;color:var(--ink)}.copy{margin:0 0 16px;color:#374151}.notice{margin:18px 0 0;border-radius:12px;padding:14px 16px;font-size:14px}.notice.good{background:var(--green-bg);color:#07543c}.notice.bad{background:var(--red-bg);color:#7f1d1d}.notice.warn{background:var(--amber-bg);color:#6b4e00}
-    .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:20px}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:11px 18px;border-radius:999px;border:1px solid transparent;background:var(--blue);color:#fff;font-weight:800;font-size:14px;text-decoration:none;cursor:pointer;font-family:inherit}.btn:hover{background:var(--blue-dark)}.btn.secondary{background:#fff;color:var(--blue);border-color:#b9c7e8}.btn.secondary:hover{background:#f6f8ff}
-    .unlock{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;max-width:520px;margin-top:16px}input{width:100%;min-height:44px;border:1px solid #cfd7e6;border-radius:999px;padding:0 16px;font:inherit;color:var(--ink);outline:none}input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(48,87,164,.14)}.error{display:none;margin:10px 0 0;color:var(--red);font-size:13px;font-weight:700}
-    .foot{border-top:1px solid var(--line);padding:20px clamp(20px,4vw,42px);color:var(--muted);font-size:14px;background:#fbfcff}.foot strong{color:var(--ink)}
-    @media (max-width:760px){.top{align-items:flex-start;flex-direction:column}.date{text-align:left;white-space:normal}.hero{grid-template-columns:1fr}.status-card{max-width:360px}.steps:before{left:13%;right:13%}.step{font-size:11px}.unlock{grid-template-columns:1fr}.btn{width:100%}}
+    body{
+      margin:0;
+      font-family:Arial, sans-serif;
+      padding:36px 16px;
+      color:var(--ink);
+      line-height:1.5;
+      background:#fff;
+    }
+    .wrap{ max-width:880px; margin:0 auto; }
+    .box{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:20px;
+      box-shadow:0 10px 30px rgba(48,87,164,.10);
+      padding:32px 28px;
+      text-align:center;
+    }
+    .logo{
+      margin:0 auto 22px;
+      color:var(--blue);
+      font-size:26px;
+      font-weight:800;
+      line-height:1;
+    }
+    .logo span{
+      display:block;
+      margin-top:3px;
+      color:#b7bfcc;
+      font-size:8px;
+      font-weight:700;
+      letter-spacing:.34em;
+      text-transform:uppercase;
+    }
+    .status-badge{
+      width:64px; height:64px; margin:0 auto 16px;
+      border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      animation:pop .35s ease-out forwards;
+    }
+    .status-badge svg{ width:36px; height:36px; opacity:0; transform:scale(.6); animation:grow .35s ease-out .18s forwards; }
+    .status-badge.admitted{ background:var(--green-bg); color:var(--green); }
+    .status-badge.denied{ background:var(--red-bg); color:var(--red); }
+    .status-badge.training{ background:var(--amber-bg); color:var(--amber); }
+    .status-badge.locked{ background:var(--lock-bg); color:var(--blue); }
+    @keyframes pop{ 0%{transform:scale(.2);opacity:0;} 90%{transform:scale(1.1);} 100%{transform:scale(1);opacity:1;} }
+    @keyframes grow{ to{opacity:1; transform:scale(1);} }
+    h1{ color:var(--blue); margin:0 0 8px; font-size:clamp(26px,3.4vw,38px); }
+    .sub{ color:var(--muted); font-size:16px; margin:0 auto 18px; max-width:640px; }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      margin:4px 0 18px;
+      padding:9px 13px;
+      border-radius:999px;
+      font-size:14px;
+      font-weight:700;
+    }
+    .pill:before{ content:""; width:9px; height:9px; border-radius:50%; background:currentColor; }
+    .pill.admitted{ background:var(--green-bg); color:var(--green); }
+    .pill.denied{ background:var(--red-bg); color:var(--red); }
+    .pill.training{ background:var(--amber-bg); color:var(--amber); }
+    .pill.locked{ background:var(--lock-bg); color:var(--blue); }
+    .steps{
+      display:grid;
+      grid-template-columns:repeat(4, 1fr);
+      gap:0;
+      max-width:620px;
+      margin:26px auto 30px;
+      position:relative;
+    }
+    .steps:before{ content:""; position:absolute; left:12.5%; right:12.5%; top:10px; height:3px; background:#43a7ff; opacity:.85; }
+    .step{ position:relative; color:#676d78; font-size:12px; font-weight:700; line-height:1.15; }
+    .dot{ width:22px; height:22px; margin:0 auto 8px; border-radius:50%; border:3px solid #43a7ff; background:#fff; position:relative; z-index:1; }
+    .step.done .dot,.step.active .dot{ background:#43a7ff; }
+    .result-copy{ max-width:640px; margin:0 auto; color:#374151; }
+    .notice{ margin:18px auto 0; max-width:640px; border-radius:12px; padding:14px 16px; font-size:14px; text-align:left; }
+    .notice.good{ background:var(--green-bg); color:#07543c; }
+    .notice.bad{ background:var(--red-bg); color:#7f1d1d; }
+    .notice.warn{ background:var(--amber-bg); color:#6b4e00; }
+    .actions{ display:flex; flex-wrap:wrap; justify-content:center; gap:12px; margin-top:22px; }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      min-height:44px; padding:11px 20px;
+      background:var(--blue); color:#fff;
+      border:1px solid transparent;
+      border-radius:999px;
+      font-weight:700; font-size:14px;
+      text-decoration:none; cursor:pointer; font-family:inherit;
+      box-shadow:0 8px 22px rgba(48,87,164,.18);
+    }
+    .btn:hover{ background:var(--blue-dark); transform:translateY(-1px); }
+    .btn.secondary{ background:#fff; color:var(--blue); border-color:#cdd5ff; box-shadow:none; }
+    .btn.secondary:hover{ background:#f6f8ff; }
+    .unlock{ display:grid; grid-template-columns:minmax(0, 1fr) auto; gap:10px; max-width:520px; margin:18px auto 0; }
+    input{ width:100%; min-height:44px; border:1px solid #cfd7e6; border-radius:999px; padding:0 16px; font:inherit; color:var(--ink); outline:none; }
+    input:focus{ border-color:var(--blue); box-shadow:0 0 0 3px rgba(48,87,164,.14); }
+    .error{ display:none; margin:10px 0 0; color:var(--red); font-size:13px; font-weight:700; }
+    .contact{ margin-top:28px; color:#374151; font-size:14px; text-align:left; display:inline-block; }
+    .contact strong{ color:var(--ink); }
+    .meanwhile{ margin-top:92px; }
+    .section-title{ margin:0 0 8px; color:var(--blue); font-size:20px; font-weight:700; }
+    .section-sub{ margin:0 0 16px; color:var(--muted); font-size:14.5px; }
+    .gallery-wrap{ position:relative; overflow:hidden; border-radius:14px; min-height:300px; background:#eef2f8; }
+    .gallery-wrap img{
+      width:100%; min-height:300px; object-fit:cover; display:block;
+      filter:blur(8px) saturate(.82) brightness(.78);
+      transform:scale(1.04);
+      -webkit-mask-image:linear-gradient(to right, black 70%, transparent 98%);
+              mask-image:linear-gradient(to right, black 70%, transparent 98%);
+    }
+    .gallery-lock{
+      position:absolute; inset:0;
+      display:flex; align-items:center; justify-content:flex-end;
+      padding:24px clamp(18px, 8vw, 82px) 24px 24px;
+      background:linear-gradient(90deg, rgba(255,255,255,.05), rgba(255,255,255,.78));
+    }
+    .lock-card{
+      width:min(100%, 330px);
+      border:1px solid rgba(255,255,255,.75);
+      border-radius:14px;
+      background:rgba(255,255,255,.88);
+      box-shadow:0 14px 32px rgba(23,32,51,.14);
+      padding:18px;
+      backdrop-filter:blur(6px);
+    }
+    .lock-card strong{ display:block; color:var(--blue); font-size:16px; margin-bottom:4px; }
+    .lock-card span{ display:block; color:#374151; font-size:14px; }
+    @media (max-width:700px){
+      body{ padding:24px 12px; }
+      .box{ padding:28px 18px; }
+      .steps{ margin-inline:-4px; }
+      .step{ font-size:11px; }
+      .unlock{ grid-template-columns:1fr; }
+      .btn{ width:100%; }
+      .gallery-lock{ justify-content:center; padding:18px; background:rgba(255,255,255,.62); }
+    }
   </style>
 </head>
 <body>
-  <main class="page">
-    <section class="shell" aria-labelledby="pageTitle">
-      <header class="top">
-        <div class="brand" aria-label="Viewpoint Academy"><div class="mark" aria-hidden="true"></div><div><div class="brand-title">Viewpoint</div><div class="brand-sub">Academy</div></div></div>
-        <div class="date" id="today"></div>
-      </header>
-      <section class="hero">
-        <div><h1 id="pageTitle">Your application results are ready</h1><p class="lead" id="leadText">Review the reference committee's final result. If your result is concealed, enter the reveal code from your advisor.</p></div>
-        <aside class="status-card" aria-live="polite"><p class="label">Current result</p><div class="pill locked" id="statusPill">Concealed</div></aside>
-      </section>
-      <section class="progress" aria-label="Application progress"><div class="steps"><div class="step done"><div class="dot" aria-hidden="true"></div>Student<br>Applied</div><div class="step done"><div class="dot" aria-hidden="true"></div>Reference<br>Contacted</div><div class="step active"><div class="dot" aria-hidden="true"></div>Acceptance<br>Results</div><div class="step"><div class="dot" aria-hidden="true"></div>Enroll</div></div></section>
-      <section class="content"><div class="panel" id="resultPanel"></div></section>
-      <footer class="foot"><strong>Admission Team</strong><br>Phone: <span id="phoneText">+1 (212) 989-7177 ext. 5</span><br>Email: <a id="emailLink" href="mailto:classroom@viewpointlearn.com">classroom@viewpointlearn.com</a></footer>
-    </section>
-  </main>
+  <div class="wrap">
+    <div class="box">
+      <div class="logo">Viewpoint<span>Academy</span></div>
+      <div class="status-badge locked" id="statusBadge" aria-hidden="true"></div>
+      <h1 id="title">Your results are ready</h1>
+      <p class="sub" id="subtitle">Please review the reference committee's final result to confirm accuracy.</p>
+      <div class="pill locked" id="statusPill">Concealed</div>
+
+      <div class="steps" aria-label="Application progress">
+        <div class="step done"><div class="dot" aria-hidden="true"></div>Student<br>Applied</div>
+        <div class="step done"><div class="dot" aria-hidden="true"></div>Reference<br>Contacted</div>
+        <div class="step active"><div class="dot" aria-hidden="true"></div>Acceptance<br>Results</div>
+        <div class="step"><div class="dot" aria-hidden="true"></div>Enroll</div>
+      </div>
+
+      <div id="resultArea"></div>
+
+      <div class="contact">
+        <strong>Admission Team</strong><br>
+        Phone: <span id="phoneText">+1 (212) 989-7177 ext. 5</span><br>
+        Email: <a id="emailLink" href="mailto:classroom@viewpointlearn.com">classroom@viewpointlearn.com</a>
+      </div>
+    </div>
+  </div>
+
+  <section class="wrap meanwhile" aria-labelledby="gallery-title">
+    <h2 id="gallery-title" class="section-title">A glimpse of what comes next</h2>
+    <p class="section-sub" id="galleryText">This gallery is intentionally blurred until the result is revealed and the next step is confirmed.</p>
+    <div class="gallery-wrap">
+      <img src="https://beta.viewpoint.me/wp-content/uploads/2025/10/View-others-succeeding-1024x620.png" alt="Blurred preview of Viewpoint student participation" loading="lazy" decoding="async" />
+      <div class="gallery-lock">
+        <div class="lock-card">
+          <strong id="galleryLockTitle">Participation preview locked</strong>
+          <span id="galleryLockText">You may soon be part of this experience. Speak with your advisor to reveal results and unlock the next step.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <script>
     const qs = new URLSearchParams(location.search);
     const statusParam = (qs.get("s") || "").trim();
@@ -55,28 +216,50 @@
     const text = value => String(value).replace(/[&<>'"]/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[char]));
     const mail = value => encodeURIComponent(value).replace(/%20/g,"+");
     const cleanPhone = value => value.replace(/[^+\d]/g, "");
+
+    const icons = {
+      admitted:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+      denied:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>',
+      training:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>',
+      locked:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>'
+    };
     const statuses = {
-      "0": {key:"denied",label:"Denied",title:"Application not approved",copy:"Thank you for your interest in " + program + ". After reviewing your application and references, we are not able to move forward with admission at this time.",noticeClass:"bad",notice:"If you believe this result was shown in error, please contact the Admission Team before taking any next steps."},
-      "1": {key:"admitted",label:"Admitted",title:"Congratulations" + (first ? ", " + first : "") + ". You have been admitted.",copy:"Your application for " + program + " has been approved. Please continue to enrollment and watch for next-step communication from the Admission Team.",noticeClass:"good",notice:"Your advisor can help confirm your schedule, payment status, and start details."},
-      "1.1": {key:"training",label:"Admitted with training requirement",title:"You have been admitted with one required term.",copy:"Your application for " + program + " has been approved. Before fully beginning the program, you will need to complete " + term + ".",noticeClass:"warn",notice:"This requirement helps make sure you are ready for the tools and course work used during training."}
+      "0": {key:"denied",label:"Denied",title:"Application not approved",subtitle:"Thank you for your interest in " + program + ".",copy:"After reviewing your application and references, we are not able to move forward with admission at this time.",noticeClass:"bad",notice:"If you believe this result was shown in error, please contact the Admission Team before taking any next steps."},
+      "1": {key:"admitted",label:"Admitted",title:"Congratulations" + (first ? ", " + first : "") + "!",subtitle:"You have been admitted to " + program + ".",copy:"Please continue to enrollment and watch for next-step communication from the Admission Team.",noticeClass:"good",notice:"Your advisor can help confirm your schedule, payment status, and start details."},
+      "1.1": {key:"training",label:"Admitted with training requirement",title:"You have been admitted with one required term.",subtitle:"Your application for " + program + " has been approved.",copy:"Before fully beginning the program, you will need to complete " + term + ".",noticeClass:"warn",notice:"This requirement helps make sure you are ready for the tools and course work used during training."}
     };
     const selected = statuses[statusParam] || statuses["1"];
     const shouldReveal = revealParam === "1" || revealParam.toLowerCase() === "true";
-    const panel = document.getElementById("resultPanel");
-    const pill = document.getElementById("statusPill");
-    document.getElementById("today").textContent = new Intl.DateTimeFormat("en-US", {month:"long",day:"numeric",year:"numeric"}).format(new Date());
+    const resultArea = document.getElementById("resultArea");
+    const statusBadge = document.getElementById("statusBadge");
+    const statusPill = document.getElementById("statusPill");
     document.getElementById("phoneText").textContent = phone;
     document.getElementById("emailLink").textContent = email;
     document.getElementById("emailLink").href = "mailto:" + email;
-    function setPill(status){pill.className = "pill " + status.key; pill.textContent = status.label;}
+
+    function setState(status){
+      statusBadge.className = "status-badge " + status.key;
+      statusBadge.innerHTML = icons[status.key];
+      statusPill.className = "pill " + status.key;
+      statusPill.textContent = status.label;
+    }
     function renderResult(){
-      setPill(selected);
-      document.getElementById("leadText").textContent = "Please review the committee's final result and contact " + advisor + " if you have questions.";
-      panel.innerHTML = '<p class="label">Final decision</p><h2 class="result-title">' + text(selected.title) + '</h2><p class="copy">' + text(selected.copy) + '</p><div class="notice ' + selected.noticeClass + '">' + text(selected.notice) + '</div><div class="actions"><a class="btn" href="mailto:' + text(email) + '?subject=' + mail('Application Results Question') + '">Contact Admission Team</a><a class="btn secondary" href="tel:' + cleanPhone(phone) + '">Call Advisor</a></div>';
+      setState(selected);
+      document.getElementById("title").textContent = selected.title;
+      document.getElementById("subtitle").textContent = selected.subtitle;
+      document.getElementById("galleryText").textContent = "Your result is visible, but the participation gallery stays blurred until enrollment is confirmed.";
+      document.getElementById("galleryLockTitle").textContent = "Participation not available yet";
+      document.getElementById("galleryLockText").textContent = "This is a preview of the student experience. Your advisor will confirm when your next step is available.";
+      resultArea.innerHTML = '<p class="result-copy">' + text(selected.copy) + '</p><div class="notice ' + selected.noticeClass + '">' + text(selected.notice) + '</div><div class="actions"><a class="btn" href="mailto:' + text(email) + '?subject=' + mail('Application Results Question') + '">Contact Admission Team</a><a class="btn secondary" href="tel:' + cleanPhone(phone) + '">Call Advisor</a></div>';
     }
     function renderLocked(){
-      pill.className = "pill locked"; pill.textContent = "Concealed";
-      panel.innerHTML = '<p class="label">Results concealed</p><h2 class="result-title">Enter your reveal code</h2><p class="copy">For privacy, this result is currently concealed. Enter the code provided by your advisor, or contact the Admission Team to reveal your result.</p><div class="unlock"><input id="codeInput" autocomplete="one-time-code" inputmode="text" placeholder="Reveal code" aria-label="Reveal code"><button class="btn" id="unlockBtn" type="button">Reveal</button></div><p class="error" id="errorText">That code did not match. Please try again or talk to your advisor.</p><div class="actions"><a class="btn secondary" href="mailto:' + text(email) + '?subject=' + mail('Application Results Reveal Code') + '">Talk to Admission Team</a></div>';
+      statusBadge.className = "status-badge locked";
+      statusBadge.innerHTML = icons.locked;
+      statusPill.className = "pill locked";
+      statusPill.textContent = "Concealed";
+      document.getElementById("title").textContent = "Your results are ready";
+      document.getElementById("subtitle").textContent = "For privacy, this result is concealed until you enter the reveal code or speak with " + advisor + ".";
+      resultArea.innerHTML = '<p class="result-copy">Enter the code provided by your advisor, or contact the Admission Team to reveal your result.</p><div class="unlock"><input id="codeInput" autocomplete="one-time-code" inputmode="text" placeholder="Reveal code" aria-label="Reveal code"><button class="btn" id="unlockBtn" type="button">Reveal</button></div><p class="error" id="errorText">That code did not match. Please try again or talk to your advisor.</p><div class="actions"><a class="btn secondary" href="mailto:' + text(email) + '?subject=' + mail('Application Results Reveal Code') + '">Talk to Admission Team</a></div>';
       document.getElementById("unlockBtn").addEventListener("click", tryUnlock);
       document.getElementById("codeInput").addEventListener("keydown", event => { if(event.key === "Enter") tryUnlock(); });
     }
@@ -93,7 +276,7 @@
       }
       document.getElementById("errorText").style.display = "block";
     }
-    if(shouldReveal){renderResult();}else{renderLocked();}
+    if(shouldReveal){ renderResult(); } else { renderLocked(); }
   </script>
 </body>
 </html>
